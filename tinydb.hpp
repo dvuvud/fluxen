@@ -88,14 +88,27 @@ namespace tinydb {
 
 // --- public types ---
 
-/* Raw byte view into mmap'd file */
+/**
+ * @brief A non-owning view of raw bytes in the memory-mapped file.
+ *
+ * Returned by the @p each() and @p prefix() iteration callbacks.
+ * The span remains valid until the next write operation or @p compact() call,
+ * so copy the data out if you need to keep it longer.
+ */
 using Bytes = std::span<const std::byte>;
 
-/* Return value from a transaction lambda */
+/**
+ * @brief Controls whether a transaction's operations are applied or discarded.
+ *
+ * Returned by the callback passed to DB::transaction().
+ *
+ * @see DB::transaction()
+ */
 enum TxResult { commit, rollback };
 
 // --- internal ---
 
+/// @cond INTERNAL
 namespace detail {
 
 inline constexpr uint8_t MAGIC[8]  = { 'T','I','N','Y','D','B','0','1' };
@@ -297,6 +310,7 @@ private:
     std::string path_;
 };
 }   // namespace detail
+/// @endcond
 
 // --- transaction ---
 
