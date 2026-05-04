@@ -1,3 +1,62 @@
+/**
+ * @file tinydb.hpp
+ * @brief Single-header embedded key-value store for C++20.
+ *
+ * Drop this file into any project and get a persistent key-value database
+ * with zero dependencies, no build system changes, and no linking required.
+ *
+ * @par Quick start
+ * @code
+ *   #include "tinydb.hpp"
+ *
+ *   tinydb::DB db("myapp.db");
+ *   db.put("username", "rick");
+ *
+ *   if (auto name = db.get("username")) {
+ *       std::cout << *name << std::endl;   // "rick"
+ *   }
+ * @endcode
+ *
+ * @par How does it work?
+ * The database is an append-only log on disk backed by a memory-mapped file.
+ * An in-memory hash index maps each key to the offset and length of its value
+ * in the file. Reads are zero-copy. Instead, they return a view directly into the
+ * mmap'd region. Writes append a 6-byte header + key + value to the file.
+ * Deletes append a tombstone. The index is rebuilt by scanning the log once
+ * on open (last write wins).
+ *
+ * @par File & data layout
+ * @code
+ *   [magic: 8 bytes "TINYDB01"]
+ *   [entry] [entry] ...
+ *
+ *   entry layout:
+ *     flags   : 1 byte   — 0x00 is live and 0x01 is tombstone
+ *     key_len : 1 byte   — length of key in bytes (max 255)
+ *     val_len : 4 bytes  — length of value in bytes (little-endian)
+ *     key     : key_len bytes
+ *     value   : val_len bytes  (omitted in tombstone entries)
+ * @endcode
+ *
+ * @par Thread safety
+ * All public methods are thread-safe. A single std::mutex serialises
+ * concurrent access.
+ *
+ * @par Important limitations
+ * - Maximum key length: 255 bytes.
+ * - Maximum value length: ~4 GB (uint32_t).
+ * - No range queries (keys are stored in hash order).
+ * - The full key set lives in RAM (std::unordered_map).
+ *
+ * @par Compiler requirements
+ * C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+.
+ * Runs on Linux, macOS, and Windows.
+ *
+ * @version 1.0.0
+ * @par License
+ * MIT License
+ */
+
 #pragma once
 
 #include <cassert>
