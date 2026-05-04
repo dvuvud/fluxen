@@ -236,6 +236,48 @@ private:
 };
 }   // namespace detail
 
+// --- transaction ---
+
+class DB;
+
+class Tx {
+public:
+    /* Store a string value */
+    void put(std::string_view key, std::string_view value) {
+        ops_.push_back({ std::string(key),
+                         std::vector<uint8_t>(value.begin(), value.end()),
+                         false });
+    }
+
+    /* Store any trivially copyable, non-string type */
+    template <typename T>
+        requires (std::is_trivially_copyable_v<T>
+               && !std::is_convertible_v<T, std::string_view>)
+    void put(std::string_view key, const T& value) {
+        const auto* p = reinterpret_cast<const uint8_t*>(&value);
+        ops_.push_back({ std::string(key),
+                         std::vector<uint8_t>(p, p + sizeof(T)),
+                         false });
+    }
+
+    /* Mark a key for deletion */
+    void remove(std::string_view key) {
+        ops_.push_back({ std::string(key), {}, true });
+    }
+
+private:
+    friend class DB;
+
+    struct Op {
+        std::string key;
+        std::vector<uint8_t> val;
+        bool is_delete;
+    };
+    std::vector<Op> ops_;
+};
+
+// --- DB ---
+
 class DB {
 public:
     explicit DB(std::string_view path) {
