@@ -76,6 +76,8 @@ if (db.has("city")) {
 
 ## Library
 
+Documentation is hosted on [dvuvud.github.io/tinydb](https://dvuvud.github.io/tinydb).
+
 ### `DB(path)`: open or create
 
 ```cpp
