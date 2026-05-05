@@ -186,7 +186,7 @@ static void BM_Compact(benchmark::State& state) {
         state.ResumeTiming();
     }
 }
-BENCHMARK(BM_Compact)->Arg(1000)->Arg(10000);
+// BENCHMARK(BM_Compact)->Arg(1000)->Arg(10000);
 
 // struct write/read
 
