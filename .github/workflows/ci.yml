@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths: ['tinydb.hpp', 'tests/test.cpp', '.github/workflows/ci.yml']
+  pull_request:
+    paths: ['tinydb.hpp', 'tests/test.cpp', '.github/workflows/ci.yml']
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y clang-tidy
+      - run: clang-tidy tinydb.hpp -- -std=c++20
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - run: cmake -B build
+      - run: cmake --build build
+      - run: ctest --test-dir build --output-on-failure
