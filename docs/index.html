@@ -93,181 +93,41 @@ $(function(){initNavTree('index.html','',''); });
   <div class="headertitle"><div class="title">tinydb </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p align="center"><a class="anchor" id="md__r_e_a_d_m_e"></a> </p>
-<p><img src="https://github.com/user-attachments/assets/87ec195d-bf13-45b3-b3f5-bc00981a55bd" alt="tinydb_logo_no_tagline-2" width="680" class="inline"/> </p>
-<p align="center"></p>
-<p>A single-header, embedded key-value store for C++20.<br  />
- Drop one file into your project and you have a persistent database. </p>
-<p align="center"></p>
-<p><img src="https://img.shields.io/badge/C%2B%2B-20-blue?style=flat-square" alt="" class="inline"/> <img src="https://img.shields.io/badge/header--only-single%20file-4A7FD6?style=flat-square" alt="" class="inline"/> <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="" class="inline"/> </p>
-<hr  />
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="tinydb_8hpp.html">tinydb.hpp</a>&quot;</span></div>
+<div class="textblock"><p>Single-header embedded key-value store for C++20.  </p>
+<p>Drop this file into any project and get a persistent key-value database with zero dependencies, no build system changes, and no linking required.</p>
+<dl class="section user"><dt>Quick start</dt><dd><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="tinydb_8hpp.html">tinydb.hpp</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_class" href="classtinydb_1_1_d_b.html">tinydb::DB</a> db(<span class="stringliteral">&quot;myapp.db&quot;</span>);</div>
-<div class="line">db.put(<span class="stringliteral">&quot;username&quot;</span>, <span class="stringliteral">&quot;run&quot;</span>);</div>
+<div class="line">db.put(<span class="stringliteral">&quot;username&quot;</span>, <span class="stringliteral">&quot;rick&quot;</span>);</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> name = db.get(<span class="stringliteral">&quot;username&quot;</span>)) {</div>
-<div class="line">    std::cout &lt;&lt; *name &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;   <span class="comment">// run</span></div>
+<div class="line">    std::cout &lt;&lt; *name &lt;&lt; std::endl;   <span class="comment">// &quot;rick&quot;</span></div>
 <div class="line">}</div>
-<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:420</div></div>
-<div class="ttc" id="atinydb_8hpp_html"><div class="ttname"><a href="tinydb_8hpp.html">tinydb.hpp</a></div><div class="ttdoc">Single-header embedded key-value store for C++20.</div></div>
-</div><!-- fragment --><p>No CMake. No dependencies. No linking. One <span class="tt">#include</span>.</p>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
-Install</h2>
-<p>Copy <a href="tinydb.hpp"><span class="tt">tinydb.hpp</span></a> into your project:</p>
-<div class="fragment"><div class="line">curl -O https://raw.githubusercontent.com/dvuvud/tinydb/main/tinydb.hpp</div>
-</div><!-- fragment --><p><b>Requirements:</b> C++20, GCC 12+, Clang 15+, or MSVC 19.34+. Linux, macOS, and Windows.</p>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
-Quick start</h2>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="tinydb_8hpp.html">tinydb.hpp</a>&quot;</span></div>
+<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:421</div></div>
+<div class="ttc" id="atinydb_8hpp_html"><div class="ttname"><a href="tinydb_8hpp.html">tinydb.hpp</a></div></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section user"><dt>How does it work?</dt><dd>The database is an append-only log on disk backed by a memory-mapped file. An in-memory hash index maps each key to the offset and length of its value in the file. Reads are zero-copy. Instead, they return a view directly into the mmap'd region. Writes append a 6-byte header + key + value to the file. Deletes append a tombstone. The index is rebuilt by scanning the log once on open (last write wins).</dd></dl>
+<dl class="section user"><dt>File &amp; data layout</dt><dd><div class="fragment"><div class="line">[magic: 8 bytes <span class="stringliteral">&quot;TINYDB01&quot;</span>]</div>
+<div class="line">[entry] [entry] ...</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Open or create a database</span></div>
-<div class="line"><a class="code hl_class" href="classtinydb_1_1_d_b.html">tinydb::DB</a> db(<span class="stringliteral">&quot;app.db&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Strings</span></div>
-<div class="line">db.put(<span class="stringliteral">&quot;city&quot;</span>, <span class="stringliteral">&quot;Stockholm&quot;</span>);</div>
-<div class="line"><span class="keyword">auto</span> city = db.get(<span class="stringliteral">&quot;city&quot;</span>);    <span class="comment">// std::optional&lt;std::string&gt;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Numbers and any trivially copyable types</span></div>
-<div class="line">db.put(<span class="stringliteral">&quot;score&quot;</span>, int32_t{100});</div>
-<div class="line">db.put(<span class="stringliteral">&quot;ratio&quot;</span>, 0.95f);</div>
-<div class="line"> </div>
-<div class="line"><span class="keyword">auto</span> score = db.get&lt;int32_t&gt;(<span class="stringliteral">&quot;score&quot;</span>);</div>
-<div class="line"><span class="keyword">auto</span> ratio = db.get&lt;<span class="keywordtype">float</span>&gt;(<span class="stringliteral">&quot;ratio&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Structs</span></div>
-<div class="line"><span class="keyword">struct </span>Config { <span class="keywordtype">int</span> port; <span class="keywordtype">bool</span> debug; };</div>
-<div class="line">db.put(<span class="stringliteral">&quot;cfg&quot;</span>, Config{8080, <span class="keyword">false</span>});</div>
-<div class="line"><span class="keyword">auto</span> cfg = db.get&lt;Config&gt;(<span class="stringliteral">&quot;cfg&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Check and delete</span></div>
-<div class="line"><span class="keywordflow">if</span> (db.has(<span class="stringliteral">&quot;city&quot;</span>)) {</div>
-<div class="line">    db.remove(<span class="stringliteral">&quot;city&quot;</span>);</div>
-<div class="line">}</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
-Library</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
-<span class="tt">DB(path)</span>: open or create</h3>
-<div class="fragment"><div class="line"><a class="code hl_class" href="classtinydb_1_1_d_b.html">tinydb::DB</a> db(<span class="stringliteral">&quot;myapp.db&quot;</span>);</div>
-</div><!-- fragment --><p>Opens the database at <span class="tt">path</span>, creating it if it doesn't exist. Throws <span class="tt">std::runtime_error</span> if the file can't be opened or has an invalid magic header.</p>
-<hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
-<span class="tt">put</span>: write a value</h3>
-<div class="fragment"><div class="line">db.put(<span class="stringliteral">&quot;key&quot;</span>, <span class="stringliteral">&quot;string&quot;</span>);      <span class="comment">// std::string / string literal</span></div>
-<div class="line">db.put(<span class="stringliteral">&quot;key&quot;</span>, int32_t{42});   <span class="comment">// any numeric type</span></div>
-<div class="line">db.put(<span class="stringliteral">&quot;key&quot;</span>, myStruct);      <span class="comment">// any trivially copyable struct</span></div>
-</div><!-- fragment --><p>Overwrites any existing value for the key. Thread-safe. Key length is limited to 255 bytes.</p>
-<hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
-<span class="tt">get&lt;T&gt;</span>: read a value</h3>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> s = db.get(<span class="stringliteral">&quot;key&quot;</span>);            <span class="comment">// std::optional&lt;std::string&gt;  (default)</span></div>
-<div class="line"><span class="keyword">auto</span> n = db.get&lt;int32_t&gt;(<span class="stringliteral">&quot;key&quot;</span>);   <span class="comment">// std::optional&lt;int32_t&gt;</span></div>
-<div class="line"><span class="keyword">auto</span> c = db.get&lt;Config&gt;(<span class="stringliteral">&quot;key&quot;</span>);    <span class="comment">// std::optional&lt;Config&gt;</span></div>
-</div><!-- fragment --><p>Returns <span class="tt">std::nullopt</span> if the key doesn't exist, or if the stored size doesn't match <span class="tt">sizeof(T)</span>.</p>
-<hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
-<span class="tt">remove</span>: delete a key</h3>
-<div class="fragment"><div class="line">db.remove(<span class="stringliteral">&quot;key&quot;</span>);   <span class="comment">// no-op if key doesn&#39;t exist</span></div>
-</div><!-- fragment --><hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
-<span class="tt">has</span>: check existence</h3>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (db.has(<span class="stringliteral">&quot;key&quot;</span>)) { ... }</div>
-</div><!-- fragment --><hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
-<span class="tt">each</span>: iterate all keys</h3>
-<div class="fragment"><div class="line">db.each([](std::string_view key, <a class="code hl_typedef" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a> val) {</div>
-<div class="line">    std::string v(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(val.data()), val.size());</div>
-<div class="line">    std::cout &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; v &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line">});</div>
-<div class="ttc" id="atinydb_8hpp_html_ac79cba7fa5286030b060158e7aed69a1"><div class="ttname"><a href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:98</div></div>
-</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>The database mutex is held for the entire iteration. Do not call any <span class="tt">DB</span> method from inside the callback, as it will deadlock. Copy keys out first if you need to modify the database during iteration.</dd></dl>
-<hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
-<span class="tt">prefix</span>: scan by key prefix</h3>
-<div class="fragment"><div class="line">db.put(<span class="stringliteral">&quot;user:rob&quot;</span>, <span class="stringliteral">&quot;admin&quot;</span>);</div>
-<div class="line">db.put(<span class="stringliteral">&quot;user:nick&quot;</span>,   <span class="stringliteral">&quot;viewer&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line">db.prefix(<span class="stringliteral">&quot;user:&quot;</span>, [](std::string_view key, <a class="code hl_typedef" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a> val) {</div>
-<div class="line">    <span class="comment">// called for user:rob and user:nick only</span></div>
-<div class="line">});</div>
-</div><!-- fragment --><p>Same mutex warning as <span class="tt">each</span>.</p>
-<hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
-<span class="tt">transaction</span>: atomic batch</h3>
-<div class="fragment"><div class="line">db.transaction([](<a class="code hl_class" href="classtinydb_1_1_tx.html">tinydb::Tx</a>&amp; tx) {</div>
-<div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">put</a>(<span class="stringliteral">&quot;balance&quot;</span>,  int32_t{500});</div>
-<div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">put</a>(<span class="stringliteral">&quot;currency&quot;</span>, std::string(<span class="stringliteral">&quot;USD&quot;</span>));</div>
-<div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47">remove</a>(<span class="stringliteral">&quot;old_key&quot;</span>);</div>
-<div class="line">    <span class="keywordflow">return</span> tinydb::commit;   <span class="comment">// or tinydb::rollback to discard everything</span></div>
-<div class="line">});</div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html"><div class="ttname"><a href="classtinydb_1_1_tx.html">tinydb::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> tinydb.hpp:331</div></div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html_a152de82fb3869ce7e22db2adffc59c47"><div class="ttname"><a href="classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47">tinydb::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:381</div></div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html_ae28a54ff7899322ee2b27d5cb02150fb"><div class="ttname"><a href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">tinydb::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:339</div></div>
-</div><!-- fragment --><p>All operations in a committed transaction are written atomically and flushed to disk. If the callback throws, all staged operations are discarded (equivalent to <span class="tt">rollback</span>).</p>
-<hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
-<span class="tt">compact</span>: reclaim disk space</h3>
-<div class="fragment"><div class="line">db.compact();</div>
-</div><!-- fragment --><p>Rewrites the file keeping only live entries. The append-only log accumulates dead entries over time as keys are overwritten or deleted. Call this periodically if your workload involves many mutations.</p>
-<hr  />
-<h3 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
-<span class="tt">key_count</span> / <span class="tt">file_size</span></h3>
-<div class="fragment"><div class="line">std::cout &lt;&lt; db.key_count() &lt;&lt; <span class="stringliteral">&quot; keys\n&quot;</span>;</div>
-<div class="line">std::cout &lt;&lt; db.file_size() &lt;&lt; <span class="stringliteral">&quot; bytes\n&quot;</span>;</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md27"></a>
-Namespaced keys</h2>
-<p>tinydb has no concept of tables, but prefixed keys give you the same thing:</p>
-<div class="fragment"><div class="line">db.put(<span class="stringliteral">&quot;user:1001&quot;</span>, <span class="stringliteral">&quot;rob&quot;</span>);</div>
-<div class="line">db.put(<span class="stringliteral">&quot;user:1002&quot;</span>, <span class="stringliteral">&quot;nick&quot;</span>);</div>
-<div class="line">db.put(<span class="stringliteral">&quot;session:abc123&quot;</span>, <span class="stringliteral">&quot;user:1001&quot;</span>);</div>
-<div class="line">db.put(<span class="stringliteral">&quot;config:theme&quot;</span>, <span class="stringliteral">&quot;dark&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line">db.prefix(<span class="stringliteral">&quot;user:&quot;</span>,    [](<span class="keyword">auto</span> key, <span class="keyword">auto</span> val) { <span class="comment">/* all users   */</span> });</div>
-<div class="line">db.prefix(<span class="stringliteral">&quot;session:&quot;</span>, [](<span class="keyword">auto</span> key, <span class="keyword">auto</span> val) { <span class="comment">/* all sessions */</span> });</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md29"></a>
-How it works</h2>
-<p>tinydb is an <b>append-only log</b> on disk with an <b>in-memory hash index</b>.</p>
-<p>Writes append a 6-byte header + key + value to the file. Reads look up the key in the index and return a view directly into the memory-mapped file. Deletes append a tombstone entry. On open, the log is scanned once to rebuild the index (last write wins). <span class="tt">compact()</span> rewrites the file with only live entries.</p>
-<p>The header is serialised in little-endian bytes with no alignment assumptions and is portable across every compiler and platform.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md30"></a>
-File &amp; data layout</h3>
-<div class="fragment"><div class="line">[magic: 8 bytes &quot;TINYDB01&quot;]</div>
-<div class="line">[entry][entry]...</div>
-<div class="line"> </div>
-<div class="line">entry:</div>
-<div class="line">  flags   : 1 byte   — 0x00 live, 0x01 tombstone</div>
-<div class="line">  key_len : 1 byte   — length of key (max 255)</div>
-<div class="line">  val_len : 4 bytes  — length of value, little-endian</div>
+<div class="line">entry layout:</div>
+<div class="line">  flags   : 1 <span class="keywordtype">byte</span>   — 0x00 is live and 0x01 is tombstone</div>
+<div class="line">  key_len : 1 <span class="keywordtype">byte</span>   — length of key in bytes (max 255)</div>
+<div class="line">  val_len : 4 bytes  — length of value in bytes (little-endian)</div>
 <div class="line">  key     : key_len bytes</div>
-<div class="line">  value   : val_len bytes  (absent in tombstone entries)</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md32"></a>
-Thread safety</h2>
-<p>All public methods are thread-safe via a single <span class="tt">std::mutex</span>.</p>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md34"></a>
-Limitations</h2>
-<ul>
-<li><b>In-memory index:</b> The full key set lives in a <span class="tt">std::unordered_map</span> in RAM.</li>
-<li><b>Single writer:</b> All operations share one mutex. It is not designed for high-throughput concurrent workloads.</li>
-<li><b>No range queries:</b> Keys are stored in hash order. <span class="tt">prefix()</span> is O(n keys).</li>
-<li><b>Key length:</b> Maximum 255 bytes.</li>
+<div class="line">  value   : val_len bytes  (omitted in tombstone entries)</div>
+</div><!-- fragment --></dd></dl>
+<dl class="section user"><dt>Thread safety</dt><dd>All public methods are thread-safe. A single std::mutex serialises concurrent access.</dd></dl>
+<dl class="section user"><dt>Important limitations</dt><dd><ul>
+<li>Maximum key length: 255 bytes.</li>
+<li>Maximum value length: ~4 GB (uint32_t).</li>
+<li>No range queries (keys are stored in hash order).</li>
+<li>The full key set lives in RAM (std::unordered_map).</li>
 </ul>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md36"></a>
-Building</h2>
-<div class="fragment"><div class="line">cmake -B build</div>
-<div class="line">cmake --build build</div>
-<div class="line">./tests/tinydb-tests</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md38"></a>
-MIT License</h2>
-<p>See [LICENSE](LICENSE). </p>
+</dd></dl>
+<dl class="section user"><dt>Compiler requirements</dt><dd>C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+. Runs on Linux, macOS, and Windows.</dd></dl>
+<dl class="section version"><dt>Version</dt><dd>1.0.0 </dd></dl>
+<dl class="section user"><dt>License</dt><dd>MIT License </dd></dl>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->

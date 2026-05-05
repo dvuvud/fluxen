@@ -1,5 +1,6 @@
 /**
  * @file tinydb.hpp
+ * @mainpage tinydb
  * @brief Single-header embedded key-value store for C++20.
  *
  * Drop this file into any project and get a persistent key-value database

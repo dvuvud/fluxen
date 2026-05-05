@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['txresult_0',['TxResult',['../tinydb_8hpp.html#ae89887131421e10b53c93033282f1cf2',1,'tinydb']]]
+  ['txresult_0',['TxResult',['../tinydb_8hpp.html#af0fa997cb38231ee8eab1529ba32078b',1,'tinydb']]]
 ];

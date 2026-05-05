@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['_3a_20open_20or_20create_0',['&lt;span class=&quot;tt&quot;&gt;DB(path)&lt;/span&gt;: open or create',['../index.html#autotoc_md7',1,'']]]
+  ['bytes_0',['Bytes',['../tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1',1,'tinydb']]]
 ];
