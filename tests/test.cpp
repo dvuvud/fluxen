@@ -324,6 +324,14 @@ TEST_F(TinyDBTest, TombstonesHonouredAfterReopen) {
     EXPECT_FALSE(db_->has("gone"));
 }
 
+TEST_F(TinyDBTest, OverwritePersistsAcrossReopen) {
+    db_->put("key", "first");
+    reopen();
+    db_->put("key", "second");
+    reopen();
+    EXPECT_EQ(db_->get("key"), "second");
+}
+
 // compaction
 
 TEST_F(TinyDBTest, CompactReducesFileSize) {

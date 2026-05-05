@@ -238,6 +238,7 @@ public:
         return WriteFile(file_, data, static_cast<DWORD>(len), &written, nullptr)
         && written == static_cast<DWORD>(len);
 #else
+        ::lseek(fd_, 0, SEEK_END);
         return ::write(fd_, data, len) == static_cast<ssize_t>(len);
 #endif
     }
