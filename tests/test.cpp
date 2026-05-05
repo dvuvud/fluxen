@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "test_helpers.hpp"
 
 #include <gtest/gtest.h>
 
 class TinyDBTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        path_ = std::filesystem::temp_directory_path()
-              / ("tinydb_test_" + std::to_string(std::rand()) + ".db");
+        path_ = make_temp_path("test");
         db_ = std::make_unique<tinydb::DB>(path_.string());
     }
 
