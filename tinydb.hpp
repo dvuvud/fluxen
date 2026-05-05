@@ -21,8 +21,9 @@
  * @par How does it work?
  * The database is an append-only log on disk backed by a memory-mapped file.
  * An in-memory hash index maps each key to the offset and length of its value
- * in the file. Reads are zero-copy. Instead, they return a view directly into the
- * mmap'd region. Writes append a 6-byte header + key + value to the file.
+ * in the file. Iteration via `each()` and `prefix()` is zero-copy. Callbacks receive
+ * a Bytes span pointing directly into the mapped region. `get()` copies into the
+ * return type. Writes append a 6-byte header + key + value to the file.
  * Deletes append a tombstone. The index is rebuilt by scanning the log once
  * on open (last write wins).
  *
@@ -706,6 +707,12 @@ public:
      *
      * @param fn A callable of the form `TxResult(Tx&)`.
      *
+     * @note The callback is invoked without holding the database mutex,
+     * so other threads may commit writes between the time the callback
+     * returns and the time the transaction is applied. The transaction's
+     * own operations are applied atomically, but they are not isolated
+     * from concurrent writers during the callback's execution.
+     *
      * @par Example
      * @code
      *   db.transaction([](tinydb::Tx& tx) {
@@ -761,6 +768,11 @@ public:
      * workload involves many overwrites or deletions.
      *
      * @throws std::runtime_error If the file rewrite fails.
+     *
+     * @warning This function invalidates all previously returned spans, views,
+     * and pointers to database-backed data. After `compact()` returns, any
+     * attempt to access such data is undefined behavior. Callers must reacquire
+     * any needed data after compaction.
      *
      * @par Example
      * @code
