@@ -1,6 +1,7 @@
 var classtinydb_1_1_d_b =
 [
     [ "DB", "classtinydb_1_1_d_b.html#a94dde37361f58cc9d4d3f3e6da81ee50", null ],
+    [ "~DB", "classtinydb_1_1_d_b.html#a50be520b12fac204dbca6c119144c697", null ],
     [ "put", "classtinydb_1_1_d_b.html#a24c39c00132b2db7117d6612a308301a", null ],
     [ "put", "classtinydb_1_1_d_b.html#a346458011e17d5f3a47810358852d9b5", null ],
     [ "get", "classtinydb_1_1_d_b.html#a24d4cdbc63ad4bf8f7bb63cc387fa741", null ],

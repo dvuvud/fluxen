@@ -103,6 +103,8 @@ $(function(){initNavTree('classtinydb_1_1_d_b.html','','classtinydb_1_1_d_b-memb
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a94dde37361f58cc9d4d3f3e6da81ee50" id="r_a94dde37361f58cc9d4d3f3e6da81ee50"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94dde37361f58cc9d4d3f3e6da81ee50">DB</a> (std::string_view path)</td></tr>
 <tr class="memdesc:a94dde37361f58cc9d4d3f3e6da81ee50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens or creates a database at the given path.  <br /></td></tr>
+<tr class="memitem:a50be520b12fac204dbca6c119144c697" id="r_a50be520b12fac204dbca6c119144c697"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a50be520b12fac204dbca6c119144c697">~DB</a> ()=default</td></tr>
+<tr class="memdesc:a50be520b12fac204dbca6c119144c697"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the database and releases all file locks.  <br /></td></tr>
 <tr class="memitem:a24c39c00132b2db7117d6612a308301a" id="r_a24c39c00132b2db7117d6612a308301a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24c39c00132b2db7117d6612a308301a">put</a> (std::string_view key, std::string_view value)</td></tr>
 <tr class="memdesc:a24c39c00132b2db7117d6612a308301a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a string value under the given key.  <br /></td></tr>
 <tr class="memitem:a346458011e17d5f3a47810358852d9b5" id="r_a346458011e17d5f3a47810358852d9b5"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; <br />
@@ -141,7 +143,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> val = db.get&lt;int64_t&gt;(<span class="stringliteral">&quot;hits&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *val &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:421</div></div>
+<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:440</div></div>
 </div><!-- fragment --> </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a94dde37361f58cc9d4d3f3e6da81ee50" name="a94dde37361f58cc9d4d3f3e6da81ee50"></a>
@@ -182,6 +184,34 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a50be520b12fac204dbca6c119144c697" name="a50be520b12fac204dbca6c119144c697"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50be520b12fac204dbca6c119144c697">&#9670;&#160;</a></span>~DB()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">tinydb::DB::~DB </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Closes the database and releases all file locks. </p>
+<dl class="section note"><dt>Note</dt><dd>On Windows, the underlying file is locked as long as this object exists. Ensure this object is destroyed before calling <span class="tt">std::filesystem::remove()</span> on the database file. </dd></dl>
 
 </div>
 </div>
@@ -439,7 +469,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 <div class="line">    std::string v(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(val.data()), val.size());</div>
 <div class="line">    std::cout &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; v &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line">});</div>
-<div class="ttc" id="atinydb_8hpp_html_ac79cba7fa5286030b060158e7aed69a1"><div class="ttname"><a href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:99</div></div>
+<div class="ttc" id="atinydb_8hpp_html_ac79cba7fa5286030b060158e7aed69a1"><div class="ttname"><a href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:101</div></div>
 </div><!-- fragment --> </dd></dl>
 
 </div>
@@ -532,9 +562,9 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 <div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47">remove</a>(<span class="stringliteral">&quot;old_session&quot;</span>);</div>
 <div class="line">    <span class="keywordflow">return</span> tinydb::commit;</div>
 <div class="line">});</div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html"><div class="ttname"><a href="classtinydb_1_1_tx.html">tinydb::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> tinydb.hpp:332</div></div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html_a152de82fb3869ce7e22db2adffc59c47"><div class="ttname"><a href="classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47">tinydb::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:382</div></div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html_ae28a54ff7899322ee2b27d5cb02150fb"><div class="ttname"><a href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">tinydb::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:340</div></div>
+<div class="ttc" id="aclasstinydb_1_1_tx_html"><div class="ttname"><a href="classtinydb_1_1_tx.html">tinydb::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> tinydb.hpp:351</div></div>
+<div class="ttc" id="aclasstinydb_1_1_tx_html_a152de82fb3869ce7e22db2adffc59c47"><div class="ttname"><a href="classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47">tinydb::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:401</div></div>
+<div class="ttc" id="aclasstinydb_1_1_tx_html_ae28a54ff7899322ee2b27d5cb02150fb"><div class="ttname"><a href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">tinydb::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:359</div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Rolling back</dt><dd><div class="fragment"><div class="line">db.transaction([&amp;](<a class="code hl_class" href="classtinydb_1_1_tx.html">tinydb::Tx</a>&amp; tx) {</div>
 <div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">put</a>(<span class="stringliteral">&quot;x&quot;</span>, new_value);</div>

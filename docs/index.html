@@ -103,7 +103,7 @@ $(function(){initNavTree('index.html','',''); });
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> name = db.get(<span class="stringliteral">&quot;username&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *name &lt;&lt; std::endl;   <span class="comment">// &quot;rick&quot;</span></div>
 <div class="line">}</div>
-<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:421</div></div>
+<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:440</div></div>
 <div class="ttc" id="atinydb_8hpp_html"><div class="ttname"><a href="tinydb_8hpp.html">tinydb.hpp</a></div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>How does it work?</dt><dd>The database is an append-only log on disk backed by a memory-mapped file. An in-memory hash index maps each key to the offset and length of its value in the file. Reads are zero-copy. Instead, they return a view directly into the mmap'd region. Writes append a 6-byte header + key + value to the file. Deletes append a tombstone. The index is rebuilt by scanning the log once on open (last write wins).</dd></dl>
@@ -123,6 +123,7 @@ $(function(){initNavTree('index.html','',''); });
 <li>Maximum value length: ~4 GB (uint32_t).</li>
 <li>No range queries (keys are stored in hash order).</li>
 <li>The full key set lives in RAM (std::unordered_map).</li>
+<li>Windows-specific: The database file is locked while a DB object exists. You must destroy the DB object before attempting to delete or move the file.</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Compiler requirements</dt><dd>C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+. Runs on Linux, macOS, and Windows.</dd></dl>
