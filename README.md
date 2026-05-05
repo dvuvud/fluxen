@@ -4,7 +4,7 @@
 
 <p align="center">
   A single-header, embedded key-value store for C++20.<br/>
-  Drop one file into your project and you have a persistent database.
+  Drop `tinydb.hpp` into your project and get a persistent key-value database.
 </p>
 
 <p align="center">
@@ -30,6 +30,61 @@ if (auto name = db.get("username")) {
 No CMake. No dependencies. No linking. One `#include`.
 
 ---
+
+## When to use tinydb
+
+tinydb is a good fit when:
+- You need a simple persistent store without a query language
+- Your workload is read-heavy
+- You want to store typed values (structs, ints, floats) without serialization boilerplate
+- You want zero build friction with no CMake targets, no vcpkg packages, no linking
+
+tinydb is **not** a good fit when:
+- You need range queries, secondary indexes, or SQL
+- Your workload is dominated by large batched writes
+- You need multi-process access to the same database file
+
+## How it works
+
+tinydb uses a [Bitcask](https://riak.com/assets/bitcask-intro.pdf)-style design:
+
+The database is an **append-only log** on disk backed by a memory-mapped file. An **in-memory hash index** maps each key to the byte offset of its value in the file. **Reads** look up the offset in the hash map and read directly from the mapped region. **Writes** append a small header + key + value to the end of the file. **Deletes** append a tombstone. Dead space is reclaimed by `compact()`. On open, the log is scanned once to rebuild the index (last write wins).
+
+## Performance
+
+Benchmarks were run on an Apple M2 with 8 GB of RAM running macOS Tahoe. All tests were performed on the internal SSD under minimal background load.
+
+SQLite was configured in WAL mode with durability settings roughly comparable to tinydb. Unless otherwise noted, all benchmarks are **single-threaded**.
+
+### Read performance
+In this setup, tinydb shows substantially higher read throughput. Each lookup is effectively a hash map probe followed by a direct memory access into an mmap’d file. By contrast, SQLite performs a B-tree lookup and goes through its query and storage layers, which adds overhead even when data is cached in memory.
+
+| Benchmark | N | tinydb | SQLite | Ratio |
+|---|---|---|---|---|
+| Sequential read | 1,000   | 38.1 M items/s | 476 k items/s | ~80x faster    |
+| Sequential read | 100,000 | 25.6 M items/s | 308 k items/s | ~83x faster    |
+| Random read | 1,000   | 35.1 M items/s | 426 k items/s | ~82x faster    |
+| Random read | 100,000 | 15.1 M items/s | 303 k items/s | ~50x faster    |
+
+These results reflect a best-case scenario for tinydb’s access pattern (direct key lookups with data already memory-resident). SQLite’s performance here includes the cost of its more general-purpose storage engine and abstractions.
+
+### Individual writes
+For individual writes, tinydb is faster in this benchmark because it appends to a flat log, while SQLite must maintain its B-tree structure even with relaxed durability settings.
+
+| Benchmark | N | tinydb | SQLite | Ratio |
+|---|---|---|---|---|
+| Sequential write | 100,000 | 213 k items/s | 89 k items/s | ~2.4x faster |
+
+### Bulk transactional writes
+For batched writes within a transaction, SQLite performs significantly better. It amortizes B-tree updates and journaling overhead across the entire transaction, whereas tinydb still performs per-entry appends.
+
+| Benchmark | N | tinydb | SQLite | Ratio |
+|---|---|---|---|---|
+| Bulk write (tx) | 10,000 | 218 k items/s | 1.25 M items/s | ~5.7x slower |
+| Bulk write (tx) | 100,000 | 217 k items/s | 1.38 M items/s | ~6.3x slower |
+
+### Notes on concurrency
+These benchmarks are single-threaded. SQLite in WAL mode supports multiple concurrent readers and a writer, and can scale read throughput across threads. In multi-threaded, read-heavy workloads, this can reduce the gap observed here, depending on contention and access patterns.
 
 ## Install
 
@@ -81,7 +136,7 @@ Full API reference is available at [dvuvud.github.io/tinydb](https://dvuvud.gith
 
 ---
 
-## Building
+## Building tests
 
 ```bash
 cmake -B build

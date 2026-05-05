@@ -12,7 +12,7 @@
 //   settings list
 //   settings reset
 
-#include "../tinydb.hpp"
+#include "tinydb.hpp"
 
 #include <iostream>
 #include <string>

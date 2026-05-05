@@ -10,7 +10,7 @@
 //   cache clear                  wipe all cached output
 //   cache list                   show all cached commands
 
-#include "../tinydb.hpp"
+#include "tinydb.hpp"
 
 #include <array>
 #include <cstdio>
