@@ -4,7 +4,7 @@
 
 <p align="center">
   A single-header, embedded key-value store for C++20.<br/>
-  Drop `tinydb.hpp` into your project and get a persistent key-value database.
+  Drop tinydb.hpp into your project and get a persistent key-value database.
 </p>
 
 <p align="center">
@@ -20,10 +20,10 @@
 #include "tinydb.hpp"
 
 tinydb::DB db("myapp.db");
-db.put("username", "run");
+db.put("username", "jim");
 
 if (auto name = db.get("username")) {
-    std::cout << *name << "\n";   // run
+    std::cout << *name << "\n";   // jim
 }
 ```
 
