@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">tinydb<span id="projectnumber">&#160;1.0.0</span>
+   <div id="projectname">tinydb<span id="projectnumber">&#160;1.1.0</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -103,10 +103,10 @@ $(function(){initNavTree('index.html','',''); });
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> name = db.get(<span class="stringliteral">&quot;username&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *name &lt;&lt; std::endl;   <span class="comment">// &quot;rick&quot;</span></div>
 <div class="line">}</div>
-<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:440</div></div>
+<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:441</div></div>
 <div class="ttc" id="atinydb_8hpp_html"><div class="ttname"><a href="tinydb_8hpp.html">tinydb.hpp</a></div></div>
 </div><!-- fragment --></dd></dl>
-<dl class="section user"><dt>How does it work?</dt><dd>The database is an append-only log on disk backed by a memory-mapped file. An in-memory hash index maps each key to the offset and length of its value in the file. Reads are zero-copy. Instead, they return a view directly into the mmap'd region. Writes append a 6-byte header + key + value to the file. Deletes append a tombstone. The index is rebuilt by scanning the log once on open (last write wins).</dd></dl>
+<dl class="section user"><dt>How does it work?</dt><dd>The database is an append-only log on disk backed by a memory-mapped file. An in-memory hash index maps each key to the offset and length of its value in the file. Iteration via <span class="tt">each()</span> and <span class="tt">prefix()</span> is zero-copy. Callbacks receive a Bytes span pointing directly into the mapped region. <span class="tt">get()</span> copies into the return type. Writes append a 6-byte header + key + value to the file. Deletes append a tombstone. The index is rebuilt by scanning the log once on open (last write wins).</dd></dl>
 <dl class="section user"><dt>File &amp; data layout</dt><dd><div class="fragment"><div class="line">[magic: 8 bytes <span class="stringliteral">&quot;TINYDB01&quot;</span>]</div>
 <div class="line">[entry] [entry] ...</div>
 <div class="line"> </div>
@@ -127,7 +127,7 @@ $(function(){initNavTree('index.html','',''); });
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Compiler requirements</dt><dd>C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+. Runs on Linux, macOS, and Windows.</dd></dl>
-<dl class="section version"><dt>Version</dt><dd>1.0.0 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>1.1.0 </dd></dl>
 <dl class="section user"><dt>License</dt><dd>MIT License </dd></dl>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
