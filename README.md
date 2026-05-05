@@ -31,6 +31,15 @@ No CMake. No dependencies. No linking. One `#include`.
 
 ---
 
+## Why tinydb exists
+tinydb is built for cases where you want persistent storage without adopting a full database system.
+
+It is not intended to replace general databases, which provide a much broader set of features such as SQL queries, indexing, and multi-purpose storage capabilities.
+
+To give a sense of where this design sits in practice, [the performance section](#performance) includes benchmarks against SQLite for a few specific, narrow workloads (primarily direct key-value access patterns).
+
+---
+
 ## When to use tinydb
 
 tinydb is a good fit when:
@@ -44,20 +53,31 @@ tinydb is **not** a good fit when:
 - Your workload is dominated by large batched writes
 - You need multi-process access to the same database file
 
+---
+
 ## How it works
 
 tinydb uses a [Bitcask](https://riak.com/assets/bitcask-intro.pdf)-style design:
 
-The database is an **append-only log** on disk backed by a memory-mapped file. An **in-memory hash index** maps each key to the byte offset of its value in the file. **Reads** look up the offset in the hash map and read directly from the mapped region. **Writes** append a small header + key + value to the end of the file. **Deletes** append a tombstone. Dead space is reclaimed by `compact()`. On open, the log is scanned once to rebuild the index (last write wins).
+- The database is an **append-only log** on disk backed by a memory-mapped file.
+- An **in-memory hash index** maps each key to the byte offset of its value in the file.
+- **Reads** look up the offset in the hash map and read directly from the mapped region.
+- **Writes** append a small header + key + value to the end of the file.
+- **Deletes** append a tombstone. Dead space is reclaimed by `compact()`.
+- On open, the log is scanned once to rebuild the index (last write wins).
+
+---
 
 ## Performance
+
+The following benchmarks show how tinydb behaves under direct key-value workloads. They are intended to illustrate the performance characteristics of the design, not to position it as a replacement for general-purpose databases.
 
 Benchmarks were run on an Apple M2 with 8 GB of RAM running macOS Tahoe. All tests were performed on the internal SSD under minimal background load.
 
 SQLite was configured in WAL mode with durability settings roughly comparable to tinydb. Unless otherwise noted, all benchmarks are **single-threaded**.
 
 ### Read performance
-In this setup, tinydb shows substantially higher read throughput. Each lookup is effectively a hash map probe followed by a direct memory access into an mmap’d file. By contrast, SQLite performs a B-tree lookup and goes through its query and storage layers, which adds overhead even when data is cached in memory.
+In these workloads, tinydb shows high read throughput due to its direct hash-index + memory-mapped design.
 
 | Benchmark | N | tinydb | SQLite | Ratio |
 |---|---|---|---|---|
