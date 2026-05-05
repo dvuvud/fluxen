@@ -252,3 +252,9 @@ cmake -B build
 cmake --build build
 ./tests/tinydb-tests
 ```
+
+---
+
+## MIT License
+
+See [LICENSE](LICENSE).
