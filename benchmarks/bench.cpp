@@ -37,9 +37,11 @@ static void BM_SequentialWrite(benchmark::State& state) {
 
     for (auto _ : state) {
         auto path = make_temp_path("write");
-        tinydb::DB db(path);
-        for (int i = 0; i < n; ++i) {
-            db.put(keys[i], vals[i]);
+        {
+            tinydb::DB db(path);
+            for (int i = 0; i < n; ++i) {
+                db.put(keys[i], vals[i]);
+            }
         }
         state.PauseTiming();
         std::filesystem::remove(path);
@@ -118,9 +120,11 @@ static void BM_Overwrite(benchmark::State& state) {
 
     for (auto _ : state) {
         auto path = make_temp_path("overwrite");
-        tinydb::DB db(path);
-        for (int i = 0; i < n; ++i) db.put(keys[i], vals[i]);
-        for (int i = 1; i < n; ++i) db.put(keys[i], vals[i]);
+        {
+            tinydb::DB db(path);
+            for (int i = 0; i < n; ++i) db.put(keys[i], vals[i]);
+            for (int i = 1; i < n; ++i) db.put(keys[i], vals[i]);
+        }
         state.PauseTiming();
         std::filesystem::remove(path);
         state.ResumeTiming();
@@ -171,10 +175,11 @@ static void BM_Compact(benchmark::State& state) {
             for (int i = 0; i < n; ++i) db.put(keys[i], vals[i]);
             for (int i = 0; i < n / 2; ++i) db.remove(keys[i]);
         }
-        tinydb::DB db(path);
-        state.ResumeTiming();
-
-        db.compact();
+        {
+            tinydb::DB db(path);
+            state.ResumeTiming();
+            db.compact();
+        }
 
         state.PauseTiming();
         std::filesystem::remove(path);
@@ -192,9 +197,11 @@ static void BM_StructWrite(benchmark::State& state) {
 
     for (auto _ : state) {
         auto path = make_temp_path("struct");
-        tinydb::DB db(path);
-        for (int i = 0; i < n; ++i) {
-            db.put(keys[i], Player{ .score=i, .x=float(i), .y=float(i), .active=true, .pad={} });
+        {
+            tinydb::DB db(path);
+            for (int i = 0; i < n; ++i) {
+                db.put(keys[i], Player{ .score=i, .x=float(i), .y=float(i), .active=true, .pad={} });
+            }
         }
         state.PauseTiming();
         std::filesystem::remove(path);
@@ -239,13 +246,15 @@ static void BM_Transaction(benchmark::State& state) {
 
     for (auto _ : state) {
         auto path = make_temp_path("tx");
-        tinydb::DB db(path);
-        db.transaction([&](tinydb::Tx& tx) -> tinydb::TxResult {
-            for (int i = 0; i < n; ++i) {
-                tx.put(keys[i], vals[i]);
-            }
-            return tinydb::commit;
-        });
+        {
+            tinydb::DB db(path);
+            db.transaction([&](tinydb::Tx& tx) -> tinydb::TxResult {
+                for (int i = 0; i < n; ++i) {
+                    tx.put(keys[i], vals[i]);
+                }
+                return tinydb::commit;
+            });
+        }
         state.PauseTiming();
         std::filesystem::remove(path);
         state.ResumeTiming();
