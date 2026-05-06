@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="680" alt="fluxen_logo" src="https://github.com/user-attachments/assets/87ec195d-bf13-45b3-b3f5-bc00981a55bd"/>
+  <img width="680" alt="fluxen_logo" src="https://github.com/user-attachments/assets/156ce053-e5d4-4198-a567-ad739019a123"/>
 </p>
 
 <p align="center">
