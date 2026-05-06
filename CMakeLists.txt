@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(
     fluxen
-    VERSION 1.2.1
+    VERSION 1.0.0.4
     LANGUAGES CXX
 )
 
