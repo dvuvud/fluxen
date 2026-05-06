@@ -3,24 +3,85 @@ name: CI
 on:
   push:
     branches: [main]
-    paths: ['tinydb.hpp', 'tests/*', '.github/workflows/ci.yml']
+    paths:
+      - "tinydb.hpp"
+      - "tests/**"
+      - ".github/workflows/ci.yml"
+
   pull_request:
-    paths: ['tinydb.hpp', 'tests/*', '.github/workflows/ci.yml']
+    paths:
+      - "tinydb.hpp"
+      - "tests/**"
+      - ".github/workflows/ci.yml"
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get install -y clang-tidy
-      - run: clang-tidy tinydb.hpp -- -std=c++20
+
+      - name: Install clang-tidy
+        run: sudo apt-get update && sudo apt-get install -y clang-tidy
+
+      - name: Run clang-tidy
+        run: clang-tidy tinydb.hpp -- -std=c++20
 
   test:
-    runs-on: ubuntu-latest
+    name: Test (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: gcc-12 (Linux)
+            os: ubuntu-22.04
+            cc: gcc-12
+            cxx: g++-12
+
+          - name: clang-15 (Linux)
+            os: ubuntu-22.04
+            cc: clang-15
+            cxx: clang++-15
+
+          - name: MSVC (Windows)
+            os: windows-2022
+            cc: cl
+            cxx: cl
+
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: cmake -B build -DTINYDB_BUILD_BENCHMARKS=OFF
-      - run: cmake --build build
-      - run: ctest --test-dir build --output-on-failure
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            gcc-12 g++-12
+
+      - name: Install Clang 15 (Linux)
+        if: runner.os == 'Linux' && matrix.cc == 'clang-15'
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 15
+          sudo apt-get install -y clang-15
+
+      - name: Configure CMake
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DTINYDB_BUILD_BENCHMARKS=OFF
+          -DCMAKE_C_COMPILER=${{ matrix.cc }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
