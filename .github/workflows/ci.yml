@@ -21,6 +21,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: cmake -B build
+      - run: cmake -B build -DTINYDB_BUILD_BENCHMARKS=OFF
       - run: cmake --build build
       - run: ctest --test-dir build --output-on-failure
