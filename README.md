@@ -36,16 +36,13 @@ No CMake. No dependencies. No linking. One `#include`.
 - [Why tinydb exists](#why-tinydb-exists)
 - [When to use tinydb](#when-to-use-tinydb)
 - [How it works](#how-it-works)
-- [Performance](#performance)
+- [Concurrency behavior](#concurrency-behavior)
+- [Install](#install)
+- [Quick start](#quick-start)
+- [Benchmarks (early results)](#benchmarks-early-results)
     - [Read performance](#read-performance)
     - [Individual writes](#individual-writes)
     - [Bulk transactional writes](#bulk-transactional-writes)
-- [Concurrency behavior](#concurrency-behavior)
-    - [Concurrent reads](#concurrent-reads)
-    - [Read/write contention](#readwrite-contention)
-    - [Writer contention](#writer-contention)
-- [Install](#install)
-- [Quick start](#quick-start)
 - [Docs](#docs)
 - [Building tests](#building-tests)
 - [License](#mit-license)
@@ -57,7 +54,7 @@ tinydb is built for cases where you want persistent storage without adopting a f
 
 It is not intended to replace general databases, which provide a much broader set of features such as SQL queries, indexing, and multi-purpose storage capabilities.
 
-To give a sense of where this design sits in practice, [the performance section](#performance) includes benchmarks against SQLite for a few specific, narrow workloads (primarily direct key-value access patterns).
+To give a sense of where this design sits in practice, [the benchmarks section](#benchmarks-early-results) includes benchmarks against SQLite for a few specific, narrow workloads (primarily direct key-value access patterns).
 
 ---
 
@@ -86,96 +83,6 @@ tinydb uses a [Bitcask](https://riak.com/assets/bitcask-intro.pdf)-style design:
 - **Writes** append a small header + key + value to the end of the file.
 - **Deletes** append a tombstone. Dead space is reclaimed by `compact()`.
 - On open, the log is scanned once to rebuild the index (last write wins).
-
----
-
-## Performance
-
-These benchmarks compare tinydb against SQLite under a set of narrow, key-value-oriented workloads.
-
-Tests were run on an Apple M2 (8 GB RAM) on macOS. SQLite was configured in WAL mode with durability settings chosen to approximate tinydb’s persistence behavior.
-
-The following benchmarks are single-threaded.
-
-#### Read performance
-tinydb benefits from direct hash lookups and memory-mapped reads.
-
-| Benchmark | N | tinydb | SQLite | Ratio |
-|---|---|---|---|---|
-| Sequential read | 1,000   | 38.1 M items/s | 476 k items/s | ~80x faster    |
-| Sequential read | 100,000 | 25.6 M items/s | 308 k items/s | ~83x faster    |
-| Random read | 1,000   | 35.1 M items/s | 426 k items/s | ~82x faster    |
-| Random read | 100,000 | 15.1 M items/s | 303 k items/s | ~50x faster    |
-
-These results reflect an ideal cache-resident workload where keys are already in memory.
-
-#### Individual writes
-For individual writes, tinydb benefits from its append-only log structure.
-
-| Benchmark | N | tinydb | SQLite | Ratio |
-|---|---|---|---|---|
-| Sequential write | 100,000 | 213 k items/s | 89 k items/s | ~2.4x faster |
-
-#### Bulk transactional writes
-SQLite performs significantly better in batched transactions due to amortized B-tree and WAL overhead.
-
-| Benchmark | N | tinydb | SQLite | Ratio |
-|---|---|---|---|---|
-| Bulk write (tx) | 10,000 | 218 k items/s | 1.25 M items/s | ~5.7x slower |
-| Bulk write (tx) | 100,000 | 217 k items/s | 1.38 M items/s | ~6.3x slower |
-
----
-
-## Concurrency behavior
-These benchmarks evaluate tinydb under multi-threaded workloads using Google Benchmark’s threading model on an 8-core Apple M2. They measure contention effects rather than raw per-operation throughput.
-
-#### Concurrent reads
-tinydb shows high baseline throughput due to its hash-based index and memory-mapped storage.
-
-Performance is not strictly linear: throughput decreases as thread count increases from 2 to 8, with a partial recovery at 16 threads. This V-shaped scaling is an artifact of **cache-coherency pressure** and core saturation. On the 8-core M2 test hardware, contention peaks when all physical cores simultaneously compete for the same memory bus and internal cache lines to access the shared index.
-
-| Benchmark | N | Threads | tinydb | SQLite | Ratio |
-|---|---|---|---|---|---|
-| Multi-threaded read | 1,000 | 2 threads | 20.89 M/s | 1.53 M/s | ~13.7x faster |
-| Multi-threaded read | 1,000 | 4 threads | 13.11 M/s | 2.64 M/s | ~5.0x faster |
-| Multi-threaded read | 1,000 | 8 threads | 11.93 M/s | 1.93 M/s | ~6.2x faster |
-| Multi-threaded read | 1,000 | 16 threads | 17.61 M/s | 2.69 M/s | ~6.5x faster |
-| Multi-threaded read | 10,000 | 2 threads | 17.42 M/s | 1.16 M/s | ~15.1x faster |
-| Multi-threaded read | 10,000 | 4 threads | 11.56 M/s | 2.30 M/s | ~5.0x faster |
-| Multi-threaded read | 10,000 | 8 threads | 9.52 M/s | 1.89 M/s | ~5.0x faster |
-| Multi-threaded read | 10,000 | 16 threads | 17.33 M/s | 2.75 M/s | ~6.3x faster |
-
-#### Read/write contention
-tinydb coordinates thread safety via a `std::shared_mutex` (Readers-Writer lock).
-
-In mixed workloads, write operations (`put`, `remove`) acquire an exclusive lock, which briefly pauses active readers. However, because the design is **append-only**, the exclusive window is extremely small—limited only to a file append and a hash-map update. Reads remain highly performant because they primarily involve a hash-map lookup and a direct pointer dereference into the mapped memory.
-
-| Benchmark | N | Threads | tinydb (reads/s) | SQLite (reads/s) | Ratio |
-|---|---|---|---|---|---|
-| Read/write contention | 1,000 | 2 threads | 235.9k/s | 164.2k/s | ~1.44x faster |
-| Read/write contention | 1,000 | 4 threads | 615.8k/s | 785.0k/s | ~1.27x slower |
-| Read/write contention | 1,000 | 8 threads | 1.15M/s | 1.40M/s | ~1.22x slower |
-| Read/write contention | 1,000 | 16 threads | 3.35M/s | 2.84M/s | ~1.18x faster |
-| Read/write contention | 10,000 | 2 threads | 237.0k/s | 152.7k/s | ~1.55x faster |
-| Read/write contention | 10,000 | 4 threads | 614.4k/s | 735.6k/s | ~1.20x slower |
-| Read/write contention | 10,000 | 8 threads | 1.11M/s | 1.24M/s | ~1.12x slower |
-| Read/write contention | 10,000 | 16 threads | 4.18M/s | 2.49M/s | ~1.68x faster |
-
-#### Writer contention
-Under multiple concurrent writers, SQLite scales significantly with thread count, whereas tinydb maintains flat, stable throughput.
-
-This is due to the difference in coordination models. SQLite allows **work coalescing**. When a thread holds the write lock, it may perform multiple queued operations before yielding, amortizing the cost of the WAL write. tinydb serializes writes with a simple exclusive lock and no cross-thread batching. Each write incurs its full latency independently, resulting in predictable but non-scaling write performance under heavy contention.
-
-| Benchmark | N | Threads | tinydb (items/s) | SQLite (items/s) | Ratio |
-|---|---|---|---|---|---|
-| Writer contention | 1,000 | 2 threads | 242.1k/s | 313.6k/s | ~1.30x slower |
-| Writer contention | 1,000 | 4 threads | 274.6k/s | 919.6k/s | ~3.35x slower |
-| Writer contention | 1,000 | 8 threads | 200.8k/s | 1.07M/s | ~5.30x slower |
-| Writer contention | 1,000 | 16 threads | 238.9k/s | 1.84M/s | ~7.69x slower |
-| Writer contention | 10,000 | 2 threads | 245.3k/s | 307.0k/s | ~1.25x slower |
-| Writer contention | 10,000 | 4 threads | 271.0k/s | 863.5k/s | ~3.19x slower |
-| Writer contention | 10,000 | 8 threads | 199.8k/s | 1.12M/s | ~5.60x slower |
-| Writer contention | 10,000 | 16 threads | 219.9k/s | 1.94M/s | ~8.83x slower |
 
 ---
 
@@ -220,6 +127,105 @@ if (db.has("city")) {
     db.remove("city");
 }
 ```
+
+---
+
+## Benchmarks (early results)
+
+Early benchmarks comparing tinydb against SQLite in key-value-style workloads.
+
+Tests were run on an Apple M2 (8 GB RAM) on macOS. SQLite was configured in WAL mode with durability settings chosen to approximate tinydb’s persistence behavior.
+
+The following benchmarks are single-threaded.
+
+#### Read performance
+tinydb benefits from direct hash lookups and memory-mapped reads.
+
+| Benchmark | N | tinydb | SQLite | Ratio |
+|---|---|---|---|---|
+| Sequential read | 1,000   | 38.1 M items/s | 476 k items/s | ~80x faster    |
+| Sequential read | 100,000 | 25.6 M items/s | 308 k items/s | ~83x faster    |
+| Random read | 1,000   | 35.1 M items/s | 426 k items/s | ~82x faster    |
+| Random read | 100,000 | 15.1 M items/s | 303 k items/s | ~50x faster    |
+
+These results reflect an ideal cache-resident workload where keys are already in memory.
+
+#### Individual writes
+For individual writes, tinydb benefits from its append-only log structure.
+
+| Benchmark | N | tinydb | SQLite | Ratio |
+|---|---|---|---|---|
+| Sequential write | 100,000 | 213 k items/s | 89 k items/s | ~2.4x faster |
+
+#### Bulk transactional writes
+SQLite performs significantly better in batched transactions due to amortized B-tree and WAL overhead.
+
+| Benchmark | N | tinydb | SQLite | Ratio |
+|---|---|---|---|---|
+| Bulk write (tx) | 10,000 | 218 k items/s | 1.25 M items/s | ~5.7x slower |
+| Bulk write (tx) | 100,000 | 217 k items/s | 1.38 M items/s | ~6.3x slower |
+
+---
+
+## Concurrency behavior
+These benchmarks evaluate tinydb under multi-threaded workloads using Google Benchmark’s threading model on an 8-core Apple M2. They measure contention effects rather than raw per-operation throughput.
+
+<details>
+<summary><b>Concurrent reads</b></summary>
+tinydb shows high baseline throughput due to its hash-based index and memory-mapped storage.
+
+Performance is not strictly linear: throughput decreases as thread count increases from 2 to 8, with a partial recovery at 16 threads. This V-shaped scaling is an artifact of **cache-coherency pressure** and core saturation. On the 8-core M2 test hardware, contention peaks when all physical cores simultaneously compete for the same memory bus and internal cache lines to access the shared index.
+
+| Benchmark | N | Threads | tinydb | SQLite | Ratio |
+|---|---|---|---|---|---|
+| Multi-threaded read | 1,000 | 2 threads | 20.89 M/s | 1.53 M/s | ~13.7x faster |
+| Multi-threaded read | 1,000 | 4 threads | 13.11 M/s | 2.64 M/s | ~5.0x faster |
+| Multi-threaded read | 1,000 | 8 threads | 11.93 M/s | 1.93 M/s | ~6.2x faster |
+| Multi-threaded read | 1,000 | 16 threads | 17.61 M/s | 2.69 M/s | ~6.5x faster |
+| Multi-threaded read | 10,000 | 2 threads | 17.42 M/s | 1.16 M/s | ~15.1x faster |
+| Multi-threaded read | 10,000 | 4 threads | 11.56 M/s | 2.30 M/s | ~5.0x faster |
+| Multi-threaded read | 10,000 | 8 threads | 9.52 M/s | 1.89 M/s | ~5.0x faster |
+| Multi-threaded read | 10,000 | 16 threads | 17.33 M/s | 2.75 M/s | ~6.3x faster |
+
+</details>
+
+<details>
+<summary><b>Read/write contention</b></summary>
+tinydb coordinates thread safety via a `std::shared_mutex` (Readers-Writer lock).
+
+In mixed workloads, write operations (`put`, `remove`) acquire an exclusive lock, which briefly pauses active readers. However, because the design is **append-only**, the exclusive window is extremely small—limited only to a file append and a hash-map update. Reads remain highly performant because they primarily involve a hash-map lookup and a direct pointer dereference into the mapped memory.
+
+| Benchmark | N | Threads | tinydb (reads/s) | SQLite (reads/s) | Ratio |
+|---|---|---|---|---|---|
+| Read/write contention | 1,000 | 2 threads | 235.9k/s | 164.2k/s | ~1.44x faster |
+| Read/write contention | 1,000 | 4 threads | 615.8k/s | 785.0k/s | ~1.27x slower |
+| Read/write contention | 1,000 | 8 threads | 1.15M/s | 1.40M/s | ~1.22x slower |
+| Read/write contention | 1,000 | 16 threads | 3.35M/s | 2.84M/s | ~1.18x faster |
+| Read/write contention | 10,000 | 2 threads | 237.0k/s | 152.7k/s | ~1.55x faster |
+| Read/write contention | 10,000 | 4 threads | 614.4k/s | 735.6k/s | ~1.20x slower |
+| Read/write contention | 10,000 | 8 threads | 1.11M/s | 1.24M/s | ~1.12x slower |
+| Read/write contention | 10,000 | 16 threads | 4.18M/s | 2.49M/s | ~1.68x faster |
+
+</details>
+
+<details>
+<summary><b>Writer contention</b></summary>
+Under multiple concurrent writers, SQLite scales significantly with thread count, whereas tinydb maintains flat, stable throughput.
+
+This is due to the difference in coordination models. SQLite allows **work coalescing**. When a thread holds the write lock, it may perform multiple queued operations before yielding, amortizing the cost of the WAL write. tinydb serializes writes with a simple exclusive lock and no cross-thread batching. Each write incurs its full latency independently, resulting in predictable but non-scaling write performance under heavy contention.
+
+| Benchmark | N | Threads | tinydb (items/s) | SQLite (items/s) | Ratio |
+|---|---|---|---|---|---|
+| Writer contention | 1,000 | 2 threads | 242.1k/s | 313.6k/s | ~1.30x slower |
+| Writer contention | 1,000 | 4 threads | 274.6k/s | 919.6k/s | ~3.35x slower |
+| Writer contention | 1,000 | 8 threads | 200.8k/s | 1.07M/s | ~5.30x slower |
+| Writer contention | 1,000 | 16 threads | 238.9k/s | 1.84M/s | ~7.69x slower |
+| Writer contention | 10,000 | 2 threads | 245.3k/s | 307.0k/s | ~1.25x slower |
+| Writer contention | 10,000 | 4 threads | 271.0k/s | 863.5k/s | ~3.19x slower |
+| Writer contention | 10,000 | 8 threads | 199.8k/s | 1.12M/s | ~5.60x slower |
+| Writer contention | 10,000 | 16 threads | 219.9k/s | 1.94M/s | ~8.83x slower |
+
+</details>
 
 ---
 
