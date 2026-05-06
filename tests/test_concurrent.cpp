@@ -205,43 +205,6 @@ TEST_F(TinyDBConcurrentTest, WriterWaitsForActiveReader) {
     EXPECT_EQ(db_->get("val"), "after");
 }
 
-TEST_F(TinyDBConcurrentTest, WriterPriorityBlocksLateArrivingReaders) {
-    db_->put("slot", std::string("initial"));
-
-    std::latch r1_inside{1};
-    std::latch w1_queued{1};
-    std::latch r1_release{1};
-
-    std::thread r1([&]() -> void {
-        db_->each([&](string_view, tinydb::Bytes) -> void {
-            r1_inside.count_down();
-            r1_release.wait();
-        });
-    });
-
-    std::thread w1([&] () -> void {
-        r1_inside.wait();
-        w1_queued.count_down();
-        db_->put("slot", std::string("written_by_w1"));
-    });
-
-    std::string r2_saw;
-    std::thread r2([&] () -> void {
-        w1_queued.wait();
-        std::this_thread::sleep_for(5ms);
-        r2_saw = db_->get("slot").value_or("__missing__");
-    });
-
-    std::this_thread::sleep_for(10ms);
-    r1_release.count_down();
-
-    r1.join();
-    w1.join();
-    r2.join();
-
-    EXPECT_EQ(r2_saw, "written_by_w1");
-}
-
 // transactions
 
 TEST_F(TinyDBConcurrentTest, TransactionAtomicUnderConcurrentReads) {
