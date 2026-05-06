@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['prefix_0',['prefix',['../classtinydb_1_1_d_b.html#aa06c4d57499900f654f4c53e76340bfc',1,'tinydb::DB']]],
-  ['put_1',['put',['../classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb',1,'tinydb::Tx::put(std::string_view key, std::string_view value)'],['../classtinydb_1_1_tx.html#a9f9e997731e7477dadf6ce0f132c83e1',1,'tinydb::Tx::put(std::string_view key, const T &amp;value)'],['../classtinydb_1_1_d_b.html#a24c39c00132b2db7117d6612a308301a',1,'tinydb::DB::put(std::string_view key, std::string_view value)'],['../classtinydb_1_1_d_b.html#a346458011e17d5f3a47810358852d9b5',1,'tinydb::DB::put(std::string_view key, const T &amp;value)']]]
+  ['prefix_0',['prefix',['../classfluxen_1_1_d_b.html#a5424ebb8ccf3a4ec076ee5d964423306',1,'fluxen::DB']]],
+  ['put_1',['put',['../classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4',1,'fluxen::Tx::put(std::string_view key, std::string_view value)'],['../classfluxen_1_1_tx.html#aa629a0f77a6a0d0ae3eb4f97f5216232',1,'fluxen::Tx::put(std::string_view key, const T &amp;value)'],['../classfluxen_1_1_d_b.html#ae62765f8a24f2baadbb5b0cfc12fd6c7',1,'fluxen::DB::put(std::string_view key, std::string_view value)'],['../classfluxen_1_1_d_b.html#ac21afa63c18b05f6068b64640cde7a2a',1,'fluxen::DB::put(std::string_view key, const T &amp;value)']]]
 ];

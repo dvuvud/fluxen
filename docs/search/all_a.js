@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['tinydb_0',['tinydb',['../index.html',1,'']]],
-  ['tinydb_2ehpp_1',['tinydb.hpp',['../tinydb_8hpp.html',1,'']]],
-  ['transaction_2',['transaction',['../classtinydb_1_1_d_b.html#a9c6c45c85948c5d0827e5b3bcec56e14',1,'tinydb::DB']]],
-  ['tx_3',['Tx',['../classtinydb_1_1_tx.html',1,'tinydb']]],
-  ['txresult_4',['TxResult',['../tinydb_8hpp.html#af0fa997cb38231ee8eab1529ba32078b',1,'tinydb']]]
+  ['transaction_0',['transaction',['../classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa',1,'fluxen::DB']]],
+  ['tx_1',['Tx',['../classfluxen_1_1_tx.html',1,'fluxen']]],
+  ['txresult_2',['TxResult',['../fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f',1,'fluxen']]]
 ];

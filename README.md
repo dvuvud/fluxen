@@ -1,25 +1,25 @@
 <p align="center">
-  <img width="680" alt="tinydb_logo_no_tagline-2" src="https://github.com/user-attachments/assets/87ec195d-bf13-45b3-b3f5-bc00981a55bd"/>
+  <img width="680" alt="fluxen_logo" src="https://github.com/user-attachments/assets/87ec195d-bf13-45b3-b3f5-bc00981a55bd"/>
 </p>
 
 <p align="center">
   A single-header, embedded key-value store for C++20.<br/>
-  Drop tinydb.hpp into your project and get a persistent key-value database.
+  Drop fluxen.hpp into your project and get a persistent key-value database.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/C%2B%2B-20-blue?style=flat-square" alt="C++20"/>
   <img src="https://img.shields.io/badge/header--only-single%20file-4A7FD6?style=flat-square" alt="header-only"/>
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="MIT"/>
-  <img src="https://github.com/dvuvud/tinydb/actions/workflows/ci.yml/badge.svg" alt="CI"/>
+  <img src="https://github.com/dvuvud/fluxen/actions/workflows/ci.yml/badge.svg" alt="CI"/>
 </p>
 
 ---
 
 ```cpp
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 
-tinydb::DB db("myapp.db");
+fluxen::DB db("myapp.db");
 db.put("username", "jim");
 
 if (auto name = db.get("username")) {
@@ -33,8 +33,8 @@ No CMake. No dependencies. No linking. One `#include`.
 
 ### Table of Contents
 
-- [Why tinydb exists](#why-tinydb-exists)
-- [When to use tinydb](#when-to-use-tinydb)
+- [Why fluxen exists](#why-fluxen-exists)
+- [When to use fluxen](#when-to-use-fluxen)
 - [How it works](#how-it-works)
 - [Install](#install)
 - [Quick start](#quick-start)
@@ -49,8 +49,8 @@ No CMake. No dependencies. No linking. One `#include`.
 
 ---
 
-## Why tinydb exists
-tinydb is built for cases where you want persistent storage without adopting a full database system.
+## Why fluxen exists
+fluxen is built for cases where you want persistent storage without adopting a full database system.
 
 It is not intended to replace general databases, which provide a much broader set of features such as SQL queries, indexing, and multi-purpose storage capabilities.
 
@@ -58,15 +58,15 @@ To give a sense of where this design sits in practice, [the benchmarks section](
 
 ---
 
-## When to use tinydb
+## When to use fluxen
 
-tinydb is a good fit when:
+fluxen is a good fit when:
 - You need a simple persistent store without a query language
 - Your workload is read-heavy
 - You want to store typed values (structs, ints, floats) without serialization boilerplate
 - You want zero build friction with no CMake targets, no vcpkg packages, no linking
 
-tinydb is **not** a good fit when:
+fluxen is **not** a good fit when:
 - You need range queries, secondary indexes, or SQL
 - Your workload is dominated by large batched writes
 - You need multi-process access to the same database file
@@ -75,7 +75,7 @@ tinydb is **not** a good fit when:
 
 ## How it works
 
-tinydb uses a [Bitcask](https://riak.com/assets/bitcask-intro.pdf)-style design:
+fluxen uses a [Bitcask](https://riak.com/assets/bitcask-intro.pdf)-style design:
 
 - The database is an **append-only log** on disk backed by a memory-mapped file.
 - An **in-memory hash index** maps each key to the byte offset of its value in the file.
@@ -88,10 +88,10 @@ tinydb uses a [Bitcask](https://riak.com/assets/bitcask-intro.pdf)-style design:
 
 ## Install
 
-Copy [`tinydb.hpp`](tinydb.hpp) into your project:
+Copy [`fluxen.hpp`](fluxen.hpp) into your project:
 
 ```bash
-curl -O https://raw.githubusercontent.com/dvuvud/tinydb/main/tinydb.hpp
+curl -O https://raw.githubusercontent.com/dvuvud/fluxen/main/fluxen.hpp
 ```
 
 **Requirements:** C++20, GCC 12+, Clang 15+, or MSVC 19.34+. Linux, macOS, and Windows.
@@ -101,10 +101,10 @@ curl -O https://raw.githubusercontent.com/dvuvud/tinydb/main/tinydb.hpp
 ## Quick start
 
 ```cpp
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 
 // Open or create a database
-tinydb::DB db("app.db");
+fluxen::DB db("app.db");
 
 // Strings
 db.put("city", "Stockholm");
@@ -132,16 +132,16 @@ if (db.has("city")) {
 
 ## Benchmarks (early results)
 
-Early benchmarks comparing tinydb against SQLite in key-value-style workloads.
+Early benchmarks comparing fluxen against SQLite in key-value-style workloads.
 
-Tests were run on an Apple M2 (8 GB RAM) on macOS. SQLite was configured in WAL mode with durability settings chosen to approximate tinydb’s persistence behavior.
+Tests were run on an Apple M2 (8 GB RAM) on macOS. SQLite was configured in WAL mode with durability settings chosen to approximate fluxen’s persistence behavior.
 
 The following benchmarks are single-threaded.
 
 #### Read performance
-tinydb benefits from direct hash lookups and memory-mapped reads.
+fluxen benefits from direct hash lookups and memory-mapped reads.
 
-| Benchmark | N | tinydb | SQLite | Ratio |
+| Benchmark | N | fluxen | SQLite | Ratio |
 |---|---|---|---|---|
 | Sequential read | 1,000   | 38.1 M items/s | 476 k items/s | ~80x faster    |
 | Sequential read | 100,000 | 25.6 M items/s | 308 k items/s | ~83x faster    |
@@ -151,16 +151,16 @@ tinydb benefits from direct hash lookups and memory-mapped reads.
 These results reflect an ideal cache-resident workload where keys are already in memory.
 
 #### Individual writes
-For individual writes, tinydb benefits from its append-only log structure.
+For individual writes, fluxen benefits from its append-only log structure.
 
-| Benchmark | N | tinydb | SQLite | Ratio |
+| Benchmark | N | fluxen | SQLite | Ratio |
 |---|---|---|---|---|
 | Sequential write | 100,000 | 213 k items/s | 89 k items/s | ~2.4x faster |
 
 #### Bulk transactional writes
 SQLite performs significantly better in batched transactions due to amortized B-tree and WAL overhead.
 
-| Benchmark | N | tinydb | SQLite | Ratio |
+| Benchmark | N | fluxen | SQLite | Ratio |
 |---|---|---|---|---|
 | Bulk write (tx) | 10,000 | 218 k items/s | 1.25 M items/s | ~5.7x slower |
 | Bulk write (tx) | 100,000 | 217 k items/s | 1.38 M items/s | ~6.3x slower |
@@ -168,15 +168,15 @@ SQLite performs significantly better in batched transactions due to amortized B-
 ---
 
 ## Concurrency behavior
-These benchmarks evaluate tinydb under multi-threaded workloads using Google Benchmark’s threading model on an 8-core Apple M2. They measure contention effects rather than raw per-operation throughput.
+These benchmarks evaluate fluxen under multi-threaded workloads using Google Benchmark’s threading model on an 8-core Apple M2. They measure contention effects rather than raw per-operation throughput.
 
 <details>
 <summary><b>Concurrent reads</b></summary>
-tinydb shows high baseline throughput due to its hash-based index and memory-mapped storage.
+fluxen shows high baseline throughput due to its hash-based index and memory-mapped storage.
 
 Performance is not strictly linear: throughput decreases as thread count increases from 2 to 8, with a partial recovery at 16 threads. This V-shaped scaling is an artifact of **cache-coherency pressure** and core saturation. On the 8-core M2 test hardware, contention peaks when all physical cores simultaneously compete for the same memory bus and internal cache lines to access the shared index.
 
-| Benchmark | N | Threads | tinydb | SQLite | Ratio |
+| Benchmark | N | Threads | fluxen | SQLite | Ratio |
 |---|---|---|---|---|---|
 | Multi-threaded read | 1,000 | 2 threads | 20.89 M/s | 1.53 M/s | ~13.7x faster |
 | Multi-threaded read | 1,000 | 4 threads | 13.11 M/s | 2.64 M/s | ~5.0x faster |
@@ -191,11 +191,11 @@ Performance is not strictly linear: throughput decreases as thread count increas
 
 <details>
 <summary><b>Read/write contention</b></summary>
-tinydb coordinates thread safety via a `std::shared_mutex` (Readers-Writer lock).
+fluxen coordinates thread safety via a `std::shared_mutex` (Readers-Writer lock).
 
 In mixed workloads, write operations (`put`, `remove`) acquire an exclusive lock, which briefly pauses active readers. However, because the design is **append-only**, the exclusive window is extremely small—limited only to a file append and a hash-map update. Reads remain highly performant because they primarily involve a hash-map lookup and a direct pointer dereference into the mapped memory.
 
-| Benchmark | N | Threads | tinydb (reads/s) | SQLite (reads/s) | Ratio |
+| Benchmark | N | Threads | fluxen (reads/s) | SQLite (reads/s) | Ratio |
 |---|---|---|---|---|---|
 | Read/write contention | 1,000 | 2 threads | 235.9k/s | 164.2k/s | ~1.44x faster |
 | Read/write contention | 1,000 | 4 threads | 615.8k/s | 785.0k/s | ~1.27x slower |
@@ -210,11 +210,11 @@ In mixed workloads, write operations (`put`, `remove`) acquire an exclusive lock
 
 <details>
 <summary><b>Writer contention</b></summary>
-Under multiple concurrent writers, SQLite scales significantly with thread count, whereas tinydb maintains flat, stable throughput.
+Under multiple concurrent writers, SQLite scales significantly with thread count, whereas fluxen maintains flat, stable throughput.
 
-This is due to the difference in coordination models. SQLite allows **work coalescing**. When a thread holds the write lock, it may perform multiple queued operations before yielding, amortizing the cost of the WAL write. tinydb serializes writes with a simple exclusive lock and no cross-thread batching. Each write incurs its full latency independently, resulting in predictable but non-scaling write performance under heavy contention.
+This is due to the difference in coordination models. SQLite allows **work coalescing**. When a thread holds the write lock, it may perform multiple queued operations before yielding, amortizing the cost of the WAL write. fluxen serializes writes with a simple exclusive lock and no cross-thread batching. Each write incurs its full latency independently, resulting in predictable but non-scaling write performance under heavy contention.
 
-| Benchmark | N | Threads | tinydb (items/s) | SQLite (items/s) | Ratio |
+| Benchmark | N | Threads | fluxen (items/s) | SQLite (items/s) | Ratio |
 |---|---|---|---|---|---|
 | Writer contention | 1,000 | 2 threads | 242.1k/s | 313.6k/s | ~1.30x slower |
 | Writer contention | 1,000 | 4 threads | 274.6k/s | 919.6k/s | ~3.35x slower |
@@ -231,7 +231,7 @@ This is due to the difference in coordination models. SQLite allows **work coale
 
 ## Docs
 
-Full API reference is available at [dvuvud.github.io/tinydb](https://dvuvud.github.io/tinydb).
+Full API reference is available at [dvuvud.github.io/fluxen](https://dvuvud.github.io/fluxen).
 
 ---
 

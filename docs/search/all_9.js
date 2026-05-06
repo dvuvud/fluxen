@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['remove_0',['remove',['../classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47',1,'tinydb::Tx::remove()'],['../classtinydb_1_1_d_b.html#a1bd319a0b27297a4a789bbd20d10c59e',1,'tinydb::DB::remove()']]]
+  ['remove_0',['remove',['../classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409',1,'fluxen::Tx::remove()'],['../classfluxen_1_1_d_b.html#a92036a8e5d31138ae5a7ace0d0853bca',1,'fluxen::DB::remove()']]]
 ];

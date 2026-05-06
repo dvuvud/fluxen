@@ -1,4 +1,4 @@
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 
 #include <filesystem>
 #include <string>
@@ -8,11 +8,11 @@
 
 #include <gtest/gtest.h>
 
-class TinyDBTest : public ::testing::Test {
+class FluxenTest : public ::testing::Test {
 protected:
     void SetUp() override {
         path_ = make_temp_path("test");
-        db_ = std::make_unique<tinydb::DB>(path_.string());
+        db_ = std::make_unique<fluxen::DB>(path_.string());
     }
 
     void TearDown() override {
@@ -22,44 +22,44 @@ protected:
 
     void reopen() {
         db_.reset();
-        db_ = std::make_unique<tinydb::DB>(path_.string());
+        db_ = std::make_unique<fluxen::DB>(path_.string());
     }
 
     std::filesystem::path path_;
-    std::unique_ptr<tinydb::DB> db_;
+    std::unique_ptr<fluxen::DB> db_;
 };
 
 // strings
 
-TEST_F(TinyDBTest, PutAndGetString) {
+TEST_F(FluxenTest, PutAndGetString) {
     db_->put("hello", "world");
     ASSERT_EQ(db_->get("hello"), "world");
 }
 
-TEST_F(TinyDBTest, GetMissingKeyReturnsNullopt) {
+TEST_F(FluxenTest, GetMissingKeyReturnsNullopt) {
     EXPECT_EQ(db_->get("missing"), std::nullopt);
 }
 
-TEST_F(TinyDBTest, OverwriteUpdatesValue) {
+TEST_F(FluxenTest, OverwriteUpdatesValue) {
     db_->put("key", "first");
     db_->put("key", "second");
     EXPECT_EQ(db_->get("key"), "second");
 }
 
-TEST_F(TinyDBTest, OverwriteDoesNotIncreaseKeyCount) {
+TEST_F(FluxenTest, OverwriteDoesNotIncreaseKeyCount) {
     db_->put("key", "first");
     db_->put("key", "second");
     EXPECT_EQ(db_->key_count(), 1u);
 }
 
-TEST_F(TinyDBTest, EmptyStringValueIsValid) {
+TEST_F(FluxenTest, EmptyStringValueIsValid) {
     db_->put("empty", "");
     auto v = db_->get("empty");
     ASSERT_TRUE(v.has_value());
     EXPECT_TRUE(v->empty());
 }
 
-TEST_F(TinyDBTest, BinaryDataRoundTrips) {
+TEST_F(FluxenTest, BinaryDataRoundTrips) {
     std::string blob = { '\x00', '\x01', '\xFF', '\xFE' };
     db_->put("blob", blob);
     EXPECT_EQ(db_->get("blob"), blob);
@@ -67,34 +67,34 @@ TEST_F(TinyDBTest, BinaryDataRoundTrips) {
 
 // numeric types
 
-TEST_F(TinyDBTest, PutAndGetInt32) {
+TEST_F(FluxenTest, PutAndGetInt32) {
     db_->put("n", int32_t{-42});
     EXPECT_EQ(db_->get<int32_t>("n"), int32_t{-42});
 }
 
-TEST_F(TinyDBTest, PutAndGetUInt64) {
+TEST_F(FluxenTest, PutAndGetUInt64) {
     db_->put("n", uint64_t{0xDEADBEEFCAFEBABEULL});
     EXPECT_EQ(db_->get<uint64_t>("n"), uint64_t{0xDEADBEEFCAFEBABEULL});
 }
 
-TEST_F(TinyDBTest, PutAndGetFloat) {
+TEST_F(FluxenTest, PutAndGetFloat) {
     db_->put("f", 3.14f);
     EXPECT_EQ(db_->get<float>("f"), 3.14f);
 }
 
-TEST_F(TinyDBTest, PutAndGetDouble) {
+TEST_F(FluxenTest, PutAndGetDouble) {
     db_->put("d", 2.718281828);
     EXPECT_EQ(db_->get<double>("d"), 2.718281828);
 }
 
-TEST_F(TinyDBTest, PutAndGetBool) {
+TEST_F(FluxenTest, PutAndGetBool) {
     db_->put("b", true);
     EXPECT_EQ(db_->get<bool>("b"), true);
 }
 
 // structs
 
-TEST_F(TinyDBTest, PutAndGetTrivialStruct) {
+TEST_F(FluxenTest, PutAndGetTrivialStruct) {
     struct Vec3 { float x, y, z; };
     db_->put("pos", Vec3{1.0f, 2.0f, 3.0f});
     auto v = db_->get<Vec3>("pos");
@@ -104,35 +104,35 @@ TEST_F(TinyDBTest, PutAndGetTrivialStruct) {
     EXPECT_FLOAT_EQ(v->z, 3.0f);
 }
 
-TEST_F(TinyDBTest, GetWrongTypeSizeReturnsNullopt) {
+TEST_F(FluxenTest, GetWrongTypeSizeReturnsNullopt) {
     db_->put("small", uint8_t{7});
     EXPECT_EQ(db_->get<uint32_t>("small"), std::nullopt);
 }
 
 // remove and has
 
-TEST_F(TinyDBTest, HasReturnsTrueForExistingKey) {
+TEST_F(FluxenTest, HasReturnsTrueForExistingKey) {
     db_->put("x", "1");
     EXPECT_TRUE(db_->has("x"));
 }
 
-TEST_F(TinyDBTest, HasReturnsFalseForMissingKey) {
+TEST_F(FluxenTest, HasReturnsFalseForMissingKey) {
     EXPECT_FALSE(db_->has("nope"));
 }
 
-TEST_F(TinyDBTest, RemoveDeletesKey) {
+TEST_F(FluxenTest, RemoveDeletesKey) {
     db_->put("x", "1");
     db_->remove("x");
     EXPECT_FALSE(db_->has("x"));
     EXPECT_EQ(db_->get("x"), std::nullopt);
 }
 
-TEST_F(TinyDBTest, RemoveNonExistentKeyIsNoop) {
+TEST_F(FluxenTest, RemoveNonExistentKeyIsNoop) {
     EXPECT_NO_THROW(db_->remove("ghost"));
     EXPECT_EQ(db_->key_count(), 0u);
 }
 
-TEST_F(TinyDBTest, ReinsertAfterRemoveWorks) {
+TEST_F(FluxenTest, ReinsertAfterRemoveWorks) {
     db_->put("x", "original");
     db_->remove("x");
     db_->put("x", "back");
@@ -141,18 +141,18 @@ TEST_F(TinyDBTest, ReinsertAfterRemoveWorks) {
 
 // key_count
 
-TEST_F(TinyDBTest, KeyCountStartsAtZero) {
+TEST_F(FluxenTest, KeyCountStartsAtZero) {
     EXPECT_EQ(db_->key_count(), 0u);
 }
 
-TEST_F(TinyDBTest, KeyCountTracksInsertions) {
+TEST_F(FluxenTest, KeyCountTracksInsertions) {
     db_->put("a", "1");
     db_->put("b", "2");
     db_->put("c", "3");
     EXPECT_EQ(db_->key_count(), 3u);
 }
 
-TEST_F(TinyDBTest, KeyCountTracksRemovals) {
+TEST_F(FluxenTest, KeyCountTracksRemovals) {
     db_->put("a", "1");
     db_->put("b", "2");
     db_->remove("a");
@@ -161,14 +161,14 @@ TEST_F(TinyDBTest, KeyCountTracksRemovals) {
 
 // each
 
-TEST_F(TinyDBTest, EachVisitsAllLiveKeys) {
+TEST_F(FluxenTest, EachVisitsAllLiveKeys) {
     db_->put("a", "1");
     db_->put("b", "2");
     db_->put("c", "3");
     db_->remove("b");
 
     std::vector<std::string> keys;
-    db_->each([&](std::string_view k, tinydb::Bytes) {
+    db_->each([&](std::string_view k, fluxen::Bytes) {
         keys.push_back(std::string(k));
     });
 
@@ -178,15 +178,15 @@ TEST_F(TinyDBTest, EachVisitsAllLiveKeys) {
     EXPECT_EQ(std::find(keys.begin(), keys.end(), "b"), keys.end());
 }
 
-TEST_F(TinyDBTest, EachOnEmptyDatabaseCallsCallbackZeroTimes) {
+TEST_F(FluxenTest, EachOnEmptyDatabaseCallsCallbackZeroTimes) {
     int calls = 0;
-    db_->each([&](std::string_view, tinydb::Bytes) { ++calls; });
+    db_->each([&](std::string_view, fluxen::Bytes) { ++calls; });
     EXPECT_EQ(calls, 0);
 }
 
-TEST_F(TinyDBTest, EachValueBytesMatchStoredString) {
+TEST_F(FluxenTest, EachValueBytesMatchStoredString) {
     db_->put("msg", "hello");
-    db_->each([](std::string_view key, tinydb::Bytes val) {
+    db_->each([](std::string_view key, fluxen::Bytes val) {
         if (key == "msg") {
             std::string v(reinterpret_cast<const char*>(val.data()), val.size());
             EXPECT_EQ(v, "hello");
@@ -196,68 +196,68 @@ TEST_F(TinyDBTest, EachValueBytesMatchStoredString) {
 
 // prefix
 
-TEST_F(TinyDBTest, PrefixFiltersCorrectly) {
+TEST_F(FluxenTest, PrefixFiltersCorrectly) {
     db_->put("user:james",   "admin");
     db_->put("user:rick",    "viewer");
     db_->put("config:theme", "dark");
 
     int users = 0;
-    db_->prefix("user:", [&](std::string_view, tinydb::Bytes) { ++users; });
+    db_->prefix("user:", [&](std::string_view, fluxen::Bytes) { ++users; });
     EXPECT_EQ(users, 2);
 }
 
-TEST_F(TinyDBTest, PrefixWithNoMatchesCallsCallbackZeroTimes) {
+TEST_F(FluxenTest, PrefixWithNoMatchesCallsCallbackZeroTimes) {
     db_->put("user:james", "admin");
     int calls = 0;
-    db_->prefix("session:", [&](std::string_view, tinydb::Bytes) { ++calls; });
+    db_->prefix("session:", [&](std::string_view, fluxen::Bytes) { ++calls; });
     EXPECT_EQ(calls, 0);
 }
 
-TEST_F(TinyDBTest, PrefixEmptyStringMatchesAll) {
+TEST_F(FluxenTest, PrefixEmptyStringMatchesAll) {
     db_->put("a", "1");
     db_->put("b", "2");
     db_->put("c", "3");
     int calls = 0;
-    db_->prefix("", [&](std::string_view, tinydb::Bytes) { ++calls; });
+    db_->prefix("", [&](std::string_view, fluxen::Bytes) { ++calls; });
     EXPECT_EQ(calls, 3);
 }
 
 // transactions
 
-TEST_F(TinyDBTest, TransactionCommitAppliesAllOps) {
-    db_->transaction([](tinydb::Tx& tx) {
+TEST_F(FluxenTest, TransactionCommitAppliesAllOps) {
+    db_->transaction([](fluxen::Tx& tx) {
         tx.put("balance",  int32_t{1000});
         tx.put("currency", std::string("USD"));
-        return tinydb::commit;
+        return fluxen::commit;
     });
     EXPECT_EQ(db_->get<int32_t>("balance"), int32_t{1000});
     EXPECT_EQ(db_->get("currency"), "USD");
 }
 
-TEST_F(TinyDBTest, TransactionRollbackAppliesNothing) {
+TEST_F(FluxenTest, TransactionRollbackAppliesNothing) {
     db_->put("x", "original");
-    db_->transaction([](tinydb::Tx& tx) {
+    db_->transaction([](fluxen::Tx& tx) {
         tx.put("x", std::string("changed"));
         tx.put("y", std::string("new"));
-        return tinydb::rollback;
+        return fluxen::rollback;
     });
     EXPECT_EQ(db_->get("x"), "original");
     EXPECT_FALSE(db_->has("y"));
 }
 
-TEST_F(TinyDBTest, TransactionCanDelete) {
+TEST_F(FluxenTest, TransactionCanDelete) {
     db_->put("temp", "bye");
-    db_->transaction([](tinydb::Tx& tx) {
+    db_->transaction([](fluxen::Tx& tx) {
         tx.remove("temp");
-        return tinydb::commit;
+        return fluxen::commit;
     });
     EXPECT_FALSE(db_->has("temp"));
 }
 
-TEST_F(TinyDBTest, TransactionThrowIsEquivalentToRollback) {
+TEST_F(FluxenTest, TransactionThrowIsEquivalentToRollback) {
     db_->put("x", "safe");
     try {
-        db_->transaction([](tinydb::Tx& tx) -> tinydb::TxResult {
+        db_->transaction([](fluxen::Tx& tx) -> fluxen::TxResult {
             tx.put("x", std::string("danger"));
             throw std::runtime_error("abort");
         });
@@ -265,13 +265,13 @@ TEST_F(TinyDBTest, TransactionThrowIsEquivalentToRollback) {
     EXPECT_EQ(db_->get("x"), "safe");
 }
 
-TEST_F(TinyDBTest, TransactionMixedPutAndDelete) {
+TEST_F(FluxenTest, TransactionMixedPutAndDelete) {
     db_->put("keep", "yes");
     db_->put("drop", "no");
-    db_->transaction([](tinydb::Tx& tx) {
+    db_->transaction([](fluxen::Tx& tx) {
         tx.remove("drop");
         tx.put("new", std::string("hello"));
-        return tinydb::commit;
+        return fluxen::commit;
     });
     EXPECT_TRUE(db_->has("keep"));
     EXPECT_FALSE(db_->has("drop"));
@@ -280,8 +280,8 @@ TEST_F(TinyDBTest, TransactionMixedPutAndDelete) {
 
 // persistence
 
-TEST_F(TinyDBTest, DataPersistsAcrossReopen) {
-    db_->put("name",    "tinydb");
+TEST_F(FluxenTest, DataPersistsAcrossReopen) {
+    db_->put("name",    "fluxen");
     db_->put("version", int32_t{1});
     db_->remove("name");
 
@@ -291,7 +291,7 @@ TEST_F(TinyDBTest, DataPersistsAcrossReopen) {
     EXPECT_EQ(db_->get<int32_t>("version"), int32_t{1});
 }
 
-TEST_F(TinyDBTest, StructPersistsAcrossReopen) {
+TEST_F(FluxenTest, StructPersistsAcrossReopen) {
     struct Config { int port; float timeout; bool debug; char pad[3]; };
     db_->put("cfg", Config{8080, 30.0f, true, {}});
 
@@ -304,7 +304,7 @@ TEST_F(TinyDBTest, StructPersistsAcrossReopen) {
     EXPECT_TRUE(cfg->debug);
 }
 
-TEST_F(TinyDBTest, KeyCountCorrectAfterReopen) {
+TEST_F(FluxenTest, KeyCountCorrectAfterReopen) {
     db_->put("a", "1");
     db_->put("b", "2");
     db_->put("c", "3");
@@ -315,7 +315,7 @@ TEST_F(TinyDBTest, KeyCountCorrectAfterReopen) {
     EXPECT_EQ(db_->key_count(), 2u);
 }
 
-TEST_F(TinyDBTest, TombstonesHonouredAfterReopen) {
+TEST_F(FluxenTest, TombstonesHonouredAfterReopen) {
     db_->put("gone", "bye");
     db_->remove("gone");
 
@@ -324,7 +324,7 @@ TEST_F(TinyDBTest, TombstonesHonouredAfterReopen) {
     EXPECT_FALSE(db_->has("gone"));
 }
 
-TEST_F(TinyDBTest, OverwritePersistsAcrossReopen) {
+TEST_F(FluxenTest, OverwritePersistsAcrossReopen) {
     db_->put("key", "first");
     reopen();
     db_->put("key", "second");
@@ -334,7 +334,7 @@ TEST_F(TinyDBTest, OverwritePersistsAcrossReopen) {
 
 // compaction
 
-TEST_F(TinyDBTest, CompactReducesFileSize) {
+TEST_F(FluxenTest, CompactReducesFileSize) {
     for (int i = 0; i < 100; ++i) {
         db_->put("k" + std::to_string(i), int32_t{i});
     }
@@ -347,7 +347,7 @@ TEST_F(TinyDBTest, CompactReducesFileSize) {
     EXPECT_LT(db_->file_size(), before);
 }
 
-TEST_F(TinyDBTest, CompactPreservesAllLiveKeys) {
+TEST_F(FluxenTest, CompactPreservesAllLiveKeys) {
     for (int i = 0; i < 100; ++i) {
         db_->put("k" + std::to_string(i), int32_t{i});
     }
@@ -363,7 +363,7 @@ TEST_F(TinyDBTest, CompactPreservesAllLiveKeys) {
     }
 }
 
-TEST_F(TinyDBTest, CompactRemovesDeletedKeys) {
+TEST_F(FluxenTest, CompactRemovesDeletedKeys) {
     for (int i = 0; i < 50; ++i) {
         db_->remove("k" + std::to_string(i));
     }
@@ -375,7 +375,7 @@ TEST_F(TinyDBTest, CompactRemovesDeletedKeys) {
     }
 }
 
-TEST_F(TinyDBTest, CompactedDataPersistsAcrossReopen) {
+TEST_F(FluxenTest, CompactedDataPersistsAcrossReopen) {
     db_->put("a", "keep");
     db_->put("b", "drop");
     db_->put("c", "keep");
@@ -390,7 +390,7 @@ TEST_F(TinyDBTest, CompactedDataPersistsAcrossReopen) {
     EXPECT_EQ(db_->key_count(), 2u);
 }
 
-TEST_F(TinyDBTest, CompactWithOverwrittenKeys) {
+TEST_F(FluxenTest, CompactWithOverwrittenKeys) {
     for (int i = 0; i < 50; ++i) {
         db_->put("k" + std::to_string(i), int32_t{i});
     }
@@ -409,25 +409,25 @@ TEST_F(TinyDBTest, CompactWithOverwrittenKeys) {
 
 // file format
 
-TEST_F(TinyDBTest, BadMagicThrowsOnOpen) {
-    auto bad_path = std::filesystem::temp_directory_path() / "tinydb_bad_magic.db";
+TEST_F(FluxenTest, BadMagicThrowsOnOpen) {
+    auto bad_path = std::filesystem::temp_directory_path() / "fluxen_bad_magic.db";
     {
         std::FILE* f = std::fopen(bad_path.string().c_str(), "wb");
         std::fwrite("NOTVALID", 1, 8, f);
         std::fclose(f);
     }
-    EXPECT_THROW(tinydb::DB{bad_path.string()}, std::runtime_error);
+    EXPECT_THROW(fluxen::DB{bad_path.string()}, std::runtime_error);
     std::filesystem::remove(bad_path);
 }
 
-TEST_F(TinyDBTest, EmptyFileInitialisesCleanly) {
+TEST_F(FluxenTest, EmptyFileInitialisesCleanly) {
     EXPECT_EQ(db_->key_count(), 0u);
     EXPECT_GT(db_->file_size(), 0u);
 }
 
 // stress testing
 
-TEST_F(TinyDBTest, ManyKeysAllReadBack) {
+TEST_F(FluxenTest, ManyKeysAllReadBack) {
     const int N = 1000;
     for (int i = 0; i < N; ++i) {
         db_->put("k" + std::to_string(i), int32_t{i});
@@ -440,13 +440,13 @@ TEST_F(TinyDBTest, ManyKeysAllReadBack) {
     }
 }
 
-TEST_F(TinyDBTest, LargeValueRoundTrips) {
+TEST_F(FluxenTest, LargeValueRoundTrips) {
     std::string big(1024 * 1024, 'x');
     db_->put("big", big);
     EXPECT_EQ(db_->get("big"), big);
 }
 
-TEST_F(TinyDBTest, LargeValuePersistsAcrossReopen) {
+TEST_F(FluxenTest, LargeValuePersistsAcrossReopen) {
     std::string big(1024 * 1024, 'z');
     db_->put("big", big);
 

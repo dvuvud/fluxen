@@ -1,5 +1,5 @@
 #include "tests/test_helpers.hpp"
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 
 #include <benchmark/benchmark.h>
 #include <sqlite3.h>
@@ -33,7 +33,7 @@ auto make_values(int n) -> std::vector<std::string> {
 
 /**
  * SQLite in WAL mode with synchronous=OFF. No fsyncs on individual writes
- * which matches tinydb's bare put().
+ * which matches fluxen's bare put().
  */
 auto open_sqlite_no_sync(const std::string& path) -> sqlite3* {
     sqlite3* db = nullptr;
@@ -49,7 +49,7 @@ auto open_sqlite_no_sync(const std::string& path) -> sqlite3* {
 
 /**
  * SQLite in WAL mode with synchronous=NORMAL. Checkpoints sync but individual
- * commits don't. Matches tinydb's transaction(), which fsyncs once at the end.
+ * commits don't. Matches fluxen's transaction(), which fsyncs once at the end.
  */
 auto open_sqlite_normal_sync(const std::string& path) -> sqlite3* {
     sqlite3* db = nullptr;
@@ -68,12 +68,12 @@ auto open_sqlite_normal_sync(const std::string& path) -> sqlite3* {
 /**
  * Sequential Write: individual writes, no explicit transaction
  *
- * One write at a time, no batching on either side. tinydb appends to the log
+ * One write at a time, no batching on either side. fluxen appends to the log
  * and SQLite auto-commits each INSERT. Neither side fsyncs between writes.
  * Baseline cost of a single put in each system.
  */
 
-static void BM_tinydb_SequentialWrite(benchmark::State& state) {
+static void BM_fluxen_SequentialWrite(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
@@ -81,7 +81,7 @@ static void BM_tinydb_SequentialWrite(benchmark::State& state) {
     for (auto _ : state) {
         auto path = make_temp_path("write");
         {
-            tinydb::DB db(path);
+            fluxen::DB db(path);
             for (int i = 0; i < n; ++i) {
                 db.put(keys[i], vals[i]);
             }
@@ -137,11 +137,11 @@ static void BM_SQLite_SequentialWrite(benchmark::State& state) {
  *
  * Both sides batch all writes into a single atomic transaction.  This is
  * SQLite's strong suit: it amortises B-tree and WAL overhead over many rows.
- * tinydb uses its transaction() API which fsyncs at the end and SQLite uses
+ * fluxen uses its transaction() API which fsyncs at the end and SQLite uses
  * synchronous=NORMAL which also syncs at checkpoint but not per-commit.
  */
 
-static void BM_tinydb_BulkWrite(benchmark::State& state) {
+static void BM_fluxen_BulkWrite(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
@@ -149,12 +149,12 @@ static void BM_tinydb_BulkWrite(benchmark::State& state) {
     for (auto _ : state) {
         auto path = make_temp_path("bulk");
         {
-            tinydb::DB db(path);
-            db.transaction([&](tinydb::Tx& tx) -> tinydb::TxResult {
+            fluxen::DB db(path);
+            db.transaction([&](fluxen::Tx& tx) -> fluxen::TxResult {
                 for (int i = 0; i < n; ++i) {
                     tx.put(keys[i], vals[i]);
                 }
-                return tinydb::commit;
+                return fluxen::commit;
             });
         }
         state.PauseTiming();
@@ -212,20 +212,20 @@ static void BM_SQLite_BulkWrite(benchmark::State& state) {
  * Pure read throughput with no open cost and no index rebuild paid during timing.
  */
 
-static void BM_tinydb_SequentialRead(benchmark::State& state) {
+static void BM_fluxen_SequentialRead(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
 
     auto path = make_temp_path("read");
     {
-        tinydb::DB setup(path);
+        fluxen::DB setup(path);
         for (int i = 0; i < n; ++i) {
             setup.put(keys[i], vals[i]);
         }
     }
 
-    tinydb::DB db(path);
+    fluxen::DB db(path);
     for (auto _ : state) {
         for (int i = 0; i < n; ++i) {
             benchmark::DoNotOptimize(db.get(keys[i]));
@@ -294,7 +294,7 @@ static void BM_SQLite_SequentialRead(benchmark::State& state) {
  * cache locality. The shuffle is fixed-seed so results are reproducible.
  */
 
-static void BM_tinydb_RandomRead(benchmark::State& state) {
+static void BM_fluxen_RandomRead(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
@@ -306,13 +306,13 @@ static void BM_tinydb_RandomRead(benchmark::State& state) {
 
     auto path = make_temp_path("rread");
     {
-        tinydb::DB setup(path);
+        fluxen::DB setup(path);
         for (int i = 0; i < n; ++i) {
             setup.put(keys[i], vals[i]);
         }
     }
 
-    tinydb::DB db(path);
+    fluxen::DB db(path);
     for (auto _ : state) {
         for (int idx : order) {
             benchmark::DoNotOptimize(db.get(keys[idx]));
@@ -378,11 +378,11 @@ static void BM_SQLite_RandomRead(benchmark::State& state) {
 /**
  * Overwrite: write N keys, then write them all again
  *
- * No transaction wrapper. Every write auto-commits. tinydb's put() naturally
+ * No transaction wrapper. Every write auto-commits. fluxen's put() naturally
  * handles overwrites and SQLite uses INSERT OR REPLACE.
  */
 
-static void BM_tinydb_Overwrite(benchmark::State& state) {
+static void BM_fluxen_Overwrite(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
@@ -390,7 +390,7 @@ static void BM_tinydb_Overwrite(benchmark::State& state) {
     for (auto _ : state) {
         auto path = make_temp_path("overwrite");
         {
-            tinydb::DB db(path);
+            fluxen::DB db(path);
             for (int i = 0; i < n; ++i) {
                 db.put(keys[i], vals[i]);
             }
@@ -453,26 +453,26 @@ static void BM_SQLite_Overwrite(benchmark::State& state) {
 /**
  * Open: how long does it take to open an existing database?
  *
- * tinydb scans the whole log and rebuilds its hash index from scratch on every
+ * fluxen scans the whole log and rebuilds its hash index from scratch on every
  * open. SQLite opens the file and does a full SELECT k, v scan to give both
  * sides comparable startup work.
  */
 
-static void BM_tinydb_Open(benchmark::State& state) {
+static void BM_fluxen_Open(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
 
     auto path = make_temp_path("open");
     {
-        tinydb::DB setup(path);
+        fluxen::DB setup(path);
         for (int i = 0; i < n; ++i) {
             setup.put(keys[i], vals[i]);
         }
     }
 
     for (auto _ : state) {
-        tinydb::DB db(path);
+        fluxen::DB db(path);
         benchmark::DoNotOptimize(db.key_count());
     }
 
@@ -526,7 +526,7 @@ static void BM_SQLite_Open(benchmark::State& state) {
 
 // Compaction
 
-static void BM_tinydb_Compact(benchmark::State& state) {
+static void BM_fluxen_Compact(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
@@ -536,7 +536,7 @@ static void BM_tinydb_Compact(benchmark::State& state) {
 
         state.PauseTiming();
         {
-            tinydb::DB db(path);
+            fluxen::DB db(path);
             for (int i = 0; i < n; ++i) {
                 db.put(keys[i], vals[i]);
             }
@@ -545,7 +545,7 @@ static void BM_tinydb_Compact(benchmark::State& state) {
             }
         }
         {
-            tinydb::DB db(path);
+            fluxen::DB db(path);
             state.ResumeTiming();
             db.compact();
         }
@@ -560,7 +560,7 @@ static void BM_tinydb_Compact(benchmark::State& state) {
  * Struct Write: storing a fixed-size struct as raw bytes, one write at a time.
  */
 
-static void BM_tinydb_StructWrite(benchmark::State& state) {
+static void BM_fluxen_StructWrite(benchmark::State& state) {
     struct Player { int32_t score; float x, y; bool active; char pad[3]; };
     const int n = state.range(0);
     auto keys = make_keys(n);
@@ -568,7 +568,7 @@ static void BM_tinydb_StructWrite(benchmark::State& state) {
     for (auto _ : state) {
         auto path = make_temp_path("struct");
         {
-            tinydb::DB db(path);
+            fluxen::DB db(path);
             for (int i = 0; i < n; ++i) {
                 db.put(keys[i], Player{.score=i, .x=float(i), .y=float(i), .active=true, .pad={}});
             }
@@ -626,20 +626,20 @@ static void BM_SQLite_StructWrite(benchmark::State& state) {
  * clock starts on both sides.
  */
 
-static void BM_tinydb_StructRead(benchmark::State& state) {
+static void BM_fluxen_StructRead(benchmark::State& state) {
     struct Player { int32_t score; float x, y; bool active; char pad[3]; };
     const int n = state.range(0);
     auto keys = make_keys(n);
 
     auto path = make_temp_path("sread");
     {
-        tinydb::DB setup(path);
+        fluxen::DB setup(path);
         for (int i = 0; i < n; ++i) {
             setup.put(keys[i], Player{.score=i, .x=float(i), .y=float(i), .active=true, .pad={}});
         }
     }
 
-    tinydb::DB db(path);
+    fluxen::DB db(path);
     for (auto _ : state) {
         for (int i = 0; i < n; ++i) {
             benchmark::DoNotOptimize(db.get<Player>(keys[i]));
@@ -703,12 +703,12 @@ static void BM_SQLite_StructRead(benchmark::State& state) {
 /**
  * Transaction: one committed batch per iteration, with durability.
  *
- * tinydb fsyncs at the end of every commit. SQLite uses synchronous=NORMAL
+ * fluxen fsyncs at the end of every commit. SQLite uses synchronous=NORMAL
  * with WAL, which syncs at checkpoint rather than per commit. This has a
  * closely matched durability level.
  */
 
-static void BM_tinydb_Transaction(benchmark::State& state) {
+static void BM_fluxen_Transaction(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
@@ -716,12 +716,12 @@ static void BM_tinydb_Transaction(benchmark::State& state) {
     for (auto _ : state) {
         auto path = make_temp_path("tx");
         {
-            tinydb::DB db(path);
-            db.transaction([&](tinydb::Tx& tx) -> tinydb::TxResult {
+            fluxen::DB db(path);
+            db.transaction([&](fluxen::Tx& tx) -> fluxen::TxResult {
                 for (int i = 0; i < n; ++i) {
                     tx.put(keys[i], vals[i]);
                 }
-                return tinydb::commit;
+                return fluxen::commit;
             });
         }
         state.PauseTiming();
@@ -776,22 +776,22 @@ static void BM_SQLite_Transaction(benchmark::State& state) {
 
 #define COMMON_ARGS Arg(100)->Arg(1000)->Arg(10000);
 
-BENCHMARK(BM_tinydb_SequentialRead)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_SequentialRead)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_SequentialRead)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_RandomRead)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_RandomRead)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_RandomRead)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_StructRead)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_StructRead)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_StructRead)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_SequentialWrite)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_SequentialWrite)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_SequentialWrite)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_BulkWrite)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_BulkWrite)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_BulkWrite)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_Overwrite)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_Overwrite)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_Overwrite)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_StructWrite)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_StructWrite)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_StructWrite)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_Open)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_Open)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_Open)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_Transaction)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_Transaction)->COMMON_ARGS;
-// BENCHMARK(BM_tinydb_Compact)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_Transaction)->COMMON_ARGS;
+// BENCHMARK(BM_fluxen_Compact)->COMMON_ARGS;

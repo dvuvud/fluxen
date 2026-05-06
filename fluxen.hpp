@@ -1,6 +1,6 @@
 /**
- * @file tinydb.hpp
- * @mainpage tinydb
+ * @file fluxen.hpp
+ * @mainpage fluxen
  * @brief Single-header embedded key-value store for C++20.
  *
  * Drop this file into any project and get a persistent key-value database
@@ -8,9 +8,9 @@
  *
  * @par Quick start
  * @code
- *   #include "tinydb.hpp"
+ *   #include "fluxen.hpp"
  *
- *   tinydb::DB db("myapp.db");
+ *   fluxen::DB db("myapp.db");
  *   db.put("username", "rick");
  *
  *   if (auto name = db.get("username")) {
@@ -29,7 +29,7 @@
  *
  * @par File & data layout
  * @code
- *   [magic: 8 bytes "TINYDB01"]
+ *   [magic: 8 bytes "fluxen01"]
  *   [entry] [entry] ...
  *
  *   entry layout:
@@ -100,7 +100,7 @@
 #include <unistd.h>
 #endif
 
-namespace tinydb {
+namespace fluxen {
 
 // --- public types ---
 
@@ -458,8 +458,8 @@ class DB;   // forward declaration
  *
  * A @p Tx is constructed by DB::transaction() and passed to the callback.
  * Operations staged on it are only applied to the database if the
- * callback returns @p tinydb::commit. They are discarded on
- * @p tinydb::rollback or if the callback throws.
+ * callback returns @p fluxen::commit. They are discarded on
+ * @p fluxen::rollback or if the callback throws.
  *
  * @note Do not construct a @p Tx directly, use DB::transaction().
  *
@@ -547,7 +547,7 @@ private:
  *
  * @par Example
  * @code
- *   tinydb::DB db("app.db");
+ *   fluxen::DB db("app.db");
  *
  *   db.put("hits", int64_t{0});
  *
@@ -569,11 +569,11 @@ public:
      *
      * @throws std::runtime_error If the file cannot be opened or created.
      * @throws std::runtime_error If the file exists but has an invalid magic
-     *         header (i.e. was not created by tinydb).
+     *         header (i.e. was not created by fluxen).
      */
     explicit DB(std::string_view path) {
         if (!file_.open(path)) {
-            throw std::runtime_error("tinydb: failed to open '" + std::string(path) + "'");
+            throw std::runtime_error("fluxen: failed to open '" + std::string(path) + "'");
         }
 
         if (file_.size() == 0) {
@@ -706,7 +706,7 @@ public:
             const auto* ptr = file_.ptr() + entry.val_offset;
             return std::string(reinterpret_cast<const char*>(ptr), entry.val_len);
         } else {
-            static_assert(std::is_trivially_copyable_v<T>, "tinydb: T must be trivially copyable");
+            static_assert(std::is_trivially_copyable_v<T>, "fluxen: T must be trivially copyable");
             if (entry.val_len != static_cast<uint32_t>(sizeof(T))) {
                 return std::nullopt;
             }
@@ -780,7 +780,7 @@ public:
      *
      * @par Example
      * @code
-     *   db.each([](std::string_view key, tinydb::Bytes val) {
+     *   db.each([](std::string_view key, fluxen::Bytes val) {
      *       std::string v(reinterpret_cast<const char*>(val.data()), val.size());
      *       std::cout << key << " = " << v << "\n";
      *   });
@@ -817,7 +817,7 @@ public:
      *   db.put("user:bryce",   "viewer");
      *   db.put("config:x",   "value");
      *
-     *   db.prefix("user:", [](std::string_view key, tinydb::Bytes val) {
+     *   db.prefix("user:", [](std::string_view key, fluxen::Bytes val) {
      *       // called for user:james and user:bryce only
      *   });
      * @endcode
@@ -839,9 +839,9 @@ public:
      * @brief Executes a batch of operations atomically.
      *
      * The callback receives a Tx object on which any number of put() and
-     * remove() calls can be staged. Returning `tinydb::commit` applies all
+     * remove() calls can be staged. Returning `fluxen::commit` applies all
      * operations atomically and flushes them to disk. Returning
-     * `tinydb::rollback` discards all staged operations and the database is
+     * `fluxen::rollback` discards all staged operations and the database is
      * left completely unchanged.
      *
      * If the callback throws, the exception propagates to the caller and all
@@ -857,22 +857,22 @@ public:
      *
      * @par Example
      * @code
-     *   db.transaction([](tinydb::Tx& tx) {
+     *   db.transaction([](fluxen::Tx& tx) {
      *       tx.put("balance",  int32_t{500});
      *       tx.put("currency", std::string("USD"));
      *       tx.remove("old_session");
-     *       return tinydb::commit;
+     *       return fluxen::commit;
      *   });
      * @endcode
      *
      * @par Rolling back
      * @code
-     *   db.transaction([&](tinydb::Tx& tx) {
+     *   db.transaction([&](fluxen::Tx& tx) {
      *       tx.put("x", new_value);
      *       if (!validate(new_value)) {
-     *           return tinydb::rollback;   // nothing is written
+     *           return fluxen::rollback;   // nothing is written
      *       }
-     *       return tinydb::commit;
+     *       return fluxen::commit;
      *   });
      * @endcode
      */
@@ -969,7 +969,7 @@ public:
         }
 
         if (!file_.rewrite(buf)) {
-            throw std::runtime_error("tinydb: compact failed during rewrite");
+            throw std::runtime_error("fluxen: compact failed during rewrite");
         }
 
         index_ = std::move(new_index);
@@ -1021,11 +1021,11 @@ private:
      */
     void load_index() {
         if (file_.size() < sizeof(detail::MAGIC)) {
-            throw std::runtime_error("tinydb: file too small to be valid");
+            throw std::runtime_error("fluxen: file too small to be valid");
         }
 
         if (std::memcmp(file_.ptr(), detail::MAGIC, sizeof(detail::MAGIC)) != 0) {
-            throw std::runtime_error("tinydb: bad magic. File was not created by tinydb");
+            throw std::runtime_error("fluxen: bad magic. File was not created by fluxen");
         }
 
         size_t pos = sizeof(detail::MAGIC);
@@ -1069,7 +1069,7 @@ private:
                       const uint8_t* val,
                       uint32_t val_len,
                       bool tombstone) {
-        assert(key.size() <= detail::MAX_KEY && "tinydb: key exceeds 255-byte limit");
+        assert(key.size() <= detail::MAX_KEY && "fluxen: key exceeds 255-byte limit");
 
         detail::EntryHeader hdr{
             .flags   = tombstone ? detail::FLAG_TOMB : detail::FLAG_LIVE,
@@ -1130,4 +1130,4 @@ private:
 
 };
 
-}   // namespace tinydb
+}   // namespace fluxen

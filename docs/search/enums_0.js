@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['txresult_0',['TxResult',['../tinydb_8hpp.html#af0fa997cb38231ee8eab1529ba32078b',1,'tinydb']]]
+  ['txresult_0',['TxResult',['../fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f',1,'fluxen']]]
 ];

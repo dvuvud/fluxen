@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['_7edb_0',['~DB',['../classtinydb_1_1_d_b.html#a50be520b12fac204dbca6c119144c697',1,'tinydb::DB']]]
+  ['_7edb_0',['~DB',['../classfluxen_1_1_d_b.html#abea3002475bcc45ea415a1630df90a57',1,'fluxen::DB']]]
 ];

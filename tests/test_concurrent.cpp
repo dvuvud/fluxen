@@ -1,4 +1,4 @@
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 #include "test_helpers.hpp"
 
 #include <atomic>
@@ -15,11 +15,11 @@ using std::thread;
 
 using namespace std::chrono_literals;
 
-class TinyDBConcurrentTest : public ::testing::Test {
+class FluxenConcurrentTest : public ::testing::Test {
 protected:
     void SetUp() override {
         path_ = make_temp_path("concurrent");
-        db_   = std::make_unique<tinydb::DB>(path_.string());
+        db_   = std::make_unique<fluxen::DB>(path_.string());
     }
 
     void TearDown() override {
@@ -29,16 +29,16 @@ protected:
 
     void reopen() {
         db_.reset();
-        db_ = std::make_unique<tinydb::DB>(path_.string());
+        db_ = std::make_unique<fluxen::DB>(path_.string());
     }
 
     std::filesystem::path      path_;
-    std::unique_ptr<tinydb::DB> db_;
+    std::unique_ptr<fluxen::DB> db_;
 };
 
 // concurrent reads
 
-TEST_F(TinyDBConcurrentTest, ConcurrentReadsReturnCorrectValue) {
+TEST_F(FluxenConcurrentTest, ConcurrentReadsReturnCorrectValue) {
     db_->put("key", int32_t{42});
 
     constexpr int kThreads = 16;
@@ -64,7 +64,7 @@ TEST_F(TinyDBConcurrentTest, ConcurrentReadsReturnCorrectValue) {
     EXPECT_EQ(mismatches.load(), 0);
 }
 
-TEST_F(TinyDBConcurrentTest, ConcurrentMixedReadOpsDoNotDeadlock) {
+TEST_F(FluxenConcurrentTest, ConcurrentMixedReadOpsDoNotDeadlock) {
     db_->put("user:alice", "admin");
     db_->put("user:bob",   "viewer");
     db_->put("cfg",        "x");
@@ -93,7 +93,7 @@ TEST_F(TinyDBConcurrentTest, ConcurrentMixedReadOpsDoNotDeadlock) {
     SUCCEED();
 }
 
-TEST_F(TinyDBConcurrentTest, LazyRemapUnderConcurrentReadersIsCorrect) {
+TEST_F(FluxenConcurrentTest, LazyRemapUnderConcurrentReadersIsCorrect) {
     db_->put("x", int32_t{1});
 
     db_->put("x", int32_t{2});
@@ -119,7 +119,7 @@ TEST_F(TinyDBConcurrentTest, LazyRemapUnderConcurrentReadersIsCorrect) {
 
 // concurrent writes
 
-TEST_F(TinyDBConcurrentTest, ConcurrentWritersDoNotCorruptData) {
+TEST_F(FluxenConcurrentTest, ConcurrentWritersDoNotCorruptData) {
     db_->put("n", int32_t{0});
 
     constexpr int kThreads = 8;
@@ -148,7 +148,7 @@ TEST_F(TinyDBConcurrentTest, ConcurrentWritersDoNotCorruptData) {
 
 // concurrent reads and writes
 
-TEST_F(TinyDBConcurrentTest, ReadersObserveWriteAfterWriterFinishes) {
+TEST_F(FluxenConcurrentTest, ReadersObserveWriteAfterWriterFinishes) {
     db_->put("counter", int32_t{0});
 
     std::latch writer_done{1};
@@ -177,7 +177,7 @@ TEST_F(TinyDBConcurrentTest, ReadersObserveWriteAfterWriterFinishes) {
     EXPECT_EQ(wrong_reads.load(), 0);
 }
 
-TEST_F(TinyDBConcurrentTest, WriterWaitsForActiveReader) {
+TEST_F(FluxenConcurrentTest, WriterWaitsForActiveReader) {
     db_->put("val", std::string("before"));
 
     std::latch reader_inside{1};
@@ -185,7 +185,7 @@ TEST_F(TinyDBConcurrentTest, WriterWaitsForActiveReader) {
     std::atomic<bool> write_done{false};
 
     std::thread reader([&]() -> void {
-        db_->each([&](string_view, tinydb::Bytes) -> void {
+        db_->each([&](string_view, fluxen::Bytes) -> void {
             reader_inside.count_down();
             std::this_thread::sleep_for(20ms);
         });
@@ -207,7 +207,7 @@ TEST_F(TinyDBConcurrentTest, WriterWaitsForActiveReader) {
 
 // transactions
 
-TEST_F(TinyDBConcurrentTest, TransactionAtomicUnderConcurrentReads) {
+TEST_F(FluxenConcurrentTest, TransactionAtomicUnderConcurrentReads) {
     db_->put("tx:a", std::string("old_a"));
     db_->put("tx:b", std::string("old_b"));
 
@@ -223,10 +223,10 @@ TEST_F(TinyDBConcurrentTest, TransactionAtomicUnderConcurrentReads) {
     });
 
     for (int i = 0; i < 200; ++i) {
-        db_->transaction([&i](tinydb::Tx& tx) -> tinydb::TxResult {
+        db_->transaction([&i](fluxen::Tx& tx) -> fluxen::TxResult {
             tx.put("tx:a", std::string("a") + std::to_string(i));
             tx.put("tx:b", std::string("b") + std::to_string(i));
-            return tinydb::commit;
+            return fluxen::commit;
         });
     }
 
@@ -238,7 +238,7 @@ TEST_F(TinyDBConcurrentTest, TransactionAtomicUnderConcurrentReads) {
 
 // compaction
 
-TEST_F(TinyDBConcurrentTest, CompactUnderConcurrentReadsCompletesCleanly) {
+TEST_F(FluxenConcurrentTest, CompactUnderConcurrentReadsCompletesCleanly) {
     for (int i = 0; i < 100; ++i) {
         db_->put("k" + std::to_string(i), int32_t{i});
     }
@@ -272,7 +272,7 @@ TEST_F(TinyDBConcurrentTest, CompactUnderConcurrentReadsCompletesCleanly) {
     EXPECT_EQ(db_->get<int32_t>("k75"), int32_t{75});
 }
 
-TEST_F(TinyDBConcurrentTest, ReadAfterCompactSeesCorrectData) {
+TEST_F(FluxenConcurrentTest, ReadAfterCompactSeesCorrectData) {
     db_->put("live", std::string("yes"));
     db_->put("dead", std::string("no"));
     db_->remove("dead");

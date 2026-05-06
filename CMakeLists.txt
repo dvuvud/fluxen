@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(
-    tinydb
+    fluxen
     VERSION 1.2.1
     LANGUAGES CXX
 )
@@ -18,36 +18,36 @@ if(WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-option(TINYDB_BUILD_EXAMPLES "Build examples" ON)
+option(FLUXEN_BUILD_EXAMPLES "Build examples" ON)
 
-if(TINYDB_BUILD_EXAMPLES)
+if(FLUXEN_BUILD_EXAMPLES)
     add_executable(settings examples/settings.cpp)
     add_executable(cache examples/cache.cpp)
 endif()
 
-option(TINYDB_BUILD_TESTS "Build the tinydb test suite" ON)
+option(FLUXEN_BUILD_TESTS "Build the fluxen test suite" ON)
 
-if(TINYDB_BUILD_TESTS)
+if(FLUXEN_BUILD_TESTS)
     add_subdirectory(external/googletest)
     enable_testing()
-    add_executable(tinydb_tests tests/test.cpp)
-    add_executable(tinydb_concurrency_tests tests/test_concurrent.cpp)
-    target_link_libraries(tinydb_tests PRIVATE GTest::gtest_main)
-    target_link_libraries(tinydb_concurrency_tests PRIVATE GTest::gtest_main)
+    add_executable(fluxen_tests tests/test.cpp)
+    add_executable(fluxen_concurrency_tests tests/test_concurrent.cpp)
+    target_link_libraries(fluxen_tests PRIVATE GTest::gtest_main)
+    target_link_libraries(fluxen_concurrency_tests PRIVATE GTest::gtest_main)
     include(GoogleTest)
-    gtest_discover_tests(tinydb_tests)
-    gtest_discover_tests(tinydb_concurrency_tests)
+    gtest_discover_tests(fluxen_tests)
+    gtest_discover_tests(fluxen_concurrency_tests)
 endif()
 
-option(TINYDB_BUILD_BENCHMARKS "Build the tinydb benchmarks" ON)
-if(TINYDB_BUILD_BENCHMARKS)
+option(FLUXEN_BUILD_BENCHMARKS "Build the fluxen benchmarks" ON)
+if(FLUXEN_BUILD_BENCHMARKS)
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
     set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
     add_subdirectory(external/googlebenchmark)
     find_package(SQLite3 REQUIRED)
-    add_executable(tinydb_benchmarks benchmarks/bench.cpp)
-    add_executable(tinydb_concurrency_benchmarks benchmarks/bench_concurrent.cpp)
-    target_link_libraries(tinydb_benchmarks PRIVATE benchmark::benchmark_main SQLite::SQLite3)
-    target_link_libraries(tinydb_concurrency_benchmarks PRIVATE benchmark::benchmark_main SQLite::SQLite3)
+    add_executable(fluxen_benchmarks benchmarks/bench.cpp)
+    add_executable(fluxen_concurrency_benchmarks benchmarks/bench_concurrent.cpp)
+    target_link_libraries(fluxen_benchmarks PRIVATE benchmark::benchmark_main SQLite::SQLite3)
+    target_link_libraries(fluxen_concurrency_benchmarks PRIVATE benchmark::benchmark_main SQLite::SQLite3)
 endif()
 

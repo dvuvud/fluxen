@@ -1,4 +1,4 @@
 var files_dup =
 [
-    [ "tinydb.hpp", "tinydb_8hpp.html", "tinydb_8hpp" ]
+    [ "fluxen.hpp", "fluxen_8hpp.html", "fluxen_8hpp" ]
 ];

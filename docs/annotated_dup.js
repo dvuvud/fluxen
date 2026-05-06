@@ -1,7 +1,7 @@
 var annotated_dup =
 [
-    [ "tinydb", null, [
-      [ "Tx", "classtinydb_1_1_tx.html", "classtinydb_1_1_tx" ],
-      [ "DB", "classtinydb_1_1_d_b.html", "classtinydb_1_1_d_b" ]
+    [ "fluxen", null, [
+      [ "Tx", "classfluxen_1_1_tx.html", "classfluxen_1_1_tx" ],
+      [ "DB", "classfluxen_1_1_d_b.html", "classfluxen_1_1_d_b" ]
     ] ]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.15.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>tinydb: tinydb::Tx Class Reference</title>
+<title>fluxen: fluxen::Tx Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">tinydb<span id="projectnumber">&#160;1.2.1</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.2.1</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -64,7 +64,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('classtinydb_1_1_tx.html','','classtinydb_1_1_tx-members'); });
+$(function(){initNavTree('classfluxen_1_1_tx.html','','classfluxen_1_1_tx-members'); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -90,25 +90,25 @@ $(function(){initNavTree('classtinydb_1_1_tx.html','','classtinydb_1_1_tx-member
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">tinydb::Tx Class Reference</div></div>
+  <div class="headertitle"><div class="title">fluxen::Tx Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>A staged batch of write operations, used inside <a class="el" href="classtinydb_1_1_d_b.html#a9c6c45c85948c5d0827e5b3bcec56e14" title="Executes a batch of operations atomically.">DB::transaction()</a>.  
+<p>A staged batch of write operations, used inside <a class="el" href="classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">DB::transaction()</a>.  
  <a href="#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tinydb_8hpp_source.html">tinydb.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="fluxen_8hpp_source.html">fluxen.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae28a54ff7899322ee2b27d5cb02150fb" id="r_ae28a54ff7899322ee2b27d5cb02150fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae28a54ff7899322ee2b27d5cb02150fb">put</a> (std::string_view key, std::string_view value)</td></tr>
-<tr class="memdesc:ae28a54ff7899322ee2b27d5cb02150fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stage a string value to be written.  <br /></td></tr>
-<tr class="memitem:a9f9e997731e7477dadf6ce0f132c83e1" id="r_a9f9e997731e7477dadf6ce0f132c83e1"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; <br />
+<tr class="memitem:a175e0524a81304ab085d86cf5b9ba3b4" id="r_a175e0524a81304ab085d86cf5b9ba3b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a175e0524a81304ab085d86cf5b9ba3b4">put</a> (std::string_view key, std::string_view value)</td></tr>
+<tr class="memdesc:a175e0524a81304ab085d86cf5b9ba3b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stage a string value to be written.  <br /></td></tr>
+<tr class="memitem:aa629a0f77a6a0d0ae3eb4f97f5216232" id="r_aa629a0f77a6a0d0ae3eb4f97f5216232"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; <br />
 requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_v&lt;T, std::string_view&gt;)</td></tr>
-<tr class="memitem:a9f9e997731e7477dadf6ce0f132c83e1 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f9e997731e7477dadf6ce0f132c83e1">put</a> (std::string_view key, const T &amp;value)</td></tr>
-<tr class="memdesc:a9f9e997731e7477dadf6ce0f132c83e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stage a trivially copyable value to be written.  <br /></td></tr>
-<tr class="memitem:a152de82fb3869ce7e22db2adffc59c47" id="r_a152de82fb3869ce7e22db2adffc59c47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a152de82fb3869ce7e22db2adffc59c47">remove</a> (std::string_view key)</td></tr>
-<tr class="memdesc:a152de82fb3869ce7e22db2adffc59c47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stage a key deletion.  <br /></td></tr>
+<tr class="memitem:aa629a0f77a6a0d0ae3eb4f97f5216232 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa629a0f77a6a0d0ae3eb4f97f5216232">put</a> (std::string_view key, const T &amp;value)</td></tr>
+<tr class="memdesc:aa629a0f77a6a0d0ae3eb4f97f5216232"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stage a trivially copyable value to be written.  <br /></td></tr>
+<tr class="memitem:a450e67cc6d3b622dbba4ca37d5c25409" id="r_a450e67cc6d3b622dbba4ca37d5c25409"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a450e67cc6d3b622dbba4ca37d5c25409">remove</a> (std::string_view key)</td></tr>
+<tr class="memdesc:a450e67cc6d3b622dbba4ca37d5c25409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stage a key deletion.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
@@ -116,13 +116,13 @@ Friends</h2></td></tr>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>DB</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A staged batch of write operations, used inside <a class="el" href="classtinydb_1_1_d_b.html#a9c6c45c85948c5d0827e5b3bcec56e14" title="Executes a batch of operations atomically.">DB::transaction()</a>. </p>
-<p>A <code class="param"><a class="el" href="classtinydb_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a></code> is constructed by <a class="el" href="classtinydb_1_1_d_b.html#a9c6c45c85948c5d0827e5b3bcec56e14" title="Executes a batch of operations atomically.">DB::transaction()</a> and passed to the callback. Operations staged on it are only applied to the database if the callback returns <code class="param">tinydb::commit</code>. They are discarded on <code class="param">tinydb::rollback</code> or if the callback throws.</p>
-<dl class="section note"><dt>Note</dt><dd>Do not construct a <code class="param"><a class="el" href="classtinydb_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a></code> directly, use <a class="el" href="classtinydb_1_1_d_b.html#a9c6c45c85948c5d0827e5b3bcec56e14" title="Executes a batch of operations atomically.">DB::transaction()</a>.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classtinydb_1_1_d_b.html#a9c6c45c85948c5d0827e5b3bcec56e14" title="Executes a batch of operations atomically.">DB::transaction()</a> </dd></dl>
+<div class="textblock"><p>A staged batch of write operations, used inside <a class="el" href="classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">DB::transaction()</a>. </p>
+<p>A <code class="param"><a class="el" href="classfluxen_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a></code> is constructed by <a class="el" href="classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">DB::transaction()</a> and passed to the callback. Operations staged on it are only applied to the database if the callback returns <code class="param">fluxen::commit</code>. They are discarded on <code class="param">fluxen::rollback</code> or if the callback throws.</p>
+<dl class="section note"><dt>Note</dt><dd>Do not construct a <code class="param"><a class="el" href="classfluxen_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a></code> directly, use <a class="el" href="classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">DB::transaction()</a>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">DB::transaction()</a> </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="ae28a54ff7899322ee2b27d5cb02150fb" name="ae28a54ff7899322ee2b27d5cb02150fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae28a54ff7899322ee2b27d5cb02150fb">&#9670;&#160;</a></span>put() <span class="overload">[1/2]</span></h2>
+<a id="a175e0524a81304ab085d86cf5b9ba3b4" name="a175e0524a81304ab085d86cf5b9ba3b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a175e0524a81304ab085d86cf5b9ba3b4">&#9670;&#160;</a></span>put() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -131,7 +131,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DB</b></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::Tx::put </td>
+          <td class="memname">void fluxen::Tx::put </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
         </tr>
@@ -159,8 +159,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DB</b></td></tr>
 
 </div>
 </div>
-<a id="a9f9e997731e7477dadf6ce0f132c83e1" name="a9f9e997731e7477dadf6ce0f132c83e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f9e997731e7477dadf6ce0f132c83e1">&#9670;&#160;</a></span>put() <span class="overload">[2/2]</span></h2>
+<a id="aa629a0f77a6a0d0ae3eb4f97f5216232" name="aa629a0f77a6a0d0ae3eb4f97f5216232"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa629a0f77a6a0d0ae3eb4f97f5216232">&#9670;&#160;</a></span>put() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -172,7 +172,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::Tx::put </td>
+          <td class="memname">void fluxen::Tx::put </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
         </tr>
@@ -211,8 +211,8 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 
 </div>
 </div>
-<a id="a152de82fb3869ce7e22db2adffc59c47" name="a152de82fb3869ce7e22db2adffc59c47"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a152de82fb3869ce7e22db2adffc59c47">&#9670;&#160;</a></span>remove()</h2>
+<a id="a450e67cc6d3b622dbba4ca37d5c25409" name="a450e67cc6d3b622dbba4ca37d5c25409"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a450e67cc6d3b622dbba4ca37d5c25409">&#9670;&#160;</a></span>remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -221,7 +221,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::Tx::remove </td>
+          <td class="memname">void fluxen::Tx::remove </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
           <td></td>
@@ -246,7 +246,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="tinydb_8hpp_source.html">tinydb.hpp</a></li>
+<li><a class="el" href="fluxen_8hpp_source.html">fluxen.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -261,7 +261,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>tinydb</b></li><li class="navelem"><a href="classtinydb_1_1_tx.html">Tx</a></li>
+    <li class="navelem"><b>fluxen</b></li><li class="navelem"><a href="classfluxen_1_1_tx.html">Tx</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.15.0 </li>
   </ul>
 </div>

@@ -5,13 +5,13 @@ All contributions are welcome, whether that be bug reports, fixes, new examples,
 ## Getting started
 
 ```bash
-git clone --recursive https://github.com/dvuvud/tinydb.git
-cd tinydb
+git clone --recursive https://github.com/dvuvud/fluxen.git
+cd fluxen
 cmake -B build && cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-All library code is in `tinydb.hpp`. Tests are in `tests/test.cpp`. Examples are in `examples/`.
+All library code is in `fluxen.hpp`. Tests are in `tests/test.cpp`. Examples are in `examples/`.
 
 ## Guidelines
 

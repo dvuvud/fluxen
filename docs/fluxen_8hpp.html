@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.15.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>tinydb: tinydb.hpp File Reference</title>
+<title>fluxen: fluxen.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">tinydb<span id="projectnumber">&#160;1.2.1</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.2.1</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -64,7 +64,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('tinydb_8hpp.html','',''); });
+$(function(){initNavTree('fluxen_8hpp.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -90,7 +90,7 @@ $(function(){initNavTree('tinydb_8hpp.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">tinydb.hpp File Reference</div></div>
+  <div class="headertitle"><div class="title">fluxen.hpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;cassert&gt;</code><br />
@@ -114,36 +114,36 @@ $(function(){initNavTree('tinydb_8hpp.html','',''); });
 <code>#include &lt;sys/stat.h&gt;</code><br />
 <code>#include &lt;unistd.h&gt;</code><br />
 </div>
-<p><a href="tinydb_8hpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="fluxen_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:tinydb_3A_3ATx" id="r_tinydb_3A_3ATx"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinydb_1_1_tx.html">tinydb::Tx</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A staged batch of write operations, used inside <a class="el" href="classtinydb_1_1_d_b.html#a9c6c45c85948c5d0827e5b3bcec56e14" title="Executes a batch of operations atomically.">DB::transaction()</a>.  <a href="classtinydb_1_1_tx.html#details">More...</a><br /></td></tr>
-<tr class="memitem:tinydb_3A_3ADB" id="r_tinydb_3A_3ADB"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinydb_1_1_d_b.html">tinydb::DB</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A persistent key-value database backed by a single file.  <a href="classtinydb_1_1_d_b.html#details">More...</a><br /></td></tr>
+<tr class="memitem:fluxen_3A_3ATx" id="r_fluxen_3A_3ATx"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfluxen_1_1_tx.html">fluxen::Tx</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A staged batch of write operations, used inside <a class="el" href="classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">DB::transaction()</a>.  <a href="classfluxen_1_1_tx.html#details">More...</a><br /></td></tr>
+<tr class="memitem:fluxen_3A_3ADB" id="r_fluxen_3A_3ADB"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfluxen_1_1_d_b.html">fluxen::DB</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A persistent key-value database backed by a single file.  <a href="classfluxen_1_1_d_b.html#details">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ac79cba7fa5286030b060158e7aed69a1" id="r_ac79cba7fa5286030b060158e7aed69a1"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a> = std::span&lt;const std::byte&gt;</td></tr>
-<tr class="memdesc:ac79cba7fa5286030b060158e7aed69a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A non-owning view of raw bytes in the memory-mapped file.  <br /></td></tr>
+<tr class="memitem:afd6a328ee037d14a9ea8a08b6edc6569" id="r_afd6a328ee037d14a9ea8a08b6edc6569"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a> = std::span&lt;const std::byte&gt;</td></tr>
+<tr class="memdesc:afd6a328ee037d14a9ea8a08b6edc6569"><td class="mdescLeft">&#160;</td><td class="mdescRight">A non-owning view of raw bytes in the memory-mapped file.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:af0fa997cb38231ee8eab1529ba32078b" id="r_af0fa997cb38231ee8eab1529ba32078b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0fa997cb38231ee8eab1529ba32078b">tinydb::TxResult</a> : uint8_t { <b>commit</b>
+<tr class="memitem:a5b83d2a98ddc80be8f159ea12a1d8c4f" id="r_a5b83d2a98ddc80be8f159ea12a1d8c4f"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5b83d2a98ddc80be8f159ea12a1d8c4f">fluxen::TxResult</a> : uint8_t { <b>commit</b>
 , <b>rollback</b>
  }</td></tr>
-<tr class="memdesc:af0fa997cb38231ee8eab1529ba32078b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Controls whether a transaction's operations are applied or discarded.  <a href="#af0fa997cb38231ee8eab1529ba32078b">More...</a><br /></td></tr>
+<tr class="memdesc:a5b83d2a98ddc80be8f159ea12a1d8c4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Controls whether a transaction's operations are applied or discarded.  <a href="#a5b83d2a98ddc80be8f159ea12a1d8c4f">More...</a><br /></td></tr>
 </table>
 <a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
-<a id="ac79cba7fa5286030b060158e7aed69a1" name="ac79cba7fa5286030b060158e7aed69a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac79cba7fa5286030b060158e7aed69a1">&#9670;&#160;</a></span>Bytes</h2>
+<a id="afd6a328ee037d14a9ea8a08b6edc6569" name="afd6a328ee037d14a9ea8a08b6edc6569"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd6a328ee037d14a9ea8a08b6edc6569">&#9670;&#160;</a></span>Bytes</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a> = std::span&lt;const std::byte&gt;</td>
+          <td class="memname">using <a class="el" href="#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a> = std::span&lt;const std::byte&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -154,14 +154,14 @@ Enumerations</h2></td></tr>
 </div>
 </div>
 <a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
-<a id="af0fa997cb38231ee8eab1529ba32078b" name="af0fa997cb38231ee8eab1529ba32078b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af0fa997cb38231ee8eab1529ba32078b">&#9670;&#160;</a></span>TxResult</h2>
+<a id="a5b83d2a98ddc80be8f159ea12a1d8c4f" name="a5b83d2a98ddc80be8f159ea12a1d8c4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b83d2a98ddc80be8f159ea12a1d8c4f">&#9670;&#160;</a></span>TxResult</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="#af0fa997cb38231ee8eab1529ba32078b">tinydb::TxResult</a> : uint8_t</td>
+          <td class="memname">enum <a class="el" href="#a5b83d2a98ddc80be8f159ea12a1d8c4f">fluxen::TxResult</a> : uint8_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -185,7 +185,7 @@ Enumerations</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="tinydb_8hpp.html">tinydb.hpp</a></li>
+    <li class="navelem"><a href="fluxen_8hpp.html">fluxen.hpp</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.15.0 </li>
   </ul>
 </div>

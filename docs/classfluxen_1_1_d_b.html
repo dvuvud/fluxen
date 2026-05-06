@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.15.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>tinydb: tinydb::DB Class Reference</title>
+<title>fluxen: fluxen::DB Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">tinydb<span id="projectnumber">&#160;1.2.1</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.2.1</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -64,7 +64,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('classtinydb_1_1_d_b.html','','classtinydb_1_1_d_b-members'); });
+$(function(){initNavTree('classfluxen_1_1_d_b.html','','classfluxen_1_1_d_b-members'); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -90,64 +90,64 @@ $(function(){initNavTree('classtinydb_1_1_d_b.html','','classtinydb_1_1_d_b-memb
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">tinydb::DB Class Reference</div></div>
+  <div class="headertitle"><div class="title">fluxen::DB Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>A persistent key-value database backed by a single file.  
  <a href="#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tinydb_8hpp_source.html">tinydb.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="fluxen_8hpp_source.html">fluxen.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a94dde37361f58cc9d4d3f3e6da81ee50" id="r_a94dde37361f58cc9d4d3f3e6da81ee50"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94dde37361f58cc9d4d3f3e6da81ee50">DB</a> (std::string_view path)</td></tr>
-<tr class="memdesc:a94dde37361f58cc9d4d3f3e6da81ee50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens or creates a database at the given path.  <br /></td></tr>
-<tr class="memitem:a50be520b12fac204dbca6c119144c697" id="r_a50be520b12fac204dbca6c119144c697"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a50be520b12fac204dbca6c119144c697">~DB</a> ()=default</td></tr>
-<tr class="memdesc:a50be520b12fac204dbca6c119144c697"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the database and releases all file locks.  <br /></td></tr>
-<tr class="memitem:a24c39c00132b2db7117d6612a308301a" id="r_a24c39c00132b2db7117d6612a308301a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24c39c00132b2db7117d6612a308301a">put</a> (std::string_view key, std::string_view value)</td></tr>
-<tr class="memdesc:a24c39c00132b2db7117d6612a308301a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a string value under the given key.  <br /></td></tr>
-<tr class="memitem:a346458011e17d5f3a47810358852d9b5" id="r_a346458011e17d5f3a47810358852d9b5"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; <br />
+<tr class="memitem:ac2862b15b595d994b07ec99f8b4885f9" id="r_ac2862b15b595d994b07ec99f8b4885f9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2862b15b595d994b07ec99f8b4885f9">DB</a> (std::string_view path)</td></tr>
+<tr class="memdesc:ac2862b15b595d994b07ec99f8b4885f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens or creates a database at the given path.  <br /></td></tr>
+<tr class="memitem:abea3002475bcc45ea415a1630df90a57" id="r_abea3002475bcc45ea415a1630df90a57"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abea3002475bcc45ea415a1630df90a57">~DB</a> ()=default</td></tr>
+<tr class="memdesc:abea3002475bcc45ea415a1630df90a57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the database and releases all file locks.  <br /></td></tr>
+<tr class="memitem:ae62765f8a24f2baadbb5b0cfc12fd6c7" id="r_ae62765f8a24f2baadbb5b0cfc12fd6c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae62765f8a24f2baadbb5b0cfc12fd6c7">put</a> (std::string_view key, std::string_view value)</td></tr>
+<tr class="memdesc:ae62765f8a24f2baadbb5b0cfc12fd6c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a string value under the given key.  <br /></td></tr>
+<tr class="memitem:ac21afa63c18b05f6068b64640cde7a2a" id="r_ac21afa63c18b05f6068b64640cde7a2a"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; <br />
 requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_v&lt;T, std::string_view&gt;)</td></tr>
-<tr class="memitem:a346458011e17d5f3a47810358852d9b5 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a346458011e17d5f3a47810358852d9b5">put</a> (std::string_view key, const T &amp;value)</td></tr>
-<tr class="memdesc:a346458011e17d5f3a47810358852d9b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a trivially copyable value under the given key.  <br /></td></tr>
-<tr class="memitem:a24d4cdbc63ad4bf8f7bb63cc387fa741" id="r_a24d4cdbc63ad4bf8f7bb63cc387fa741"><td class="memTemplParams" colspan="2">template&lt;typename T = std::string&gt; </td></tr>
-<tr class="memitem:a24d4cdbc63ad4bf8f7bb63cc387fa741 template"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24d4cdbc63ad4bf8f7bb63cc387fa741">get</a> (std::string_view key) const -&gt; std::optional&lt; T &gt;</td></tr>
-<tr class="memdesc:a24d4cdbc63ad4bf8f7bb63cc387fa741"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the value stored under the given key.  <br /></td></tr>
-<tr class="memitem:a1bd319a0b27297a4a789bbd20d10c59e" id="r_a1bd319a0b27297a4a789bbd20d10c59e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1bd319a0b27297a4a789bbd20d10c59e">remove</a> (std::string_view key)</td></tr>
-<tr class="memdesc:a1bd319a0b27297a4a789bbd20d10c59e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the value stored under the given key.  <br /></td></tr>
-<tr class="memitem:a50a9d121a9f2ffec9058a0c3ebe97d79" id="r_a50a9d121a9f2ffec9058a0c3ebe97d79"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a50a9d121a9f2ffec9058a0c3ebe97d79">has</a> (std::string_view key) const -&gt; bool</td></tr>
-<tr class="memdesc:a50a9d121a9f2ffec9058a0c3ebe97d79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the given key exists in the database.  <br /></td></tr>
-<tr class="memitem:a18d9baba6d88af889391521b885f4d9b" id="r_a18d9baba6d88af889391521b885f4d9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18d9baba6d88af889391521b885f4d9b">each</a> (const std::function&lt; void(std::string_view, <a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">Bytes</a>)&gt; &amp;fn) const</td></tr>
-<tr class="memdesc:a18d9baba6d88af889391521b885f4d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all live key-value pairs.  <br /></td></tr>
-<tr class="memitem:aa06c4d57499900f654f4c53e76340bfc" id="r_aa06c4d57499900f654f4c53e76340bfc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa06c4d57499900f654f4c53e76340bfc">prefix</a> (std::string_view pfx, const std::function&lt; void(std::string_view, <a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">Bytes</a>)&gt; &amp;fn) const</td></tr>
-<tr class="memdesc:aa06c4d57499900f654f4c53e76340bfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all keys that begin with the given prefix.  <br /></td></tr>
-<tr class="memitem:a9c6c45c85948c5d0827e5b3bcec56e14" id="r_a9c6c45c85948c5d0827e5b3bcec56e14"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c6c45c85948c5d0827e5b3bcec56e14">transaction</a> (const std::function&lt; <a class="el" href="tinydb_8hpp.html#af0fa997cb38231ee8eab1529ba32078b">TxResult</a>(<a class="el" href="classtinydb_1_1_tx.html">Tx</a> &amp;)&gt; &amp;fn)</td></tr>
-<tr class="memdesc:a9c6c45c85948c5d0827e5b3bcec56e14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes a batch of operations atomically.  <br /></td></tr>
-<tr class="memitem:a0df111ee2e449632705b8ea529e5eddd" id="r_a0df111ee2e449632705b8ea529e5eddd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0df111ee2e449632705b8ea529e5eddd">compact</a> ()</td></tr>
-<tr class="memdesc:a0df111ee2e449632705b8ea529e5eddd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites the database file retaining only live entries.  <br /></td></tr>
-<tr class="memitem:a0f1684b6e7e7c86c17e5b004d1a09d8a" id="r_a0f1684b6e7e7c86c17e5b004d1a09d8a"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f1684b6e7e7c86c17e5b004d1a09d8a">key_count</a> () const -&gt; size_t</td></tr>
-<tr class="memdesc:a0f1684b6e7e7c86c17e5b004d1a09d8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of live keys currently stored.  <br /></td></tr>
-<tr class="memitem:ae6a1a8e3da68cc9995ee35dfcdd8963b" id="r_ae6a1a8e3da68cc9995ee35dfcdd8963b"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6a1a8e3da68cc9995ee35dfcdd8963b">file_size</a> () const -&gt; size_t</td></tr>
-<tr class="memdesc:ae6a1a8e3da68cc9995ee35dfcdd8963b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current size of the database file in bytes.  <br /></td></tr>
+<tr class="memitem:ac21afa63c18b05f6068b64640cde7a2a template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac21afa63c18b05f6068b64640cde7a2a">put</a> (std::string_view key, const T &amp;value)</td></tr>
+<tr class="memdesc:ac21afa63c18b05f6068b64640cde7a2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a trivially copyable value under the given key.  <br /></td></tr>
+<tr class="memitem:ad40ad6ba8e4dfa1883bce67479f5f06f" id="r_ad40ad6ba8e4dfa1883bce67479f5f06f"><td class="memTemplParams" colspan="2">template&lt;typename T = std::string&gt; </td></tr>
+<tr class="memitem:ad40ad6ba8e4dfa1883bce67479f5f06f template"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad40ad6ba8e4dfa1883bce67479f5f06f">get</a> (std::string_view key) const -&gt; std::optional&lt; T &gt;</td></tr>
+<tr class="memdesc:ad40ad6ba8e4dfa1883bce67479f5f06f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the value stored under the given key.  <br /></td></tr>
+<tr class="memitem:a92036a8e5d31138ae5a7ace0d0853bca" id="r_a92036a8e5d31138ae5a7ace0d0853bca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92036a8e5d31138ae5a7ace0d0853bca">remove</a> (std::string_view key)</td></tr>
+<tr class="memdesc:a92036a8e5d31138ae5a7ace0d0853bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the value stored under the given key.  <br /></td></tr>
+<tr class="memitem:a144e98434b28c71fcdf6e21e05e4040f" id="r_a144e98434b28c71fcdf6e21e05e4040f"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a144e98434b28c71fcdf6e21e05e4040f">has</a> (std::string_view key) const -&gt; bool</td></tr>
+<tr class="memdesc:a144e98434b28c71fcdf6e21e05e4040f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the given key exists in the database.  <br /></td></tr>
+<tr class="memitem:ae266a56e66ecd85e77c06697207cfb6d" id="r_ae266a56e66ecd85e77c06697207cfb6d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae266a56e66ecd85e77c06697207cfb6d">each</a> (const std::function&lt; void(std::string_view, <a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">Bytes</a>)&gt; &amp;fn) const</td></tr>
+<tr class="memdesc:ae266a56e66ecd85e77c06697207cfb6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all live key-value pairs.  <br /></td></tr>
+<tr class="memitem:a5424ebb8ccf3a4ec076ee5d964423306" id="r_a5424ebb8ccf3a4ec076ee5d964423306"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5424ebb8ccf3a4ec076ee5d964423306">prefix</a> (std::string_view pfx, const std::function&lt; void(std::string_view, <a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">Bytes</a>)&gt; &amp;fn) const</td></tr>
+<tr class="memdesc:a5424ebb8ccf3a4ec076ee5d964423306"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all keys that begin with the given prefix.  <br /></td></tr>
+<tr class="memitem:a813e5af289cced2fb818bd4e59251faa" id="r_a813e5af289cced2fb818bd4e59251faa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a813e5af289cced2fb818bd4e59251faa">transaction</a> (const std::function&lt; <a class="el" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">TxResult</a>(<a class="el" href="classfluxen_1_1_tx.html">Tx</a> &amp;)&gt; &amp;fn)</td></tr>
+<tr class="memdesc:a813e5af289cced2fb818bd4e59251faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes a batch of operations atomically.  <br /></td></tr>
+<tr class="memitem:af03b664bcda9141683485bbcd31bdaf5" id="r_af03b664bcda9141683485bbcd31bdaf5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af03b664bcda9141683485bbcd31bdaf5">compact</a> ()</td></tr>
+<tr class="memdesc:af03b664bcda9141683485bbcd31bdaf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites the database file retaining only live entries.  <br /></td></tr>
+<tr class="memitem:a46a68dd1141bd1c7db5d624673a5f91d" id="r_a46a68dd1141bd1c7db5d624673a5f91d"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46a68dd1141bd1c7db5d624673a5f91d">key_count</a> () const -&gt; size_t</td></tr>
+<tr class="memdesc:a46a68dd1141bd1c7db5d624673a5f91d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of live keys currently stored.  <br /></td></tr>
+<tr class="memitem:a42423d7851b32c55c997c3df74f0901d" id="r_a42423d7851b32c55c997c3df74f0901d"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42423d7851b32c55c997c3df74f0901d">file_size</a> () const -&gt; size_t</td></tr>
+<tr class="memdesc:a42423d7851b32c55c997c3df74f0901d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current size of the database file in bytes.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A persistent key-value database backed by a single file. </p>
 <p>Keys are UTF-8 strings up to 255 bytes. Values can be std::string, string literals, or any trivially copyable type (int, float, struct, ...).</p>
 <p>The database is safe to use from multiple threads concurrently. Reads proceed in parallel, and writes acquire an exclusive lock and are given priority over waiting readers to prevent starvation. See the <a class="el" href="index.html">Thread safety</a> section in the main page for full details.</p>
-<dl class="section note"><dt>Note</dt><dd><code class="param"><a class="el" href="classtinydb_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a></code> is non-copyable. Create one instance per file.</dd></dl>
-<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_class" href="classtinydb_1_1_d_b.html">tinydb::DB</a> db(<span class="stringliteral">&quot;app.db&quot;</span>);</div>
+<dl class="section note"><dt>Note</dt><dd><code class="param"><a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a></code> is non-copyable. Create one instance per file.</dd></dl>
+<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_class" href="classfluxen_1_1_d_b.html">fluxen::DB</a> db(<span class="stringliteral">&quot;app.db&quot;</span>);</div>
 <div class="line"> </div>
 <div class="line">db.put(<span class="stringliteral">&quot;hits&quot;</span>, int64_t{0});</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> val = db.get&lt;int64_t&gt;(<span class="stringliteral">&quot;hits&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *val &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclasstinydb_1_1_d_b_html"><div class="ttname"><a href="classtinydb_1_1_d_b.html">tinydb::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:560</div></div>
+<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:559</div></div>
 </div><!-- fragment --> </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a94dde37361f58cc9d4d3f3e6da81ee50" name="a94dde37361f58cc9d4d3f3e6da81ee50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94dde37361f58cc9d4d3f3e6da81ee50">&#9670;&#160;</a></span>DB()</h2>
+<a id="ac2862b15b595d994b07ec99f8b4885f9" name="ac2862b15b595d994b07ec99f8b4885f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2862b15b595d994b07ec99f8b4885f9">&#9670;&#160;</a></span>DB()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -156,7 +156,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">tinydb::DB::DB </td>
+          <td class="memname">fluxen::DB::DB </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>path</em></span></td><td>)</td>
           <td></td>
@@ -180,15 +180,15 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::runtime_error</td><td>If the file cannot be opened or created. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the file exists but has an invalid magic header (i.e. was not created by tinydb). </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the file exists but has an invalid magic header (i.e. was not created by fluxen). </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a50be520b12fac204dbca6c119144c697" name="a50be520b12fac204dbca6c119144c697"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50be520b12fac204dbca6c119144c697">&#9670;&#160;</a></span>~DB()</h2>
+<a id="abea3002475bcc45ea415a1630df90a57" name="abea3002475bcc45ea415a1630df90a57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abea3002475bcc45ea415a1630df90a57">&#9670;&#160;</a></span>~DB()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -197,7 +197,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">tinydb::DB::~DB </td>
+          <td class="memname">fluxen::DB::~DB </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -216,8 +216,8 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a24c39c00132b2db7117d6612a308301a" name="a24c39c00132b2db7117d6612a308301a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24c39c00132b2db7117d6612a308301a">&#9670;&#160;</a></span>put() <span class="overload">[1/2]</span></h2>
+<a id="ae62765f8a24f2baadbb5b0cfc12fd6c7" name="ae62765f8a24f2baadbb5b0cfc12fd6c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae62765f8a24f2baadbb5b0cfc12fd6c7">&#9670;&#160;</a></span>put() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -226,7 +226,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::DB::put </td>
+          <td class="memname">void fluxen::DB::put </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
         </tr>
@@ -244,7 +244,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 </div><div class="memdoc">
 
 <p>Stores a string value under the given key. </p>
-<p>If the key already exists its value is overwritten. The write is appended to the on-disk log immediately but is not explicitly fsynced. Use <a class="el" href="#a9c6c45c85948c5d0827e5b3bcec56e14" title="Executes a batch of operations atomically.">transaction()</a> if you require durability guarantees.</p>
+<p>If the key already exists its value is overwritten. The write is appended to the on-disk log immediately but is not explicitly fsynced. Use <a class="el" href="#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">transaction()</a> if you require durability guarantees.</p>
 <p>Acquires an exclusive lock, blocking until all active readers have finished.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -256,8 +256,8 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 
 </div>
 </div>
-<a id="a346458011e17d5f3a47810358852d9b5" name="a346458011e17d5f3a47810358852d9b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a346458011e17d5f3a47810358852d9b5">&#9670;&#160;</a></span>put() <span class="overload">[2/2]</span></h2>
+<a id="ac21afa63c18b05f6068b64640cde7a2a" name="ac21afa63c18b05f6068b64640cde7a2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac21afa63c18b05f6068b64640cde7a2a">&#9670;&#160;</a></span>put() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -269,7 +269,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::DB::put </td>
+          <td class="memname">void fluxen::DB::put </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
         </tr>
@@ -287,7 +287,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 </div><div class="memdoc">
 
 <p>Stores a trivially copyable value under the given key. </p>
-<p>The value is stored as its raw bytes via <span class="tt">memcpy</span>. Overwriting a key with a value of a different size is valid. A subsequent <a class="el" href="#a24d4cdbc63ad4bf8f7bb63cc387fa741" title="Retrieves the value stored under the given key.">get&lt;T&gt;()</a> call will return <span class="tt">nullopt</span> if the stored size does not match <span class="tt">sizeof(T)</span>.</p>
+<p>The value is stored as its raw bytes via <span class="tt">memcpy</span>. Overwriting a key with a value of a different size is valid. A subsequent <a class="el" href="#ad40ad6ba8e4dfa1883bce67479f5f06f" title="Retrieves the value stored under the given key.">get&lt;T&gt;()</a> call will return <span class="tt">nullopt</span> if the stored size does not match <span class="tt">sizeof(T)</span>.</p>
 <p>Acquires an exclusive lock, blocking until all active readers have finished.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -309,8 +309,8 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 
 </div>
 </div>
-<a id="a24d4cdbc63ad4bf8f7bb63cc387fa741" name="a24d4cdbc63ad4bf8f7bb63cc387fa741"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24d4cdbc63ad4bf8f7bb63cc387fa741">&#9670;&#160;</a></span>get()</h2>
+<a id="ad40ad6ba8e4dfa1883bce67479f5f06f" name="ad40ad6ba8e4dfa1883bce67479f5f06f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad40ad6ba8e4dfa1883bce67479f5f06f">&#9670;&#160;</a></span>get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -321,7 +321,7 @@ template&lt;typename T = std::string&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">auto tinydb::DB::get </td>
+          <td class="memname">auto fluxen::DB::get </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
           <td> const-&gt;std::optional&lt; T &gt;</td>
@@ -366,8 +366,8 @@ template&lt;typename T = std::string&gt; </div>
 
 </div>
 </div>
-<a id="a1bd319a0b27297a4a789bbd20d10c59e" name="a1bd319a0b27297a4a789bbd20d10c59e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1bd319a0b27297a4a789bbd20d10c59e">&#9670;&#160;</a></span>remove()</h2>
+<a id="a92036a8e5d31138ae5a7ace0d0853bca" name="a92036a8e5d31138ae5a7ace0d0853bca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92036a8e5d31138ae5a7ace0d0853bca">&#9670;&#160;</a></span>remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -376,7 +376,7 @@ template&lt;typename T = std::string&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::DB::remove </td>
+          <td class="memname">void fluxen::DB::remove </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
           <td></td>
@@ -390,7 +390,7 @@ template&lt;typename T = std::string&gt; </div>
 </div><div class="memdoc">
 
 <p>Deletes the value stored under the given key. </p>
-<p>Appends a tombstone entry to the log and removes the key from the index. If the key does not exist this is a no-op. Space used by the old value is reclaimed the next time <a class="el" href="#a0df111ee2e449632705b8ea529e5eddd" title="Rewrites the database file retaining only live entries.">compact()</a> is called.</p>
+<p>Appends a tombstone entry to the log and removes the key from the index. If the key does not exist this is a no-op. Space used by the old value is reclaimed the next time <a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a> is called.</p>
 <p>Acquires an exclusive lock, blocking until all active readers have finished. Waiting writers take priority over new readers.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -401,8 +401,8 @@ template&lt;typename T = std::string&gt; </div>
 
 </div>
 </div>
-<a id="a50a9d121a9f2ffec9058a0c3ebe97d79" name="a50a9d121a9f2ffec9058a0c3ebe97d79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50a9d121a9f2ffec9058a0c3ebe97d79">&#9670;&#160;</a></span>has()</h2>
+<a id="a144e98434b28c71fcdf6e21e05e4040f" name="a144e98434b28c71fcdf6e21e05e4040f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a144e98434b28c71fcdf6e21e05e4040f">&#9670;&#160;</a></span>has()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -411,7 +411,7 @@ template&lt;typename T = std::string&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">auto tinydb::DB::has </td>
+          <td class="memname">auto fluxen::DB::has </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
           <td> const-&gt;bool</td>
@@ -436,8 +436,8 @@ template&lt;typename T = std::string&gt; </div>
 
 </div>
 </div>
-<a id="a18d9baba6d88af889391521b885f4d9b" name="a18d9baba6d88af889391521b885f4d9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18d9baba6d88af889391521b885f4d9b">&#9670;&#160;</a></span>each()</h2>
+<a id="ae266a56e66ecd85e77c06697207cfb6d" name="ae266a56e66ecd85e77c06697207cfb6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae266a56e66ecd85e77c06697207cfb6d">&#9670;&#160;</a></span>each()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -446,9 +446,9 @@ template&lt;typename T = std::string&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::DB::each </td>
+          <td class="memname">void fluxen::DB::each </td>
           <td>(</td>
-          <td class="paramtype">const std::function&lt; void(std::string_view, <a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">Bytes</a>)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>fn</em></span></td><td>)</td>
+          <td class="paramtype">const std::function&lt; void(std::string_view, <a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">Bytes</a>)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>fn</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -460,7 +460,7 @@ template&lt;typename T = std::string&gt; </div>
 </div><div class="memdoc">
 
 <p>Iterates over all live key-value pairs. </p>
-<p>The callback is invoked once per key with a <span class="tt">string_view</span> of the key and a <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a></span> span pointing directly into the memory-mapped file. The iteration order is unspecified.</p>
+<p>The callback is invoked once per key with a <span class="tt">string_view</span> of the key and a <span class="tt"><a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a></span> span pointing directly into the memory-mapped file. The iteration order is unspecified.</p>
 <p>Acquires a shared lock for the duration of iteration, allowing concurrent readers. Write methods called from another thread will block until iteration completes.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -468,20 +468,20 @@ template&lt;typename T = std::string&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section warning"><dt>Warning</dt><dd>Do not call any write method (<code class="param">put</code>, <code class="param">remove</code>, <code class="param">transaction</code>, <code class="param">compact</code>) on this <a class="el" href="classtinydb_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> instance from inside <code class="param">fn</code>. The shared lock is not reentrant with an exclusive lock and will deadlock. Read methods (<code class="param">get</code>, <code class="param">has</code>, <code class="param">key_count</code> etc.) are safe to call from inside <code class="param">fn</code>. If you need to write during iteration, copy the keys out first and operate on them after <code class="param"><a class="el" href="#a18d9baba6d88af889391521b885f4d9b" title="Iterates over all live key-value pairs.">each()</a></code> returns.</dd>
+<dl class="section warning"><dt>Warning</dt><dd>Do not call any write method (<code class="param">put</code>, <code class="param">remove</code>, <code class="param">transaction</code>, <code class="param">compact</code>) on this <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> instance from inside <code class="param">fn</code>. The shared lock is not reentrant with an exclusive lock and will deadlock. Read methods (<code class="param">get</code>, <code class="param">has</code>, <code class="param">key_count</code> etc.) are safe to call from inside <code class="param">fn</code>. If you need to write during iteration, copy the keys out first and operate on them after <code class="param"><a class="el" href="#ae266a56e66ecd85e77c06697207cfb6d" title="Iterates over all live key-value pairs.">each()</a></code> returns.</dd>
 <dd>
-The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a></span> span is only valid for the duration of the callback. Do not store it. Instead, copy the data if you need it later.</dd></dl>
-<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line">db.each([](std::string_view key, <a class="code hl_typedef" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a> val) {</div>
+The <span class="tt"><a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a></span> span is only valid for the duration of the callback. Do not store it. Instead, copy the data if you need it later.</dd></dl>
+<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line">db.each([](std::string_view key, <a class="code hl_typedef" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a> val) {</div>
 <div class="line">    std::string v(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(val.data()), val.size());</div>
 <div class="line">    std::cout &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; v &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line">});</div>
-<div class="ttc" id="atinydb_8hpp_html_ac79cba7fa5286030b060158e7aed69a1"><div class="ttname"><a href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:114</div></div>
+<div class="ttc" id="afluxen_8hpp_html_afd6a328ee037d14a9ea8a08b6edc6569"><div class="ttname"><a href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:114</div></div>
 </div><!-- fragment --> </dd></dl>
 
 </div>
 </div>
-<a id="aa06c4d57499900f654f4c53e76340bfc" name="aa06c4d57499900f654f4c53e76340bfc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa06c4d57499900f654f4c53e76340bfc">&#9670;&#160;</a></span>prefix()</h2>
+<a id="a5424ebb8ccf3a4ec076ee5d964423306" name="a5424ebb8ccf3a4ec076ee5d964423306"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5424ebb8ccf3a4ec076ee5d964423306">&#9670;&#160;</a></span>prefix()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -490,14 +490,14 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::DB::prefix </td>
+          <td class="memname">void fluxen::DB::prefix </td>
           <td>(</td>
           <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>pfx</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::function&lt; void(std::string_view, <a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">Bytes</a>)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>fn</em></span>&#160;) const</td>
+          <td class="paramtype">const std::function&lt; void(std::string_view, <a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">Bytes</a>)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>fn</em></span>&#160;) const</td>
         </tr>
       </table>
   </td>
@@ -509,7 +509,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 
 <p>Iterates over all keys that begin with the given prefix. </p>
 <p>A convenient way to implement namespaced key sets. For example, all keys stored as <span class="tt">"user:1001"</span>, <span class="tt">"user:1002"</span>, etc. can be iterated with <span class="tt">db.prefix("user:", fn)</span>.</p>
-<p>The callback and locking behaviour are identical to <a class="el" href="#a18d9baba6d88af889391521b885f4d9b" title="Iterates over all live key-value pairs.">each()</a>. The same warnings about write methods and <a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a> span lifetime apply.</p>
+<p>The callback and locking behaviour are identical to <a class="el" href="#ae266a56e66ecd85e77c06697207cfb6d" title="Iterates over all live key-value pairs.">each()</a>. The same warnings about write methods and <a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a> span lifetime apply.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pfx</td><td>The prefix string to filter by. </td></tr>
@@ -522,15 +522,15 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 <div class="line">db.put(<span class="stringliteral">&quot;user:bryce&quot;</span>,   <span class="stringliteral">&quot;viewer&quot;</span>);</div>
 <div class="line">db.put(<span class="stringliteral">&quot;config:x&quot;</span>,   <span class="stringliteral">&quot;value&quot;</span>);</div>
 <div class="line"> </div>
-<div class="line">db.prefix(<span class="stringliteral">&quot;user:&quot;</span>, [](std::string_view key, <a class="code hl_typedef" href="tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1">tinydb::Bytes</a> val) {</div>
+<div class="line">db.prefix(<span class="stringliteral">&quot;user:&quot;</span>, [](std::string_view key, <a class="code hl_typedef" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a> val) {</div>
 <div class="line">    <span class="comment">// called for user:james and user:bryce only</span></div>
 <div class="line">});</div>
 </div><!-- fragment --> </dd></dl>
 
 </div>
 </div>
-<a id="a9c6c45c85948c5d0827e5b3bcec56e14" name="a9c6c45c85948c5d0827e5b3bcec56e14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c6c45c85948c5d0827e5b3bcec56e14">&#9670;&#160;</a></span>transaction()</h2>
+<a id="a813e5af289cced2fb818bd4e59251faa" name="a813e5af289cced2fb818bd4e59251faa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a813e5af289cced2fb818bd4e59251faa">&#9670;&#160;</a></span>transaction()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -539,9 +539,9 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::DB::transaction </td>
+          <td class="memname">void fluxen::DB::transaction </td>
           <td>(</td>
-          <td class="paramtype">const std::function&lt; <a class="el" href="tinydb_8hpp.html#af0fa997cb38231ee8eab1529ba32078b">TxResult</a>(<a class="el" href="classtinydb_1_1_tx.html">Tx</a> &amp;)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>fn</em></span></td><td>)</td>
+          <td class="paramtype">const std::function&lt; <a class="el" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">TxResult</a>(<a class="el" href="classfluxen_1_1_tx.html">Tx</a> &amp;)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>fn</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -553,38 +553,38 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 </div><div class="memdoc">
 
 <p>Executes a batch of operations atomically. </p>
-<p>The callback receives a <a class="el" href="classtinydb_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a> object on which any number of <a class="el" href="#a24c39c00132b2db7117d6612a308301a" title="Stores a string value under the given key.">put()</a> and <a class="el" href="#a1bd319a0b27297a4a789bbd20d10c59e" title="Deletes the value stored under the given key.">remove()</a> calls can be staged. Returning <span class="tt">tinydb::commit</span> applies all operations atomically and flushes them to disk. Returning <span class="tt">tinydb::rollback</span> discards all staged operations and the database is left completely unchanged.</p>
+<p>The callback receives a <a class="el" href="classfluxen_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a> object on which any number of <a class="el" href="#ae62765f8a24f2baadbb5b0cfc12fd6c7" title="Stores a string value under the given key.">put()</a> and <a class="el" href="#a92036a8e5d31138ae5a7ace0d0853bca" title="Deletes the value stored under the given key.">remove()</a> calls can be staged. Returning <span class="tt">fluxen::commit</span> applies all operations atomically and flushes them to disk. Returning <span class="tt">fluxen::rollback</span> discards all staged operations and the database is left completely unchanged.</p>
 <p>If the callback throws, the exception propagates to the caller and all staged operations are discarded (equivalent to rollback).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">fn</td><td>A callable of the form <span class="tt"><a class="el" href="tinydb_8hpp.html#af0fa997cb38231ee8eab1529ba32078b" title="Controls whether a transaction&#39;s operations are applied or discarded.">TxResult</a>(<a class="el" href="classtinydb_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a>&amp;)</span>.</td></tr>
+    <tr><td class="paramname">fn</td><td>A callable of the form <span class="tt"><a class="el" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f" title="Controls whether a transaction&#39;s operations are applied or discarded.">TxResult</a>(<a class="el" href="classfluxen_1_1_tx.html" title="A staged batch of write operations, used inside DB::transaction().">Tx</a>&amp;)</span>.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>The callback is invoked without holding the database mutex, so other threads may commit writes between the time the callback returns and the time the transaction is applied. The transaction's own operations are applied atomically, but they are not isolated from concurrent writers during the callback's execution.</dd></dl>
-<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line">db.transaction([](<a class="code hl_class" href="classtinydb_1_1_tx.html">tinydb::Tx</a>&amp; tx) {</div>
-<div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">put</a>(<span class="stringliteral">&quot;balance&quot;</span>,  int32_t{500});</div>
-<div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">put</a>(<span class="stringliteral">&quot;currency&quot;</span>, std::string(<span class="stringliteral">&quot;USD&quot;</span>));</div>
-<div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47">remove</a>(<span class="stringliteral">&quot;old_session&quot;</span>);</div>
-<div class="line">    <span class="keywordflow">return</span> tinydb::commit;</div>
+<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line">db.transaction([](<a class="code hl_class" href="classfluxen_1_1_tx.html">fluxen::Tx</a>&amp; tx) {</div>
+<div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;balance&quot;</span>,  int32_t{500});</div>
+<div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;currency&quot;</span>, std::string(<span class="stringliteral">&quot;USD&quot;</span>));</div>
+<div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">remove</a>(<span class="stringliteral">&quot;old_session&quot;</span>);</div>
+<div class="line">    <span class="keywordflow">return</span> fluxen::commit;</div>
 <div class="line">});</div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html"><div class="ttname"><a href="classtinydb_1_1_tx.html">tinydb::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> tinydb.hpp:469</div></div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html_a152de82fb3869ce7e22db2adffc59c47"><div class="ttname"><a href="classtinydb_1_1_tx.html#a152de82fb3869ce7e22db2adffc59c47">tinydb::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:519</div></div>
-<div class="ttc" id="aclasstinydb_1_1_tx_html_ae28a54ff7899322ee2b27d5cb02150fb"><div class="ttname"><a href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">tinydb::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> tinydb.hpp:477</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:468</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:476</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:518</div></div>
 </div><!-- fragment --></dd></dl>
-<dl class="section user"><dt>Rolling back</dt><dd><div class="fragment"><div class="line">db.transaction([&amp;](<a class="code hl_class" href="classtinydb_1_1_tx.html">tinydb::Tx</a>&amp; tx) {</div>
-<div class="line">    tx.<a class="code hl_function" href="classtinydb_1_1_tx.html#ae28a54ff7899322ee2b27d5cb02150fb">put</a>(<span class="stringliteral">&quot;x&quot;</span>, new_value);</div>
+<dl class="section user"><dt>Rolling back</dt><dd><div class="fragment"><div class="line">db.transaction([&amp;](<a class="code hl_class" href="classfluxen_1_1_tx.html">fluxen::Tx</a>&amp; tx) {</div>
+<div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;x&quot;</span>, new_value);</div>
 <div class="line">    <span class="keywordflow">if</span> (!validate(new_value)) {</div>
-<div class="line">        <span class="keywordflow">return</span> tinydb::rollback;   <span class="comment">// nothing is written</span></div>
+<div class="line">        <span class="keywordflow">return</span> fluxen::rollback;   <span class="comment">// nothing is written</span></div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">return</span> tinydb::commit;</div>
+<div class="line">    <span class="keywordflow">return</span> fluxen::commit;</div>
 <div class="line">});</div>
 </div><!-- fragment --> </dd></dl>
 
 </div>
 </div>
-<a id="a0df111ee2e449632705b8ea529e5eddd" name="a0df111ee2e449632705b8ea529e5eddd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0df111ee2e449632705b8ea529e5eddd">&#9670;&#160;</a></span>compact()</h2>
+<a id="af03b664bcda9141683485bbcd31bdaf5" name="af03b664bcda9141683485bbcd31bdaf5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af03b664bcda9141683485bbcd31bdaf5">&#9670;&#160;</a></span>compact()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -593,7 +593,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void tinydb::DB::compact </td>
+          <td class="memname">void fluxen::DB::compact </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -607,7 +607,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 </div><div class="memdoc">
 
 <p>Rewrites the database file retaining only live entries. </p>
-<p>The append-only log accumulates dead entries over time as keys are overwritten or deleted. <span class="tt"><a class="el" href="#a0df111ee2e449632705b8ea529e5eddd" title="Rewrites the database file retaining only live entries.">compact()</a></span> rewrites the file with only the current live values, reclaiming that space.</p>
+<p>The append-only log accumulates dead entries over time as keys are overwritten or deleted. <span class="tt"><a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a></span> rewrites the file with only the current live values, reclaiming that space.</p>
 <p>The rewrite is crash-safe. Compacted data is first written to a temporary file (<code class="param"></code> &lt;path&gt;.tmp), fsynced, and then atomically renamed over the original. A crash at any point leaves either the original or the fully written new file intact. That way data is never lost.</p>
 <p>Acquires an exclusive lock, blocking all reads and writes for the duration of the rewrite. The database remains fully consistent. If the process is interrupted mid-compact the old file is still intact.</p>
 <p>There is no automatic compaction. Call this periodically if your workload involves many overwrites or deletions.</p>
@@ -617,7 +617,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
   </table>
   </dd>
 </dl>
-<dl class="section warning"><dt>Warning</dt><dd>This function invalidates all previously returned spans, views, and pointers to database-backed data. After <span class="tt"><a class="el" href="#a0df111ee2e449632705b8ea529e5eddd" title="Rewrites the database file retaining only live entries.">compact()</a></span> returns, any attempt to access such data is undefined behavior. Callers must reacquire any needed data after compaction.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This function invalidates all previously returned spans, views, and pointers to database-backed data. After <span class="tt"><a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a></span> returns, any attempt to access such data is undefined behavior. Callers must reacquire any needed data after compaction.</dd></dl>
 <dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><span class="comment">// After a batch of deletions</span></div>
 <div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; key : expired_keys) {</div>
 <div class="line">    db.remove(key);</div>
@@ -627,8 +627,8 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 
 </div>
 </div>
-<a id="a0f1684b6e7e7c86c17e5b004d1a09d8a" name="a0f1684b6e7e7c86c17e5b004d1a09d8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f1684b6e7e7c86c17e5b004d1a09d8a">&#9670;&#160;</a></span>key_count()</h2>
+<a id="a46a68dd1141bd1c7db5d624673a5f91d" name="a46a68dd1141bd1c7db5d624673a5f91d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46a68dd1141bd1c7db5d624673a5f91d">&#9670;&#160;</a></span>key_count()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -637,7 +637,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">auto tinydb::DB::key_count </td>
+          <td class="memname">auto fluxen::DB::key_count </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const-&gt;size_t</td>
@@ -656,8 +656,8 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 
 </div>
 </div>
-<a id="ae6a1a8e3da68cc9995ee35dfcdd8963b" name="ae6a1a8e3da68cc9995ee35dfcdd8963b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6a1a8e3da68cc9995ee35dfcdd8963b">&#9670;&#160;</a></span>file_size()</h2>
+<a id="a42423d7851b32c55c997c3df74f0901d" name="a42423d7851b32c55c997c3df74f0901d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42423d7851b32c55c997c3df74f0901d">&#9670;&#160;</a></span>file_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -666,7 +666,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">auto tinydb::DB::file_size </td>
+          <td class="memname">auto fluxen::DB::file_size </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const-&gt;size_t</td>
@@ -680,14 +680,14 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 </div><div class="memdoc">
 
 <p>Returns the current size of the database file in bytes. </p>
-<p>This includes space used by dead entries (overwritten or deleted values) that have not yet been reclaimed by <a class="el" href="#a0df111ee2e449632705b8ea529e5eddd" title="Rewrites the database file retaining only live entries.">compact()</a>. It is an upper bound on the live data size.</p>
+<p>This includes space used by dead entries (overwritten or deleted values) that have not yet been reclaimed by <a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a>. It is an upper bound on the live data size.</p>
 <p>Acquires a shared lock, allowing concurrent calls from other readers.</p>
 <dl class="section return"><dt>Returns</dt><dd>File size in bytes. </dd></dl>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="tinydb_8hpp_source.html">tinydb.hpp</a></li>
+<li><a class="el" href="fluxen_8hpp_source.html">fluxen.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -702,7 +702,7 @@ The <span class="tt"><a class="el" href="tinydb_8hpp.html#ac79cba7fa5286030b0601
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>tinydb</b></li><li class="navelem"><a href="classtinydb_1_1_d_b.html">DB</a></li>
+    <li class="navelem"><b>fluxen</b></li><li class="navelem"><a href="classfluxen_1_1_d_b.html">DB</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.15.0 </li>
   </ul>
 </div>

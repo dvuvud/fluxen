@@ -1,6 +1,6 @@
-// A persistent shell command output cache built with tinydb.
+// A persistent shell command output cache built with fluxen.
 //
-// Demonstrates usage of tinydb to memoize expensive or slow commands.
+// Demonstrates usage of fluxen to memoize expensive or slow commands.
 // The output of any shell command is cached by its
 // command string and returned instantly on subsequent runs.
 //
@@ -10,7 +10,7 @@
 //   cache clear                  wipe all cached output
 //   cache list                   show all cached commands
 
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 
 #include <array>
 #include <cstdio>
@@ -64,7 +64,7 @@ auto main(int argc, char* argv[]) -> int {
         return 1;
     }
 
-    tinydb::DB db(DB_PATH);
+    fluxen::DB db(DB_PATH);
     std::string_view cmd = argv[1];
 
     if (cmd == "run") {
@@ -124,7 +124,7 @@ auto main(int argc, char* argv[]) -> int {
             return 0;
         }
 
-        db.each([](std::string_view key, tinydb::Bytes) -> void {
+        db.each([](std::string_view key, fluxen::Bytes) -> void {
             std::cout << key << "\n";
         });
 
@@ -133,7 +133,7 @@ auto main(int argc, char* argv[]) -> int {
 
     if (cmd == "clear") {
         std::vector<std::string> keys;
-        db.each([&](std::string_view key, tinydb::Bytes) -> void {
+        db.each([&](std::string_view key, fluxen::Bytes) -> void {
             keys.emplace_back(key);
         });
         for (const auto& key : keys) {

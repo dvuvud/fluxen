@@ -1,6 +1,6 @@
-// A minimal build-tool configuration store built with tinydb.
+// A minimal build-tool configuration store built with fluxen.
 //
-// Demonstrates using tinydb as a persistent settings backend for a
+// Demonstrates using fluxen as a persistent settings backend for a
 // CLI tool. Settings are written once and remembered across runs.
 //
 // Usage:
@@ -12,7 +12,7 @@
 //   settings list
 //   settings reset
 
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 
 #include <iostream>
 #include <string>
@@ -50,7 +50,7 @@ auto main(int argc, char* argv[]) -> int {
         return 1;
     }
 
-    tinydb::DB db(DB_PATH);
+    fluxen::DB db(DB_PATH);
     std::string_view cmd = argv[1];
 
     if (cmd == "set") {

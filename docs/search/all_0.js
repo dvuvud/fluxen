@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['bytes_0',['Bytes',['../tinydb_8hpp.html#ac79cba7fa5286030b060158e7aed69a1',1,'tinydb']]]
+  ['bytes_0',['Bytes',['../fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569',1,'fluxen']]]
 ];

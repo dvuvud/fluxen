@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['db_0',['DB',['../classtinydb_1_1_d_b.html',1,'tinydb::DB'],['../classtinydb_1_1_d_b.html#a94dde37361f58cc9d4d3f3e6da81ee50',1,'tinydb::DB::DB()']]]
+  ['db_0',['DB',['../classfluxen_1_1_d_b.html',1,'fluxen::DB'],['../classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9',1,'fluxen::DB::DB()']]]
 ];

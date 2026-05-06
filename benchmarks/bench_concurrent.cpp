@@ -1,4 +1,4 @@
-#include "tinydb.hpp"
+#include "fluxen.hpp"
 #include "tests/test_helpers.hpp"
 #include <benchmark/benchmark.h>
 #include <sqlite3.h>
@@ -46,14 +46,14 @@ void sqlite_populate(const std::string& path, const std::vector<std::string>& ke
     sqlite3_close(db);
 }
 
-static std::unique_ptr<tinydb::DB> g_tinydb;
+static std::unique_ptr<fluxen::DB> g_fluxen;
 static std::string g_db_path;
 
 } // namespace
 
 // concurrent reads
 
-static void BM_tinydb_ConcurrentReads(benchmark::State& state) {
+static void BM_fluxen_ConcurrentReads(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
 
@@ -61,20 +61,20 @@ static void BM_tinydb_ConcurrentReads(benchmark::State& state) {
         g_db_path = make_temp_path("cr_tdb");
         auto vals = make_values(n);
         {
-            tinydb::DB setup(g_db_path);
+            fluxen::DB setup(g_db_path);
             for (int i = 0; i < n; ++i) setup.put(keys[i], vals[i]);
         }
-        g_tinydb = std::make_unique<tinydb::DB>(g_db_path);
+        g_fluxen = std::make_unique<fluxen::DB>(g_db_path);
     }
 
     for (auto _ : state) {
         for (int i = 0; i < n; ++i) {
-            benchmark::DoNotOptimize(g_tinydb->get(keys[i]));
+            benchmark::DoNotOptimize(g_fluxen->get(keys[i]));
         }
     }
 
     if (state.thread_index() == 0) {
-        g_tinydb.reset();
+        g_fluxen.reset();
         std::filesystem::remove(g_db_path);
     }
     state.SetItemsProcessed(state.iterations() * n);
@@ -114,32 +114,32 @@ static void BM_SQLite_ConcurrentReads(benchmark::State& state) {
 
 // read/write contention
 
-static void BM_tinydb_ReadWriteContention(benchmark::State& state) {
+static void BM_fluxen_ReadWriteContention(benchmark::State& state) {
     const int n = state.range(0);
     auto keys = make_keys(n);
     auto vals = make_values(n);
 
     if (state.thread_index() == 0) {
         g_db_path = make_temp_path("rwc_tdb");
-        g_tinydb = std::make_unique<tinydb::DB>(g_db_path);
+        g_fluxen = std::make_unique<fluxen::DB>(g_db_path);
     }
 
     long local_reads = 0;
     for (auto _ : state) {
         if (state.thread_index() == 0) {
             for (int i = 0; i < n; ++i) {
-                g_tinydb->put(keys[i], vals[i]);
+                g_fluxen->put(keys[i], vals[i]);
             }
         } else {
             for (int i = 0; i < n; ++i) {
-                benchmark::DoNotOptimize(g_tinydb->get(keys[i]));
+                benchmark::DoNotOptimize(g_fluxen->get(keys[i]));
                 local_reads++;
             }
         }
     }
 
     if (state.thread_index() == 0) {
-        g_tinydb.reset();
+        g_fluxen.reset();
         std::filesystem::remove(g_db_path);
     }
     state.counters["reads"] = benchmark::Counter(local_reads, benchmark::Counter::kIsRate);
@@ -195,7 +195,7 @@ static void BM_SQLite_ReadWriteContention(benchmark::State& state) {
 
 // writer contention
 
-static void BM_tinydb_WriterContention(benchmark::State& state) {
+static void BM_fluxen_WriterContention(benchmark::State& state) {
     const int n = state.range(0);
     const int keys_per_thread = n / state.threads();
     auto keys = make_keys(n);
@@ -203,18 +203,18 @@ static void BM_tinydb_WriterContention(benchmark::State& state) {
 
     if (state.thread_index() == 0) {
         g_db_path = make_temp_path("wc_tdb");
-        g_tinydb = std::make_unique<tinydb::DB>(g_db_path);
+        g_fluxen = std::make_unique<fluxen::DB>(g_db_path);
     }
 
     const int start = state.thread_index() * keys_per_thread;
     for (auto _ : state) {
         for (int i = start; i < start + keys_per_thread; ++i) {
-            g_tinydb->put(keys[i], vals[i]);
+            g_fluxen->put(keys[i], vals[i]);
         }
     }
 
     if (state.thread_index() == 0) {
-        g_tinydb.reset();
+        g_fluxen.reset();
         std::filesystem::remove(g_db_path);
     }
     state.SetItemsProcessed(state.iterations() * keys_per_thread);
@@ -261,9 +261,9 @@ static void BM_SQLite_WriterContention(benchmark::State& state) {
 
 #define COMMON_ARGS Arg(1000)->Arg(10000)->ThreadRange(2, 16)
 
-BENCHMARK(BM_tinydb_ConcurrentReads)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_ConcurrentReads)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_ConcurrentReads)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_ReadWriteContention)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_ReadWriteContention)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_ReadWriteContention)->COMMON_ARGS;
-BENCHMARK(BM_tinydb_WriterContention)->COMMON_ARGS;
+BENCHMARK(BM_fluxen_WriterContention)->COMMON_ARGS;
 BENCHMARK(BM_SQLite_WriterContention)->COMMON_ARGS;
