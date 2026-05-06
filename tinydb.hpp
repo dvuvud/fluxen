@@ -42,12 +42,11 @@
  *
  * @par Thread safety
  * All public methods are thread-safe. Concurrent reads are permitted via a
- * write-preferring reader-writer lock: multiple threads may call @p get(),
+ * shared mutex: multiple threads may call @p get(),
  * @p has(), @p each(), @p prefix(), @p key_count(), and @p file_size()
  * simultaneously. Write operations (@p put(), @p remove(), @p transaction(),
  * @p compact()) acquire an exclusive lock and block until all active readers
- * have finished. Waiting writers take priority over new readers to prevent
- * writer starvation.
+ * have finished.
  *
  * The memory-mapped file is remapped lazily: writes leave the mapping stale
  * and the first reader to observe a dirty mapping performs the remap under a
@@ -75,7 +74,6 @@
 #pragma once
 
 #include <cassert>
-#include <condition_variable>
 #include <shared_mutex>
 #include <stdexcept>
 #include <mutex>
@@ -167,67 +165,6 @@ inline auto decode_header(const uint8_t in[HEADER_SIZE]) noexcept -> EntryHeader
 struct IndexEntry {
     size_t val_offset;  // byte offset of value data in file
     uint32_t val_len;
-};
-
-/**
- * @brief A write-preferring reader-writer lock.
- *
- * Satisfies BasicLockable (lock/unlock) and SharedLockable (lock_shared/
- * unlock_shared), so it works directly with std::unique_lock,
- * std::scoped_lock, and std::shared_lock via class template argument
- * deduction. There is no explicit template parameter required.
- *
- * Write priority is enforced via @p waiting_writers_: once any writer
- * calls @p lock(), new readers block in @p lock_shared() until all
- * pending writers have finished, preventing writer starvation.
- *
- * An internal @p std::mutex guards the counter members themselves.
- * Condition variables are used for sleeping rather than spinning, so
- * blocked threads do not consume CPU while waiting.
- */
-class WritePreferringRWLock {
-public:
-    void lock() {
-        std::unique_lock lk(mu_);
-        ++waiting_writers_;
-        write_cv_.wait(lk, [this] () -> bool{
-            return active_readers_ == 0 && active_writers_ == 0;
-        });
-        --waiting_writers_;
-        ++active_writers_;
-    }
-
-    void unlock() {
-        std::unique_lock lk(mu_);
-        --active_writers_;
-        if (waiting_writers_ > 0) {
-            write_cv_.notify_one();
-        } else {
-            read_cv_.notify_all();
-        }
-    }
-
-    void lock_shared() {
-        std::unique_lock lk(mu_);
-        read_cv_.wait(lk, [this] () -> bool{
-            return waiting_writers_ == 0 && active_writers_ == 0;
-        });
-        ++active_readers_;
-    }
-
-    void unlock_shared() {
-        std::unique_lock lk(mu_);
-        if (--active_readers_ == 0 && waiting_writers_ > 0) {
-            write_cv_.notify_one();
-        }
-    }
-private:
-    std::mutex mu_;
-    std::condition_variable read_cv_;
-    std::condition_variable write_cv_;
-    int active_readers_  = 0;
-    int active_writers_  = 0;
-    int waiting_writers_ = 0;
 };
 
 /* Cross-platform mmap wrapper */
@@ -582,13 +519,13 @@ public:
      * Use transaction() if you require durability guarantees.
      *
      * Acquires an exclusive lock, blocking until all active readers have
-     * finished. Waiting writers take priority over new readers.
+     * finished.
      *
      * @param key   Key to write. Must be between 1 and 255 bytes.
      * @param value String value to store.
      */
     void put(std::string_view key, std::string_view value) {
-        std::scoped_lock lock(mu_);
+        std::unique_lock lock(mu_);
         append_entry(
             key,
             reinterpret_cast<const uint8_t*>(value.data()),
@@ -605,7 +542,7 @@ public:
      * will return `nullopt` if the stored size does not match `sizeof(T)`.
      *
      * Acquires an exclusive lock, blocking until all active readers have
-     * finished. Waiting writers take priority over new readers.
+     * finished.
      *
      * @tparam T    Any trivially copyable type: int, float, bool, struct, etc.
      *              Must not be implicitly convertible to std::string_view.
@@ -623,7 +560,7 @@ public:
         requires (std::is_trivially_copyable_v<T>
                && !std::is_convertible_v<T, std::string_view>)
     void put(std::string_view key, const T& value) {
-        std::scoped_lock lock(mu_);
+        std::unique_lock lock(mu_);
         append_entry(
             key,
             reinterpret_cast<const uint8_t*>(&value),
@@ -706,7 +643,7 @@ public:
      * @param key The key to delete.
      */
     void remove(std::string_view key) {
-        std::scoped_lock lock(mu_);
+        std::unique_lock lock(mu_);
         if (!index_.contains(std::string(key))) {
             return;
         }
@@ -856,7 +793,7 @@ public:
         TxResult result = fn(tx);
         if (result == rollback) return;
 
-        std::scoped_lock lock(mu_);
+        std::unique_lock lock(mu_);
         for (const auto& op : tx.ops_) {
             append_entry(
                 op.key,
@@ -901,7 +838,7 @@ public:
      * @endcode
      */
     void compact() {
-        std::scoped_lock lock(mu_);
+        std::unique_lock lock(mu_);
 
         if (file_.is_dirty()) {
             file_.remap();
@@ -1095,7 +1032,7 @@ private:
 
     std::unordered_map<std::string, detail::IndexEntry> index_;
     mutable detail::MappedFile file_;
-    mutable detail::WritePreferringRWLock mu_;
+    mutable std::shared_mutex mu_;
     mutable std::mutex sync_mutex_;
 
 };
