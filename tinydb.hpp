@@ -88,6 +88,7 @@
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
+#include <atomic>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -316,7 +317,7 @@ public:
      * since only exclusive-lock holders can set this flag.
      */
     [[nodiscard]] auto is_dirty() const noexcept -> bool {
-        return dirty_.load(std::memory_order_acquire);;
+        return dirty_.load(std::memory_order_acquire);
     }
 
     [[nodiscard]] auto size() const noexcept -> size_t { return file_size_; }
