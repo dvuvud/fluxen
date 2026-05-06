@@ -11,7 +11,9 @@
 #include <numeric>
 #include <random>
 
-static auto make_keys(int n) -> std::vector<std::string> {
+namespace {
+
+auto make_keys(int n) -> std::vector<std::string> {
     std::vector<std::string> keys;
     keys.reserve(n);
     for (int i = 0; i < n; ++i) {
@@ -20,7 +22,7 @@ static auto make_keys(int n) -> std::vector<std::string> {
     return keys;
 }
 
-static auto make_values(int n) -> std::vector<std::string> {
+auto make_values(int n) -> std::vector<std::string> {
     std::vector<std::string> vals;
     vals.reserve(n);
     for (int i = 0; i < n; ++i) {
@@ -33,7 +35,7 @@ static auto make_values(int n) -> std::vector<std::string> {
  * SQLite in WAL mode with synchronous=OFF. No fsyncs on individual writes
  * which matches tinydb's bare put().
  */
-static auto open_sqlite_no_sync(const std::string& path) -> sqlite3* {
+auto open_sqlite_no_sync(const std::string& path) -> sqlite3* {
     sqlite3* db = nullptr;
     sqlite3_open(path.c_str(), &db);
     sqlite3_exec(
@@ -49,7 +51,7 @@ static auto open_sqlite_no_sync(const std::string& path) -> sqlite3* {
  * SQLite in WAL mode with synchronous=NORMAL. Checkpoints sync but individual
  * commits don't. Matches tinydb's transaction(), which fsyncs once at the end.
  */
-static auto open_sqlite_normal_sync(const std::string& path) -> sqlite3* {
+auto open_sqlite_normal_sync(const std::string& path) -> sqlite3* {
     sqlite3* db = nullptr;
     sqlite3_open(path.c_str(), &db);
     sqlite3_exec(
@@ -60,6 +62,8 @@ static auto open_sqlite_normal_sync(const std::string& path) -> sqlite3* {
     );
     return db;
 }
+
+} // namespace
 
 /**
  * Sequential Write: individual writes, no explicit transaction
@@ -88,7 +92,6 @@ static void BM_tinydb_SequentialWrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_SequentialWrite)->Arg(1000)->Arg(10000)->Arg(100000);
 
 static void BM_SQLite_SequentialWrite(benchmark::State& state) {
     const int n = state.range(0);
@@ -128,7 +131,6 @@ static void BM_SQLite_SequentialWrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_SequentialWrite)->Arg(1000)->Arg(10000)->Arg(100000);
 
 /**
  * Bulk Write: all keys in one transaction
@@ -161,7 +163,6 @@ static void BM_tinydb_BulkWrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_BulkWrite)->Arg(1000)->Arg(10000)->Arg(100000);
 
 static void BM_SQLite_BulkWrite(benchmark::State& state) {
     const int n = state.range(0);
@@ -203,7 +204,6 @@ static void BM_SQLite_BulkWrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_BulkWrite)->Arg(1000)->Arg(10000)->Arg(100000);
 
 /**
  * Sequential Read
@@ -235,7 +235,6 @@ static void BM_tinydb_SequentialRead(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_SequentialRead)->Arg(1000)->Arg(10000)->Arg(100000);
 
 static void BM_SQLite_SequentialRead(benchmark::State& state) {
     const int n = state.range(0);
@@ -287,7 +286,6 @@ static void BM_SQLite_SequentialRead(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_SequentialRead)->Arg(1000)->Arg(10000)->Arg(100000);
 
 /**
  * Random Read
@@ -324,7 +322,6 @@ static void BM_tinydb_RandomRead(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_RandomRead)->Arg(1000)->Arg(10000)->Arg(100000);
 
 static void BM_SQLite_RandomRead(benchmark::State& state) {
     const int n = state.range(0);
@@ -377,7 +374,6 @@ static void BM_SQLite_RandomRead(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_RandomRead)->Arg(1000)->Arg(10000)->Arg(100000);
 
 /**
  * Overwrite: write N keys, then write them all again
@@ -408,7 +404,6 @@ static void BM_tinydb_Overwrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n * 2);
 }
-BENCHMARK(BM_tinydb_Overwrite)->Arg(1000)->Arg(10000);
 
 static void BM_SQLite_Overwrite(benchmark::State& state) {
     const int n = state.range(0);
@@ -454,7 +449,6 @@ static void BM_SQLite_Overwrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n * 2);
 }
-BENCHMARK(BM_SQLite_Overwrite)->Arg(1000)->Arg(10000);
 
 /**
  * Open: how long does it take to open an existing database?
@@ -485,7 +479,6 @@ static void BM_tinydb_Open(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_Open)->Arg(1000)->Arg(10000)->Arg(100000);
 
 static void BM_SQLite_Open(benchmark::State& state) {
     const int n = state.range(0);
@@ -530,7 +523,6 @@ static void BM_SQLite_Open(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_Open)->Arg(1000)->Arg(10000)->Arg(100000);
 
 // Compaction
 
@@ -563,7 +555,6 @@ static void BM_tinydb_Compact(benchmark::State& state) {
         state.ResumeTiming();
     }
 }
-// BENCHMARK(BM_tinydb_Compact)->Arg(1000)->Arg(10000);
 
 /**
  * Struct Write: storing a fixed-size struct as raw bytes, one write at a time.
@@ -588,7 +579,6 @@ static void BM_tinydb_StructWrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_StructWrite)->Arg(1000)->Arg(10000);
 
 struct Player { int32_t score; float x, y; bool active; char pad[3]; };
 
@@ -630,7 +620,6 @@ static void BM_SQLite_StructWrite(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_StructWrite)->Arg(1000)->Arg(10000);
 
 /**
  * Struct Read: reading those structs back out. Connection open before the
@@ -660,7 +649,6 @@ static void BM_tinydb_StructRead(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_StructRead)->Arg(1000)->Arg(10000);
 
 static void BM_SQLite_StructRead(benchmark::State& state) {
     const int n = state.range(0);
@@ -711,7 +699,6 @@ static void BM_SQLite_StructRead(benchmark::State& state) {
     std::filesystem::remove(path);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_StructRead)->Arg(1000)->Arg(10000);
 
 /**
  * Transaction: one committed batch per iteration, with durability.
@@ -743,7 +730,6 @@ static void BM_tinydb_Transaction(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_tinydb_Transaction)->Arg(100)->Arg(1000)->Arg(10000);
 
 static void BM_SQLite_Transaction(benchmark::State& state) {
     const int n = state.range(0);
@@ -785,4 +771,27 @@ static void BM_SQLite_Transaction(benchmark::State& state) {
     }
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_SQLite_Transaction)->Arg(100)->Arg(1000)->Arg(10000);
+
+// registration
+
+#define COMMON_ARGS Arg(100)->Arg(1000)->Arg(10000);
+
+BENCHMARK(BM_tinydb_SequentialRead)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_SequentialRead)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_RandomRead)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_RandomRead)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_StructRead)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_StructRead)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_SequentialWrite)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_SequentialWrite)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_BulkWrite)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_BulkWrite)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_Overwrite)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_Overwrite)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_StructWrite)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_StructWrite)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_Open)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_Open)->COMMON_ARGS;
+BENCHMARK(BM_SQLite_Transaction)->COMMON_ARGS;
+BENCHMARK(BM_tinydb_Transaction)->COMMON_ARGS;
+// BENCHMARK(BM_tinydb_Compact)->COMMON_ARGS;
