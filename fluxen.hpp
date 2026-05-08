@@ -193,14 +193,14 @@ public:
         path_ = path;
 #ifdef _WIN32
         file_ = CreateFileA(path_.c_str(),
-                            GENERIC_READ | GENERIC_WRITE,
+                            GENERIC_READ | FILE_APPEND_DATA,
                             FILE_SHARE_READ, nullptr,
                             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
         if (file_ == INVALID_HANDLE_VALUE) {
             return false;
         }
 #else
-        fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT, 0644);
+        fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
         if (fd_ < 0) {
             return false;
         }
@@ -267,13 +267,11 @@ public:
         }
 #ifdef _WIN32
         DWORD written = 0;
-        SetFilePointer(file_, 0, nullptr, FILE_END);
         if (!WriteFile(file_, data, static_cast<DWORD>(len), &written, nullptr)
             || written != static_cast<DWORD>(len)) {
             return false;
         }
 #else
-        ::lseek(fd_, 0, SEEK_END);
         if (::write(fd_, data, len) != static_cast<ssize_t>(len)) {
             return false;
         }
