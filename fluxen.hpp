@@ -1077,20 +1077,20 @@ private:
             .val_len = val_len,
         };
 
-        uint8_t raw[detail::HEADER_SIZE];
-        detail::encode_header(raw, hdr);
- 
-        file_.append(raw, detail::HEADER_SIZE);
-        file_.append(key.data(), key.size());
+        std::vector<uint8_t> buf;
+        buf.resize(detail::HEADER_SIZE + key.size() + val_len);
+        detail::encode_header(buf.data(), hdr);
+        std::memcpy(buf.data() + detail::HEADER_SIZE, key.data(), key.size());
         if (val && val_len) {
-            file_.append(val, val_len);
+            std::memcpy(buf.data() + detail::HEADER_SIZE + key.size(), val, val_len);
         }
+
+        file_.append(buf.data(), buf.size());
 
         if (tombstone) {
             index_.erase(std::string(key));
         } else {
-            size_t val_off = file_.size() - val_len;
-            index_[std::string(key)] = { .val_offset=val_off, .val_len=val_len };
+            index_[std::string(key)] = { .val_offset=file_.size() - val_len, .val_len=val_len };
         }
     }
 
