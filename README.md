@@ -49,8 +49,6 @@ fluxen is built for cases where you want persistent storage without adopting a f
 
 It is not intended to replace general databases, which provide a much broader set of features such as SQL queries, indexing, and multi-purpose storage capabilities.
 
-To give a sense of where this design sits in practice, [the benchmarks section](#benchmarks-early-results) includes benchmarks against SQLite for a few specific, narrow workloads (primarily direct key-value access patterns).
-
 ---
 
 ## When to use fluxen
