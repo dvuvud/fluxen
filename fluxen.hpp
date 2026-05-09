@@ -179,6 +179,7 @@ struct StringHash {
     }
 };
 
+using IndexMap = std::unordered_map<std::string, IndexEntry, StringHash, std::equal_to<>>;
 
 /* Cross-platform mmap wrapper */
 class MappedFile {
@@ -955,7 +956,7 @@ public:
             detail::MAGIC + sizeof(detail::MAGIC)
         );
 
-        std::unordered_map<std::string, detail::IndexEntry, detail::StringHash, std::equal_to<>> new_index;
+        detail::IndexMap new_index;
         for (const auto& [key, entry] : index_) {
             detail::EntryHeader hdr{
                 .flags   = detail::FLAG_LIVE,
@@ -1134,7 +1135,7 @@ private:
         }
     }
 
-    std::unordered_map<std::string, detail::IndexEntry, detail::StringHash, std::equal_to<>> index_;
+    detail::IndexMap index_;
     mutable detail::MappedFile file_;
     mutable std::shared_mutex mu_;
     mutable std::mutex sync_mutex_;
