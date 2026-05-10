@@ -454,3 +454,35 @@ TEST_F(FluxenTest, LargeValuePersistsAcrossReopen) {
 
     EXPECT_EQ(db_->get("big"), big);
 }
+
+TEST_F(FluxenTest, PartialTailEntryTruncatedOnReopen) {
+    db_->put("before", "good");
+    const size_t good_size = db_->file_size();
+    db_.reset();
+
+    {
+        std::FILE* f = std::fopen(path_.string().c_str(), "ab");
+        ASSERT_NE(f, nullptr);
+        const uint8_t partial[] = {
+            0x00,
+            0x03,
+            0xE8, 0x03, 0x00, 0x00,
+        };
+        std::fwrite(partial, 1, sizeof(partial), f);
+        std::fclose(f);
+    }
+
+    ASSERT_NO_THROW(reopen());
+
+    EXPECT_EQ(db_->get("before"), "good");
+
+    EXPECT_EQ(db_->file_size(), good_size);
+
+    db_->put("after", "also good");
+    db_.reset();
+
+    reopen();
+    EXPECT_EQ(db_->get("before"), "good");
+    EXPECT_EQ(db_->get("after"), "also good");
+    EXPECT_EQ(db_->key_count(), 2u);
+}
