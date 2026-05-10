@@ -27,7 +27,7 @@
  * file. Deletes append a tombstone. The index is rebuilt by scanning the log
  * once on open (last write wins).
  * `transaction()` stages any number of operations and flushes them as a
- * single write + fsync — the right tool for bulk writes.
+ * single write + fsync.
  *
  * @par File & data layout
  * @code
@@ -63,13 +63,13 @@
  * - The full key set lives in RAM (std::unordered_map).
  * - Windows-specific: The database file is locked while a DB object exists.
  *   You must destroy the DB object before attempting to delete or move the
- * file.
+ *   file.
  *
  * @par Compiler requirements
  * C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+.
  * Runs on Linux, macOS, and Windows.
  *
- * @version 1.0.0
+ * @version 1.0.1
  * @par License
  * MIT License
  */
@@ -303,6 +303,11 @@ public:
     return true;
   }
 
+  /**
+   * Flushes OS write buffers to disk.
+   * @return true on success, false if the underlying fsync/FlushFileBuffers
+   *         call fails. The caller must treat false as a hard I/O error.
+   */
   [[nodiscard]] auto sync() -> bool {
 #ifdef _WIN32
     return FlushFileBuffers(file_) != 0;
@@ -311,6 +316,16 @@ public:
 #endif
   }
 
+  /**
+   * Truncates the file to @p new_size bytes, rolling back any bytes that
+   * were appended after that point. Updates the cached file size and marks
+   * the mapping dirty so the next reader will remap.
+   *
+   * Call this to undo a partial append whose subsequent fsync failed.
+   *
+   * @param new_size Target file size. This must be <= current file size.
+   * @return true on success, false if the OS call fails.
+   */
   [[nodiscard]] auto truncate(size_t new_size) -> bool {
 #ifdef _WIN32
     LARGE_INTEGER li{};
@@ -581,6 +596,14 @@ public:
  * priority over waiting readers to prevent starvation. See the
  * @ref index "Thread safety" section in the main page for full details.
  *
+ * @par Poisoned state
+ * If a write operation fails at the OS level and the subsequent attempt to
+ * truncate the partial write also fails, the DB enters a permanent
+ * <em>poisoned</em> state. Every subsequent call to any public method will
+ * throw `std::runtime_error`. The only recovery is to destroy the DB object.
+ * Normal I/O errors that are successfully rolled back do @em not poison the
+ * database.
+ *
  * @note @p DB is non-copyable. Create one instance per file.
  *
  * @par Example
@@ -617,11 +640,18 @@ public:
    * magic header. If it exists, it is scanned to rebuild the
    * in-memory index.
    *
+   * @par Crash recovery
+   * If the file contains a partial entry at the tail (e.g. from a crash
+   * mid-write), the partial bytes are automatically truncated and the
+   * database opens successfully with all fully committed entries intact.
+   *
    * @param path Filesystem path to the database file.
    *
    * @throws std::runtime_error If the file cannot be opened or created.
    * @throws std::runtime_error If the file exists but has an invalid magic
    *         header (i.e. was not created by fluxen).
+   * @throws std::runtime_error If a partial tail entry is detected but
+   *         truncation fails.
    */
   explicit DB(std::string_view path) {
     if (!file_.open(path)) {
@@ -663,6 +693,11 @@ public:
    *
    * @param key   Key to write. Must be between 1 and 255 bytes.
    * @param value String value to store.
+   *
+   * @throws std::runtime_error If the database is poisoned.
+   * @throws std::runtime_error If the append fails. The partial write is
+   *         rolled back via truncation before throwing. If truncation also
+   *         fails, the database is poisoned and the error message will say so.
    */
   void put(std::string_view key, std::string_view value) {
     check_poisoned();
@@ -685,6 +720,11 @@ public:
    *              Must not be implicitly convertible to std::string_view.
    * @param key   Key to write. Must be between 1 and 255 bytes.
    * @param value Value to store.
+   *
+   * @throws std::runtime_error If the database is poisoned.
+   * @throws std::runtime_error If the append fails. The partial write is
+   *         rolled back via truncation before throwing. If truncation also
+   *         fails, the database is poisoned and the error message will say so.
    *
    * @par Example
    * @code
@@ -723,6 +763,8 @@ public:
    *           Must be `std::string` or a trivially copyable type.
    * @param key The key to look up.
    * @return `std::optional<T>` containing the value, or `std::nullopt`.
+   *
+   * @throws std::runtime_error If the database is poisoned.
    *
    * @par Example
    * @code
@@ -777,6 +819,11 @@ public:
    * finished. Waiting writers take priority over new readers.
    *
    * @param key The key to delete.
+   *
+   * @throws std::runtime_error If the database is poisoned.
+   * @throws std::runtime_error If the append fails. The partial write is
+   *         rolled back via truncation before throwing. If truncation also
+   *         fails, the database is poisoned and the error message will say so.
    */
   void remove(std::string_view key) {
     check_poisoned();
@@ -793,6 +840,8 @@ public:
    *
    * @param key The key to look up.
    * @return `true` if the key exists, `false` otherwise.
+   *
+   * @throws std::runtime_error If the database is poisoned.
    */
   [[nodiscard]] auto has(std::string_view key) const -> bool {
     check_poisoned();
@@ -818,6 +867,8 @@ public:
    * is not reentrant with an exclusive lock and will deadlock. Copy keys out
    * first if you need to write during iteration. The @p Bytes span is only
    * valid for the duration of the callback; copy the data if you need it later.
+   *
+   * @throws std::runtime_error If the database is poisoned.
    *
    * @par Example
    * @code
@@ -853,6 +904,8 @@ public:
    *
    * @note Iteration is O(total keys), not O(matching keys), because the
    *       underlying index is a hash map with no sorted order.
+   *
+   * @throws std::runtime_error If the database is poisoned.
    *
    * @par Example
    * @code
@@ -894,6 +947,13 @@ public:
    * staged operations are discarded (equivalent to rollback).
    *
    * @param fn A callable of the form `TxResult(Tx&)`.
+   *
+   * @throws std::runtime_error If the database is poisoned.
+   * @throws std::runtime_error If the batch append fails, or if the append
+   *         succeeds but the subsequent fsync fails. In both cases the partial
+   *         write is truncated before throwing, leaving the database unchanged.
+   *         If truncation itself fails after an fsync error, the database is
+   *         poisoned and every subsequent call will throw.
    *
    * @note All staged operations are serialized into a single buffer and written
    * with one syscall and one fsync. This makes transaction() significantly
@@ -999,6 +1059,7 @@ public:
    * There is no automatic compaction. Call this periodically if your
    * workload involves many overwrites or deletions.
    *
+   * @throws std::runtime_error If the database is poisoned.
    * @throws std::runtime_error If the file rewrite fails.
    *
    * @warning Invalidates all previously returned Bytes spans and pointers into
@@ -1054,6 +1115,7 @@ public:
    * Acquires a shared lock, allowing concurrent calls from other readers.
    *
    * @return Number of keys in the index.
+   * @throws std::runtime_error If the database is poisoned.
    */
   [[nodiscard]] auto key_count() const -> size_t {
     check_poisoned();
@@ -1071,6 +1133,7 @@ public:
    * Acquires a shared lock, allowing concurrent calls from other readers.
    *
    * @return File size in bytes.
+   * @throws std::runtime_error If the database is poisoned.
    */
   [[nodiscard]] auto file_size() const -> size_t {
     check_poisoned();
