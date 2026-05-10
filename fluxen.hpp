@@ -328,6 +328,7 @@ public:
    */
   [[nodiscard]] auto truncate(size_t new_size) -> bool {
 #ifdef _WIN32
+    unmap();
     LARGE_INTEGER li{};
     li.QuadPart = static_cast<LONGLONG>(new_size);
     if (!SetFilePointerEx(file_, li, nullptr, FILE_BEGIN)) {
