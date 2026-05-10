@@ -303,12 +303,34 @@ public:
     return true;
   }
 
-  void sync() {
+  [[nodiscard]] auto sync() -> bool {
 #ifdef _WIN32
-    FlushFileBuffers(file_);
+    return FlushFileBuffers(file_) != 0;
 #else
-    ::fsync(fd_);
+    return ::fsync(fd_) == 0;
 #endif
+  }
+
+  [[nodiscard]] auto truncate(size_t new_size) -> bool {
+#ifdef _WIN32
+    LARGE_INTEGER li{};
+    li.QuadPart = static_cast<LONGLONG>(new_size);
+    if (!SetFilePointerEx(file_, li, nullptr, FILE_BEGIN)) {
+      return false;
+    }
+    if (!SetEndOfFile(file_)) {
+      SetFilePointer(file_, 0, nullptr, FILE_END);
+      return false;
+    }
+    SetFilePointer(file_, 0, nullptr, FILE_END);
+#else
+    if (::ftruncate(fd_, static_cast<off_t>(new_size)) != 0) {
+      return false;
+    }
+#endif
+    file_size_ = new_size;
+    dirty_.store(true, std::memory_order_release);
+    return true;
   }
 
   /**
