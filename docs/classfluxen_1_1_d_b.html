@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fluxen<span id="projectnumber">&#160;1.0.0</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.0.1</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -135,6 +135,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="textblock"><p>A persistent key-value database backed by a single file. </p>
 <p>Keys are UTF-8 strings up to 255 bytes. Values can be std::string, string literals, or any trivially copyable type (int, float, struct, ...).</p>
 <p>The database is safe to use from multiple threads concurrently. Reads proceed in parallel, and writes acquire an exclusive lock and are given priority over waiting readers to prevent starvation. See the <a class="el" href="index.html">Thread safety</a> section in the main page for full details.</p>
+<dl class="section user"><dt>Poisoned state</dt><dd>If a write operation fails at the OS level and the subsequent attempt to truncate the partial write also fails, the <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> enters a permanent <em>poisoned</em> state. Every subsequent call to any public method will throw <span class="tt">std::runtime_error</span>. The only recovery is to destroy the <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object. Normal I/O errors that are successfully rolled back do <em>not</em> poison the database.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd><code class="param"><a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a></code> is non-copyable. Create one instance per file.</dd></dl>
 <dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_class" href="classfluxen_1_1_d_b.html">fluxen::DB</a> db(<span class="stringliteral">&quot;app.db&quot;</span>);</div>
 <div class="line"> </div>
@@ -143,7 +144,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> val = db.get&lt;int64_t&gt;(<span class="stringliteral">&quot;hits&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *val &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:575</div></div>
+<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:620</div></div>
 </div><!-- fragment --> </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac2862b15b595d994b07ec99f8b4885f9" name="ac2862b15b595d994b07ec99f8b4885f9"></a>
@@ -171,6 +172,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 
 <p>Opens or creates a database at the given path. </p>
 <p>If the file does not exist, it is created and initialised with the magic header. If it exists, it is scanned to rebuild the in-memory index.</p>
+<dl class="section user"><dt>Crash recovery</dt><dd>If the file contains a partial entry at the tail (e.g. from a crash mid-write), the partial bytes are automatically truncated and the database opens successfully with all fully committed entries intact.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>Filesystem path to the database file.</td></tr>
@@ -181,6 +183,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <table class="exception">
     <tr><td class="paramname">std::runtime_error</td><td>If the file cannot be opened or created. </td></tr>
     <tr><td class="paramname">std::runtime_error</td><td>If the file exists but has an invalid magic header (i.e. was not created by fluxen). </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If a partial tail entry is detected but truncation fails. </td></tr>
   </table>
   </dd>
 </dl>
@@ -249,7 +252,14 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">key</td><td>Key to write. Must be between 1 and 255 bytes. </td></tr>
-    <tr><td class="paramname">value</td><td>String value to store. </td></tr>
+    <tr><td class="paramname">value</td><td>String value to store.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
   </table>
   </dd>
 </dl>
@@ -299,6 +309,13 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <table class="params">
     <tr><td class="paramname">key</td><td>Key to write. Must be between 1 and 255 bytes. </td></tr>
     <tr><td class="paramname">value</td><td>Value to store.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so.</td></tr>
   </table>
   </dd>
 </dl>
@@ -354,6 +371,12 @@ template&lt;typename T = std::string&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><span class="tt">std::optional&lt;T&gt;</span> containing the value, or <span class="tt">std::nullopt</span>.</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned.</td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><span class="keyword">auto</span> name  = db.get(<span class="stringliteral">&quot;username&quot;</span>);            <span class="comment">// std::optional&lt;std::string&gt;</span></div>
 <div class="line"><span class="keyword">auto</span> score = db.get&lt;int32_t&gt;(<span class="stringliteral">&quot;score&quot;</span>);      <span class="comment">// std::optional&lt;int32_t&gt;</span></div>
 <div class="line"><span class="keyword">auto</span> cfg   = db.get&lt;Config&gt;(<span class="stringliteral">&quot;cfg&quot;</span>);         <span class="comment">// std::optional&lt;Config&gt;</span></div>
@@ -394,7 +417,14 @@ template&lt;typename T = std::string&gt; </div>
 <p>Acquires an exclusive lock, blocking until all active readers have finished. Waiting writers take priority over new readers.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">key</td><td>The key to delete. </td></tr>
+    <tr><td class="paramname">key</td><td>The key to delete.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
   </table>
   </dd>
 </dl>
@@ -432,7 +462,13 @@ template&lt;typename T = std::string&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><span class="tt">true</span> if the key exists, <span class="tt">false</span> otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><span class="tt">true</span> if the key exists, <span class="tt">false</span> otherwise.</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -469,6 +505,12 @@ template&lt;typename T = std::string&gt; </div>
   </dd>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Do not call any write method from inside <code class="param">fn</code> — the shared lock is not reentrant with an exclusive lock and will deadlock. Copy keys out first if you need to write during iteration. The <code class="param"><a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a></code> span is only valid for the duration of the callback; copy the data if you need it later.</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned.</td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line">db.each([](std::string_view key, <a class="code hl_typedef" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a> val) {</div>
 <div class="line">    std::string v(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(val.data()), val.size());</div>
 <div class="line">    std::cout &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; v &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
@@ -516,6 +558,12 @@ template&lt;typename T = std::string&gt; </div>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Iteration is O(total keys), not O(matching keys), because the underlying index is a hash map with no sorted order.</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned.</td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line">db.put(<span class="stringliteral">&quot;user:james&quot;</span>, <span class="stringliteral">&quot;admin&quot;</span>);</div>
 <div class="line">db.put(<span class="stringliteral">&quot;user:bryce&quot;</span>,   <span class="stringliteral">&quot;viewer&quot;</span>);</div>
 <div class="line">db.put(<span class="stringliteral">&quot;config:x&quot;</span>,   <span class="stringliteral">&quot;value&quot;</span>);</div>
@@ -559,6 +607,13 @@ template&lt;typename T = std::string&gt; </div>
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the batch append fails, or if the append succeeds but the subsequent fsync fails. In both cases the partial write is truncated before throwing, leaving the database unchanged. If truncation itself fails after an fsync error, the database is poisoned and every subsequent call will throw.</td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section note"><dt>Note</dt><dd>All staged operations are serialized into a single buffer and written with one syscall and one fsync. This makes <a class="el" href="#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">transaction()</a> significantly faster than the equivalent number of individual <a class="el" href="#ae62765f8a24f2baadbb5b0cfc12fd6c7" title="Stores a string value under the given key.">put()</a> calls when writing many keys at once. The callback runs without holding the database mutex, so other threads may write between callback return and commit; the transaction's own operations are always applied atomically.</dd></dl>
 <dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line">db.transaction([](<a class="code hl_class" href="classfluxen_1_1_tx.html">fluxen::Tx</a>&amp; tx) {</div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;balance&quot;</span>,  int32_t{500});</div>
@@ -566,9 +621,9 @@ template&lt;typename T = std::string&gt; </div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">remove</a>(<span class="stringliteral">&quot;old_session&quot;</span>);</div>
 <div class="line">    <span class="keywordflow">return</span> fluxen::commit;</div>
 <div class="line">});</div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:484</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:502</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:544</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:521</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:539</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:581</div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Rolling back</dt><dd><div class="fragment"><div class="line">db.transaction([&amp;](<a class="code hl_class" href="classfluxen_1_1_tx.html">fluxen::Tx</a>&amp; tx) {</div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;x&quot;</span>, new_value);</div>
@@ -611,6 +666,7 @@ template&lt;typename T = std::string&gt; </div>
 <p>There is no automatic compaction. Call this periodically if your workload involves many overwrites or deletions.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
     <tr><td class="paramname">std::runtime_error</td><td>If the file rewrite fails.</td></tr>
   </table>
   </dd>
@@ -645,6 +701,12 @@ template&lt;typename T = std::string&gt; </div>
 <p>Returns the number of live keys currently stored. </p>
 <p>Acquires a shared lock, allowing concurrent calls from other readers.</p>
 <dl class="section return"><dt>Returns</dt><dd>Number of keys in the index. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -675,6 +737,12 @@ template&lt;typename T = std::string&gt; </div>
 <p>This includes space used by dead entries (overwritten or deleted values) that have not yet been reclaimed by <a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a>. It is an upper bound on the live data size.</p>
 <p>Acquires a shared lock, allowing concurrent calls from other readers.</p>
 <dl class="section return"><dt>Returns</dt><dd>File size in bytes. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
