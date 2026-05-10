@@ -58,10 +58,10 @@ fluxen is a good fit when:
 - Your workload is read-heavy
 - You want to store typed values (structs, ints, floats) without serialization boilerplate
 - You want zero build friction with no CMake targets, no vcpkg packages, no linking
+- You need atomic bulk writes: `transaction()` commits many operations in a single write
 
 fluxen is **not** a good fit when:
 - You need range queries, secondary indexes, or SQL
-- Your workload is dominated by large batched writes
 - You need multi-process access to the same database file
 
 ---
@@ -74,6 +74,7 @@ fluxen uses a [Bitcask](https://riak.com/assets/bitcask-intro.pdf)-style design:
 - An **in-memory hash index** maps each key to the byte offset of its value in the file.
 - **Reads** look up the offset in the hash map and read directly from the mapped region.
 - **Writes** append a small header + key + value to the end of the file.
+- **Transactions** stage any number of operations and flush them in a single write + fsync.
 - **Deletes** append a tombstone. Dead space is reclaimed by `compact()`.
 - On open, the log is scanned once to rebuild the index (last write wins).
 
@@ -117,8 +118,16 @@ auto cfg = db.get<Config>("cfg");
 
 // Check and delete
 if (db.has("city")) {
-    db.remove("city");
+  db.remove("city");
 }
+
+// Bulk writes: one write, one fsync, fully atomic
+db.transaction([](fluxen::Tx& tx) {
+  tx.put("balance",  int32_t{500});
+  tx.put("currency", std::string("USD"));
+  tx.remove("old_session");
+  return fluxen::commit;
+});
 ```
 
 ---
