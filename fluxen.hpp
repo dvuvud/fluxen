@@ -893,15 +893,42 @@ public:
   void transaction(const std::function<TxResult(Tx &)> &fn) {
     Tx tx;
     TxResult result = fn(tx);
-    if (result == rollback)
+    if (result == rollback) {
       return;
+    }
+
+    std::vector<uint8_t> batch;
+    batch.reserve(tx.ops_.size() * 64);
+    for (const auto& op : tx.ops_) {
+        detail::EntryHeader hdr{
+            .flags   = op.is_delete ? detail::FLAG_TOMB : detail::FLAG_LIVE,
+            .key_len = static_cast<uint8_t>(op.key.size()),
+            .val_len = op.is_delete ? 0u : static_cast<uint32_t>(op.val.size()),
+        };
+        uint8_t raw[detail::HEADER_SIZE];
+        detail::encode_header(raw, hdr);
+        batch.insert(batch.end(), raw, raw + detail::HEADER_SIZE);
+        batch.insert(batch.end(), op.key.begin(), op.key.end());
+        if (!op.is_delete) {
+            batch.insert(batch.end(), op.val.begin(), op.val.end());
+        }
+    }
 
     std::unique_lock lock(mu_);
-    for (const auto &op : tx.ops_) {
-      append_entry(op.key, op.is_delete ? nullptr : op.val.data(),
-                   op.is_delete ? 0 : op.val.size(), op.is_delete);
-    }
+    file_.append(batch.data(), batch.size());
     file_.sync();
+
+    size_t base = file_.size() - batch.size();
+    size_t pos  = 0;
+    for (const auto& op : tx.ops_) {
+        pos += detail::HEADER_SIZE + op.key.size();
+        if (op.is_delete) {
+            index_.erase(op.key);
+        } else {
+            index_[op.key] = { .val_offset=base + pos, .val_len=static_cast<uint32_t>(op.val.size()) };
+            pos += op.val.size();
+        }
+    }
   }
 
   // --- MAINTENANCE ---
