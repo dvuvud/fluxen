@@ -26,6 +26,8 @@
  * into the return type. Writes append a 6-byte header + key + value to the
  * file. Deletes append a tombstone. The index is rebuilt by scanning the log
  * once on open (last write wins).
+ * `transaction()` stages any number of operations and flushes them as a
+ * single write + fsync — the right tool for bulk writes.
  *
  * @par File & data layout
  * @code
@@ -67,7 +69,7 @@
  * C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+.
  * Runs on Linux, macOS, and Windows.
  *
- * @version 1.0.0-beta.5
+ * @version 1.0.0
  * @par License
  * MIT License
  */
@@ -777,17 +779,10 @@ public:
    *
    * @param fn Callback of the form `void(std::string_view key, Bytes val)`.
    *
-   * @warning Do not call any write method (@p put, @p remove, @p transaction,
-   * @p compact) on this DB instance from inside @p fn. The shared
-   * lock is not reentrant with an exclusive lock and will deadlock.
-   * Read methods (@p get, @p has, @p key_count etc.) are safe to
-   * call from inside @p fn.
-   * If you need to write during iteration, copy the keys out first
-   * and operate on them after @p each() returns.
-   *
-   * @warning The `Bytes` span is only valid for the duration of the
-   *          callback. Do not store it. Instead, copy the data if you need it
-   * later.
+   * @warning Do not call any write method from inside @p fn — the shared lock
+   * is not reentrant with an exclusive lock and will deadlock. Copy keys out
+   * first if you need to write during iteration. The @p Bytes span is only
+   * valid for the duration of the callback; copy the data if you need it later.
    *
    * @par Example
    * @code
@@ -863,11 +858,12 @@ public:
    *
    * @param fn A callable of the form `TxResult(Tx&)`.
    *
-   * @note The callback is invoked without holding the database mutex,
-   * so other threads may commit writes between the time the callback
-   * returns and the time the transaction is applied. The transaction's
-   * own operations are applied atomically, but they are not isolated
-   * from concurrent writers during the callback's execution.
+   * @note All staged operations are serialized into a single buffer and written
+   * with one syscall and one fsync. This makes transaction() significantly
+   * faster than the equivalent number of individual put() calls when writing
+   * many keys at once. The callback runs without holding the database mutex,
+   * so other threads may write between callback return and commit; the
+   * transaction's own operations are always applied atomically.
    *
    * @par Example
    * @code
@@ -954,19 +950,8 @@ public:
    *
    * @throws std::runtime_error If the file rewrite fails.
    *
-   * @warning This function invalidates all previously returned spans, views,
-   * and pointers to database-backed data. After `compact()` returns, any
-   * attempt to access such data is undefined behavior. Callers must reacquire
-   * any needed data after compaction.
-   *
-   * @par Example
-   * @code
-   *   // After a batch of deletions
-   *   for (auto& key : expired_keys) {
-   *       db.remove(key);
-   *   }
-   *   db.compact();
-   * @endcode
+   * @warning Invalidates all previously returned Bytes spans and pointers into
+   * the mapped region. Reacquire any needed data after compaction.
    */
   void compact() {
     std::unique_lock lock(mu_);
