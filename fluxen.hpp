@@ -1081,6 +1081,7 @@ private:
     }
 
     size_t pos = sizeof(detail::MAGIC);
+    size_t last_good_pos = pos;
 
     while (pos + detail::HEADER_SIZE <= file_.size()) {
       uint8_t raw[detail::HEADER_SIZE];
@@ -1103,6 +1104,14 @@ private:
       }
 
       pos += hdr.val_len;
+      last_good_pos = pos;
+    }
+
+    if (last_good_pos < file_.size()) {
+      if (!file_.truncate(last_good_pos)) {
+        throw std::runtime_error(
+            "fluxen: failed to truncate partial tail entry on open");
+      }
     }
   }
 
