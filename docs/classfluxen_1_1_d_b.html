@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fluxen<span id="projectnumber">&#160;1.1.0</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.1.1</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -144,7 +144,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> val = db.get&lt;int64_t&gt;(<span class="stringliteral">&quot;hits&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *val &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:649</div></div>
+<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:665</div></div>
 </div><!-- fragment --> </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac2862b15b595d994b07ec99f8b4885f9" name="ac2862b15b595d994b07ec99f8b4885f9"></a>
@@ -260,6 +260,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
   <table class="exception">
     <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
     <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the key is empty or longer than 255 bytes. </td></tr>
   </table>
   </dd>
 </dl>
@@ -315,7 +316,8 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so.</td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the key is empty or longer than 255 bytes.</td></tr>
   </table>
   </dd>
 </dl>
@@ -425,6 +427,7 @@ template&lt;typename T = std::string&gt; </div>
   <table class="exception">
     <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
     <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the key is empty or longer than 255 bytes. </td></tr>
   </table>
   </dd>
 </dl>
@@ -621,9 +624,9 @@ template&lt;typename T = std::string&gt; </div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">remove</a>(<span class="stringliteral">&quot;old_session&quot;</span>);</div>
 <div class="line">    <span class="keywordflow">return</span> fluxen::commit;</div>
 <div class="line">});</div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:537</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:556</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:607</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:553</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:572</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:623</div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Rolling back</dt><dd><div class="fragment"><div class="line">db.transaction([&amp;](<a class="code hl_class" href="classfluxen_1_1_tx.html">fluxen::Tx</a>&amp; tx) {</div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;x&quot;</span>, new_value);</div>
@@ -668,7 +671,8 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If compaction failed and the original file could not be reopened. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed; any further use is undefined.</td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If compaction failed and the original file could not be reopened. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed; any further use is undefined. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the file mapping could not be refreshed before or after the rewrite. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed due to any further use being undefined.</td></tr>
   </table>
   </dd>
 </dl>
