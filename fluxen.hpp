@@ -551,8 +551,12 @@ public:
    *
    * @param key   The key to write (max 255 bytes).
    * @param value The string value to store.
+   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
    */
   void put(std::string_view key, std::string_view value) {
+    if (key.empty() || key.size() > detail::MAX_KEY) {
+      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+    }
     ops_.push_back({.key = std::string(key),
                     .val = std::vector<uint8_t>(value.begin(), value.end()),
                     .is_delete = false});
@@ -569,6 +573,8 @@ public:
    * @param key   The key to write (max 255 bytes).
    * @param value The value to store. Stored as raw bytes via memcpy.
    *
+   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
+   *
    * @par Example
    * @code
    *   struct Point { float x, y; };
@@ -580,6 +586,9 @@ public:
     requires(std::is_trivially_copyable_v<T> &&
              !std::is_convertible_v<T, std::string_view>)
   void put(std::string_view key, const T &value) {
+    if (key.empty() || key.size() > detail::MAX_KEY) {
+      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+    }
     const auto *p = reinterpret_cast<const uint8_t *>(&value);
     ops_.push_back({.key = std::string(key),
                     .val = std::vector<uint8_t>(p, p + sizeof(T)),
@@ -593,8 +602,12 @@ public:
    * transaction is committed.
    *
    * @param key The key to delete.
+   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
    */
   void remove(std::string_view key) {
+    if (key.empty() || key.size() > detail::MAX_KEY) {
+      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+    }
     ops_.push_back({.key = std::string(key), .val = {}, .is_delete = true});
   }
 };
@@ -1233,12 +1246,13 @@ private:
    * value. For tombstone entries the key is erased from the index.
    *
    * @pre The caller must hold @p mu_.
-   * @pre `key.size() <= detail::MAX_KEY`
+   * @pre `!key.empty() && key.size() <= detail::MAX_KEY` (enforced at runtime)
    */
   void append_entry(std::string_view key, const uint8_t *val, uint32_t val_len,
                     bool tombstone) {
-    assert(key.size() <= detail::MAX_KEY &&
-           "fluxen: key exceeds 255-byte limit");
+    if (key.empty() || key.size() > detail::MAX_KEY) {
+      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+    }
 
     detail::EntryHeader hdr{
         .flags = tombstone ? detail::FLAG_TOMB : detail::FLAG_LIVE,
