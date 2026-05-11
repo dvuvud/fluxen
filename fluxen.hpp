@@ -454,13 +454,15 @@ public:
                         FILE_SHARE_READ, nullptr, OPEN_EXISTING,
                         FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file_ == INVALID_HANDLE_VALUE) {
-      return false;
+      throw std::runtime_error(
+          "fluxen: failed to reopen database file after successful replace");
     }
     SetFilePointer(file_, 0, nullptr, FILE_END);
 #else
     fd_ = ::open(path_.c_str(), O_RDWR | O_APPEND, 0644);
     if (fd_ < 0) {
-      return false;
+      throw std::runtime_error(
+          "fluxen: failed to reopen database file after successful rename");
     }
 #endif
     return remap();
