@@ -366,6 +366,9 @@ public:
    * @throws std::runtime_error If the rename/replace failed and the original
    *         file could not be reopened afterwards. The MappedFile is left in
    *         an unusable state and the caller must not continue using it.
+   * @throws std::runtime_error If the rename/replace failed and the
+   *         subsequent remap of the original file failed. The MappedFile is
+   *         left in an unusable state and the caller must not continue using it.
    */
   auto rewrite(const std::vector<uint8_t> &data) -> bool {
     const std::string tmp_path = path_ + ".tmp";
@@ -733,6 +736,7 @@ public:
    * @throws std::runtime_error If the append fails. The partial write is
    *         rolled back via truncation before throwing. If truncation also
    *         fails, the database is poisoned and the error message will say so.
+   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
    */
   void put(std::string_view key, std::string_view value) {
     check_poisoned();
@@ -760,6 +764,7 @@ public:
    * @throws std::runtime_error If the append fails. The partial write is
    *         rolled back via truncation before throwing. If truncation also
    *         fails, the database is poisoned and the error message will say so.
+   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
    *
    * @par Example
    * @code
@@ -859,6 +864,7 @@ public:
    * @throws std::runtime_error If the append fails. The partial write is
    *         rolled back via truncation before throwing. If truncation also
    *         fails, the database is poisoned and the error message will say so.
+   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
    */
   void remove(std::string_view key) {
     check_poisoned();
@@ -1103,6 +1109,9 @@ public:
    * @throws std::runtime_error If compaction failed and the original file
    *         could not be reopened. The DB object must be destroyed; any
    *         further use is undefined.
+   * @throws std::runtime_error If the file mapping could not be refreshed
+   *         before or after the rewrite. The DB object must be destroyed
+   *         due to any further use being undefined.
    *
    * @warning On success, invalidates all previously returned Bytes spans and
    * pointers into the mapped region. Reacquire any needed data after a
