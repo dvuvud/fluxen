@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fluxen<span id="projectnumber">&#160;1.0.1</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.1.0</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -124,8 +124,8 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <tr class="memdesc:a5424ebb8ccf3a4ec076ee5d964423306"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all keys that begin with the given prefix.  <br /></td></tr>
 <tr class="memitem:a813e5af289cced2fb818bd4e59251faa" id="r_a813e5af289cced2fb818bd4e59251faa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a813e5af289cced2fb818bd4e59251faa">transaction</a> (const std::function&lt; <a class="el" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">TxResult</a>(<a class="el" href="classfluxen_1_1_tx.html">Tx</a> &amp;)&gt; &amp;fn)</td></tr>
 <tr class="memdesc:a813e5af289cced2fb818bd4e59251faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes a batch of operations atomically.  <br /></td></tr>
-<tr class="memitem:af03b664bcda9141683485bbcd31bdaf5" id="r_af03b664bcda9141683485bbcd31bdaf5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af03b664bcda9141683485bbcd31bdaf5">compact</a> ()</td></tr>
-<tr class="memdesc:af03b664bcda9141683485bbcd31bdaf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites the database file retaining only live entries.  <br /></td></tr>
+<tr class="memitem:ac2338b94d43bf9172a351ff46bd062ba" id="r_ac2338b94d43bf9172a351ff46bd062ba"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2338b94d43bf9172a351ff46bd062ba">compact</a> () -&gt; bool</td></tr>
+<tr class="memdesc:ac2338b94d43bf9172a351ff46bd062ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites the database file retaining only live entries.  <br /></td></tr>
 <tr class="memitem:a46a68dd1141bd1c7db5d624673a5f91d" id="r_a46a68dd1141bd1c7db5d624673a5f91d"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46a68dd1141bd1c7db5d624673a5f91d">key_count</a> () const -&gt; size_t</td></tr>
 <tr class="memdesc:a46a68dd1141bd1c7db5d624673a5f91d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of live keys currently stored.  <br /></td></tr>
 <tr class="memitem:a42423d7851b32c55c997c3df74f0901d" id="r_a42423d7851b32c55c997c3df74f0901d"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42423d7851b32c55c997c3df74f0901d">file_size</a> () const -&gt; size_t</td></tr>
@@ -144,7 +144,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> val = db.get&lt;int64_t&gt;(<span class="stringliteral">&quot;hits&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *val &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:620</div></div>
+<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:649</div></div>
 </div><!-- fragment --> </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac2862b15b595d994b07ec99f8b4885f9" name="ac2862b15b595d994b07ec99f8b4885f9"></a>
@@ -413,7 +413,7 @@ template&lt;typename T = std::string&gt; </div>
 </div><div class="memdoc">
 
 <p>Deletes the value stored under the given key. </p>
-<p>Appends a tombstone entry to the log and removes the key from the index. If the key does not exist this is a no-op. Space used by the old value is reclaimed the next time <a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a> is called.</p>
+<p>Appends a tombstone entry to the log and removes the key from the index. If the key does not exist this is a no-op. Space used by the old value is reclaimed the next time <a class="el" href="#ac2338b94d43bf9172a351ff46bd062ba" title="Rewrites the database file retaining only live entries.">compact()</a> is called.</p>
 <p>Acquires an exclusive lock, blocking until all active readers have finished. Waiting writers take priority over new readers.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -621,9 +621,9 @@ template&lt;typename T = std::string&gt; </div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">remove</a>(<span class="stringliteral">&quot;old_session&quot;</span>);</div>
 <div class="line">    <span class="keywordflow">return</span> fluxen::commit;</div>
 <div class="line">});</div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:521</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:539</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:581</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:537</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:556</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:607</div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Rolling back</dt><dd><div class="fragment"><div class="line">db.transaction([&amp;](<a class="code hl_class" href="classfluxen_1_1_tx.html">fluxen::Tx</a>&amp; tx) {</div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;x&quot;</span>, new_value);</div>
@@ -636,8 +636,8 @@ template&lt;typename T = std::string&gt; </div>
 
 </div>
 </div>
-<a id="af03b664bcda9141683485bbcd31bdaf5" name="af03b664bcda9141683485bbcd31bdaf5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af03b664bcda9141683485bbcd31bdaf5">&#9670;&#160;</a></span>compact()</h2>
+<a id="ac2338b94d43bf9172a351ff46bd062ba" name="ac2338b94d43bf9172a351ff46bd062ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2338b94d43bf9172a351ff46bd062ba">&#9670;&#160;</a></span>compact()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -646,32 +646,33 @@ template&lt;typename T = std::string&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void fluxen::DB::compact </td>
+          <td class="memname">auto fluxen::DB::compact </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
+          <td>-&gt;bool</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Rewrites the database file retaining only live entries. </p>
-<p>The append-only log accumulates dead entries over time as keys are overwritten or deleted. <span class="tt"><a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a></span> rewrites the file with only the current live values, reclaiming that space.</p>
-<p>The rewrite is crash-safe. Compacted data is first written to a temporary file (<code class="param"></code> &lt;path&gt;.tmp), fsynced, and then atomically renamed over the original. A crash at any point leaves either the original or the fully written new file intact. That way data is never lost.</p>
+<p>The append-only log accumulates dead entries over time as keys are overwritten or deleted. <span class="tt"><a class="el" href="#ac2338b94d43bf9172a351ff46bd062ba" title="Rewrites the database file retaining only live entries.">compact()</a></span> rewrites the file with only the current live values, reclaiming that space.</p>
+<p>The rewrite is crash-safe. Compacted data is first written to a temporary file (<code class="param"></code> &lt;path&gt;.tmp), fsynced, and then atomically renamed over the original. A crash at any point leaves either the original or the fully written new file intact.</p>
 <p>Acquires an exclusive lock, blocking all reads and writes for the duration of the rewrite. The database remains fully consistent. If the process is interrupted mid-compact the old file is still intact.</p>
 <p>There is no automatic compaction. Call this periodically if your workload involves many overwrites or deletions.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if compaction succeeded. false if the atomic rename failed. In that case the database is fully intact and usable, just not compacted. The caller may retry later.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the file rewrite fails.</td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If compaction failed and the original file could not be reopened. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed; any further use is undefined.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section warning"><dt>Warning</dt><dd>Invalidates all previously returned <a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a> spans and pointers into the mapped region. Reacquire any needed data after compaction. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>On success, invalidates all previously returned <a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a> spans and pointers into the mapped region. Reacquire any needed data after a successful compaction. Spans remain valid if false is returned. </dd></dl>
 
 </div>
 </div>
@@ -734,7 +735,7 @@ template&lt;typename T = std::string&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the current size of the database file in bytes. </p>
-<p>This includes space used by dead entries (overwritten or deleted values) that have not yet been reclaimed by <a class="el" href="#af03b664bcda9141683485bbcd31bdaf5" title="Rewrites the database file retaining only live entries.">compact()</a>. It is an upper bound on the live data size.</p>
+<p>This includes space used by dead entries (overwritten or deleted values) that have not yet been reclaimed by <a class="el" href="#ac2338b94d43bf9172a351ff46bd062ba" title="Rewrites the database file retaining only live entries.">compact()</a>. It is an upper bound on the live data size.</p>
 <p>Acquires a shared lock, allowing concurrent calls from other readers.</p>
 <dl class="section return"><dt>Returns</dt><dd>File size in bytes. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>

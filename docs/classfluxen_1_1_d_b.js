@@ -10,7 +10,7 @@ var classfluxen_1_1_d_b =
     [ "each", "classfluxen_1_1_d_b.html#ae266a56e66ecd85e77c06697207cfb6d", null ],
     [ "prefix", "classfluxen_1_1_d_b.html#a5424ebb8ccf3a4ec076ee5d964423306", null ],
     [ "transaction", "classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa", null ],
-    [ "compact", "classfluxen_1_1_d_b.html#af03b664bcda9141683485bbcd31bdaf5", null ],
+    [ "compact", "classfluxen_1_1_d_b.html#ac2338b94d43bf9172a351ff46bd062ba", null ],
     [ "key_count", "classfluxen_1_1_d_b.html#a46a68dd1141bd1c7db5d624673a5f91d", null ],
     [ "file_size", "classfluxen_1_1_d_b.html#a42423d7851b32c55c997c3df74f0901d", null ]
 ];

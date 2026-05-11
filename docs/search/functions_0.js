@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['compact_0',['compact',['../classfluxen_1_1_d_b.html#af03b664bcda9141683485bbcd31bdaf5',1,'fluxen::DB']]]
+  ['compact_0',['compact',['../classfluxen_1_1_d_b.html#ac2338b94d43bf9172a351ff46bd062ba',1,'fluxen::DB']]]
 ];

@@ -69,7 +69,7 @@
  * C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+.
  * Runs on Linux, macOS, and Windows.
  *
- * @version 1.0.1
+ * @version 1.1.0
  * @par License
  * MIT License
  */
