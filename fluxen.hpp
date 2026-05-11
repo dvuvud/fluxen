@@ -435,7 +435,9 @@ public:
       }
 
       SetFilePointer(file_, 0, nullptr, FILE_END);
-      remap();
+      if (!remap()) {
+        throw std::runtime_error("fluxen: remap failed after replace failure");
+      }
       return false;
     }
 #else
@@ -446,7 +448,9 @@ public:
         throw std::runtime_error(
             "fluxen: failed to reopen database file after rename");
       }
-      remap();
+      if (!remap()) {
+        throw std::runtime_error("fluxen: remap failed after rename failure");
+      }
       return false;
     }
 #endif
@@ -1108,8 +1112,8 @@ public:
     check_poisoned();
     std::unique_lock lock(mu_);
 
-    if (file_.is_dirty()) {
-      file_.remap();
+    if (file_.is_dirty() && !file_.remap()) {
+      throw std::runtime_error("fluxen: remap failed before compaction");
     }
 
     std::vector<uint8_t> buf;
@@ -1317,8 +1321,8 @@ private:
     }
 
     std::unique_lock sync_lock(sync_mutex_);
-    if (file_.is_dirty()) {
-      file_.remap();
+    if (file_.is_dirty() && !file_.remap()) {
+      throw std::runtime_error("fluxen: remap failed");
     }
   }
 };
