@@ -156,14 +156,14 @@ inline void encode_header(uint8_t out[HEADER_SIZE],
 
 /* Deserialise header from a 6-byte buffer */
 inline auto decode_header(const uint8_t in[HEADER_SIZE]) noexcept
-    -> EntryHeader {
+-> EntryHeader {
   return {
-      .flags = in[0],
-      .key_len = in[1],
-      .val_len = static_cast<uint32_t>(in[2]) |
-                 static_cast<uint32_t>(in[3]) << 8 |
-                 static_cast<uint32_t>(in[4]) << 16 |
-                 static_cast<uint32_t>(in[5]) << 24,
+    .flags = in[0],
+    .key_len = in[1],
+    .val_len = static_cast<uint32_t>(in[2]) |
+    static_cast<uint32_t>(in[3]) << 8 |
+    static_cast<uint32_t>(in[4]) << 16 |
+    static_cast<uint32_t>(in[5]) << 24,
   };
 }
 
@@ -185,7 +185,7 @@ struct StringHash {
 };
 
 using IndexMap =
-    std::unordered_map<std::string, IndexEntry, StringHash, std::equal_to<>>;
+std::unordered_map<std::string, IndexEntry, StringHash, std::equal_to<>>;
 
 /* Cross-platform mmap wrapper */
 class MappedFile {
@@ -261,7 +261,7 @@ public:
     }
 
     ptr_ = static_cast<uint8_t *>(
-        MapViewOfFile(map_, FILE_MAP_ALL_ACCESS, 0, 0, size_));
+      MapViewOfFile(map_, FILE_MAP_ALL_ACCESS, 0, 0, size_));
 
     if (!ptr_) {
       CloseHandle(map_);
@@ -271,7 +271,7 @@ public:
     }
 #else
     ptr_ = static_cast<uint8_t *>(
-        ::mmap(nullptr, size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0));
+      ::mmap(nullptr, size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0));
 
     if (ptr_ == MAP_FAILED) {
       ptr_ = nullptr;
@@ -290,7 +290,7 @@ public:
 #ifdef _WIN32
     DWORD written = 0;
     if (!WriteFile(file_, data, static_cast<DWORD>(len), &written, nullptr) ||
-        written != static_cast<DWORD>(len)) {
+      written != static_cast<DWORD>(len)) {
       return false;
     }
 #else
@@ -385,10 +385,10 @@ public:
     }
     DWORD written = 0;
     const bool write_ok =
-        WriteFile(tmp, data.data(), static_cast<DWORD>(data.size()), &written,
-                  nullptr) &&
-        written == static_cast<DWORD>(data.size()) &&
-        FlushFileBuffers(tmp) != 0;
+      WriteFile(tmp, data.data(), static_cast<DWORD>(data.size()), &written,
+                nullptr) &&
+      written == static_cast<DWORD>(data.size()) &&
+      FlushFileBuffers(tmp) != 0;
 
     CloseHandle(tmp);
 
@@ -398,13 +398,13 @@ public:
     }
 #else
     const int tmp_fd =
-        ::open(tmp_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+      ::open(tmp_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
     if (tmp_fd < 0) {
       return false;
     }
     const bool write_ok = ::write(tmp_fd, data.data(), data.size()) ==
-                              static_cast<ssize_t>(data.size()) &&
-                          ::fsync(tmp_fd) == 0;
+      static_cast<ssize_t>(data.size()) &&
+      ::fsync(tmp_fd) == 0;
 
     ::close(tmp_fd);
 
@@ -438,7 +438,7 @@ public:
 
       if (file_ == INVALID_HANDLE_VALUE) {
         throw std::runtime_error(
-            "fluxen: failed to reopen database file after replace");
+          "fluxen: failed to reopen database file after replace");
       }
 
       SetFilePointer(file_, 0, nullptr, FILE_END);
@@ -453,7 +453,7 @@ public:
       fd_ = ::open(path_.c_str(), O_RDWR | O_APPEND, 0644);
       if (fd_ < 0) {
         throw std::runtime_error(
-            "fluxen: failed to reopen database file after rename");
+          "fluxen: failed to reopen database file after rename");
       }
       if (!remap()) {
         throw std::runtime_error("fluxen: remap failed after rename failure");
@@ -468,14 +468,14 @@ public:
                         FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file_ == INVALID_HANDLE_VALUE) {
       throw std::runtime_error(
-          "fluxen: failed to reopen database file after successful replace");
+        "fluxen: failed to reopen database file after successful replace");
     }
     SetFilePointer(file_, 0, nullptr, FILE_END);
 #else
     fd_ = ::open(path_.c_str(), O_RDWR | O_APPEND, 0644);
     if (fd_ < 0) {
       throw std::runtime_error(
-          "fluxen: failed to reopen database file after successful rename");
+        "fluxen: failed to reopen database file after successful rename");
     }
 #endif
     if (!remap()) {
@@ -574,8 +574,8 @@ public:
       throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
     }
     ops_.push_back({.key = std::string(key),
-                    .val = std::vector<uint8_t>(value.begin(), value.end()),
-                    .is_delete = false});
+      .val = std::vector<uint8_t>(value.begin(), value.end()),
+      .is_delete = false});
   }
 
   /**
@@ -599,16 +599,16 @@ public:
    * @endcode
    */
   template <typename T>
-    requires(std::is_trivially_copyable_v<T> &&
-             !std::is_convertible_v<T, std::string_view>)
+  requires(std::is_trivially_copyable_v<T> &&
+  !std::is_convertible_v<T, std::string_view>)
   void put(std::string_view key, const T &value) {
     if (key.empty() || key.size() > detail::MAX_KEY) {
       throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
     }
     const auto *p = reinterpret_cast<const uint8_t *>(&value);
     ops_.push_back({.key = std::string(key),
-                    .val = std::vector<uint8_t>(p, p + sizeof(T)),
-                    .is_delete = false});
+      .val = std::vector<uint8_t>(p, p + sizeof(T)),
+      .is_delete = false});
   }
 
   /**
@@ -673,7 +673,7 @@ private:
   void check_poisoned() const {
     if (poisoned_) {
       throw std::runtime_error(
-          "fluxen: database is poisoned due to an unrecoverable I/O error");
+        "fluxen: database is poisoned due to an unrecoverable I/O error");
     }
   }
 
@@ -781,8 +781,8 @@ public:
    * @endcode
    */
   template <typename T>
-    requires(std::is_trivially_copyable_v<T> &&
-             !std::is_convertible_v<T, std::string_view>)
+  requires(std::is_trivially_copyable_v<T> &&
+  !std::is_convertible_v<T, std::string_view>)
   void put(std::string_view key, const T &value) {
     check_poisoned();
     std::unique_lock lock(mu_);
@@ -843,7 +843,7 @@ public:
       return std::string(reinterpret_cast<const char *>(ptr), entry.val_len);
     } else {
       static_assert(std::is_trivially_copyable_v<T>,
-                    "fluxen: T must be trivially copyable");
+      "fluxen: T must be trivially copyable");
       if (entry.val_len != static_cast<uint32_t>(sizeof(T))) {
         return std::nullopt;
       }
@@ -932,7 +932,7 @@ public:
     ensure_mapped();
     for (const auto &[key, entry] : index_) {
       auto *ptr =
-          reinterpret_cast<const std::byte *>(file_.ptr() + entry.val_offset);
+        reinterpret_cast<const std::byte *>(file_.ptr() + entry.val_offset);
       fn(key, Bytes{ptr, entry.val_len});
     }
   }
@@ -974,7 +974,7 @@ public:
     for (const auto &[key, entry] : index_) {
       if (key.starts_with(pfx)) {
         auto *ptr =
-            reinterpret_cast<const std::byte *>(file_.ptr() + entry.val_offset);
+          reinterpret_cast<const std::byte *>(file_.ptr() + entry.val_offset);
         fn(key, Bytes{ptr, entry.val_len});
       }
     }
@@ -1043,9 +1043,9 @@ public:
     batch.reserve(tx.ops_.size() * 64);
     for (const auto &op : tx.ops_) {
       detail::EntryHeader hdr{
-          .flags = op.is_delete ? detail::FLAG_TOMB : detail::FLAG_LIVE,
-          .key_len = static_cast<uint8_t>(op.key.size()),
-          .val_len = op.is_delete ? 0u : static_cast<uint32_t>(op.val.size()),
+        .flags = op.is_delete ? detail::FLAG_TOMB : detail::FLAG_LIVE,
+        .key_len = static_cast<uint8_t>(op.key.size()),
+        .val_len = op.is_delete ? 0u : static_cast<uint32_t>(op.val.size()),
       };
       uint8_t raw[detail::HEADER_SIZE];
       detail::encode_header(raw, hdr);
@@ -1068,8 +1068,8 @@ public:
       if (!file_.truncate(size_before)) {
         poisoned_ = true;
         throw std::runtime_error(
-            "fluxen: transaction fsync failed and truncation failed. Database "
-            "file may contain a partial tail entry");
+          "fluxen: transaction fsync failed and truncation failed. Database "
+          "file may contain a partial tail entry");
       }
       throw std::runtime_error("fluxen: transaction fsync failed");
     }
@@ -1081,7 +1081,7 @@ public:
         index_.erase(op.key);
       } else {
         index_[op.key] = {.val_offset = size_before + pos,
-                          .val_len = static_cast<uint32_t>(op.val.size())};
+          .val_len = static_cast<uint32_t>(op.val.size())};
         pos += op.val.size();
       }
     }
@@ -1140,9 +1140,9 @@ public:
     detail::IndexMap new_index;
     for (const auto &[key, entry] : index_) {
       detail::EntryHeader hdr{
-          .flags = detail::FLAG_LIVE,
-          .key_len = static_cast<uint8_t>(key.size()),
-          .val_len = entry.val_len,
+        .flags = detail::FLAG_LIVE,
+        .key_len = static_cast<uint8_t>(key.size()),
+        .val_len = entry.val_len,
       };
 
       uint8_t raw[detail::HEADER_SIZE];
@@ -1224,7 +1224,7 @@ private:
 
     if (std::memcmp(file_.ptr(), detail::MAGIC, sizeof(detail::MAGIC)) != 0) {
       throw std::runtime_error(
-          "fluxen: bad magic. File was not created by fluxen");
+        "fluxen: bad magic. File was not created by fluxen");
     }
 
     size_t pos = sizeof(detail::MAGIC);
@@ -1257,7 +1257,7 @@ private:
     if (last_good_pos < file_.size()) {
       if (!file_.truncate(last_good_pos)) {
         throw std::runtime_error(
-            "fluxen: failed to truncate partial tail entry on open");
+          "fluxen: failed to truncate partial tail entry on open");
       }
     }
   }
@@ -1278,9 +1278,9 @@ private:
     }
 
     detail::EntryHeader hdr{
-        .flags = tombstone ? detail::FLAG_TOMB : detail::FLAG_LIVE,
-        .key_len = static_cast<uint8_t>(key.size()),
-        .val_len = val_len,
+      .flags = tombstone ? detail::FLAG_TOMB : detail::FLAG_LIVE,
+      .key_len = static_cast<uint8_t>(key.size()),
+      .val_len = val_len,
     };
 
     std::vector<uint8_t> buf;
@@ -1297,8 +1297,8 @@ private:
       if (!file_.truncate(size_before)) {
         poisoned_ = true;
         throw std::runtime_error(
-            "fluxen: append failed and truncation failed. Database file may "
-            "contain a partial tail entry");
+          "fluxen: append failed and truncation failed. Database file may "
+          "contain a partial tail entry");
       }
       throw std::runtime_error("fluxen: append failed");
     }
@@ -1309,7 +1309,7 @@ private:
       }
     } else {
       index_[std::string(key)] = {.val_offset = file_.size() - val_len,
-                                  .val_len = val_len};
+        .val_len = val_len};
     }
   }
 
