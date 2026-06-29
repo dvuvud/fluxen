@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['tx_0',['Tx',['../classfluxen_1_1_tx.html',1,'fluxen']]]
+  ['db_0',['DB',['../classfluxen_1_1_d_b.html',1,'fluxen']]]
 ];

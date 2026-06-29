@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fluxen<span id="projectnumber">&#160;1.1.1</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.1.2</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -98,6 +98,7 @@ $(function(){initNavTree('fluxen_8hpp.html','',''); });
 <code>#include &lt;cstddef&gt;</code><br />
 <code>#include &lt;cstdint&gt;</code><br />
 <code>#include &lt;cstring&gt;</code><br />
+<code>#include &lt;filesystem&gt;</code><br />
 <code>#include &lt;functional&gt;</code><br />
 <code>#include &lt;mutex&gt;</code><br />
 <code>#include &lt;optional&gt;</code><br />
@@ -118,6 +119,11 @@ $(function(){initNavTree('fluxen_8hpp.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:fluxen_3A_3Aio_5Ferror" id="r_fluxen_3A_3Aio_5Ferror"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfluxen_1_1io__error.html">fluxen::io_error</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">fluxen's error hierarchy  <a href="structfluxen_1_1io__error.html#details">More...</a><br /></td></tr>
+<tr class="memitem:fluxen_3A_3Acorrupt_5Ferror" id="r_fluxen_3A_3Acorrupt_5Ferror"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfluxen_1_1corrupt__error.html">fluxen::corrupt_error</a></td></tr>
+<tr class="memitem:fluxen_3A_3Apoisoned_5Ferror" id="r_fluxen_3A_3Apoisoned_5Ferror"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td></tr>
+<tr class="memitem:fluxen_3A_3Akey_5Ferror" id="r_fluxen_3A_3Akey_5Ferror"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfluxen_1_1key__error.html">fluxen::key_error</a></td></tr>
 <tr class="memitem:fluxen_3A_3ATx" id="r_fluxen_3A_3ATx"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfluxen_1_1_tx.html">fluxen::Tx</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A staged batch of write operations, used inside <a class="el" href="classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa" title="Executes a batch of operations atomically.">DB::transaction()</a>.  <a href="classfluxen_1_1_tx.html#details">More...</a><br /></td></tr>
 <tr class="memitem:fluxen_3A_3ADB" id="r_fluxen_3A_3ADB"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfluxen_1_1_d_b.html">fluxen::DB</a></td></tr>
