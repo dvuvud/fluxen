@@ -398,7 +398,8 @@ public:
    *         state and the caller must not continue using it.
    */
   auto rewrite(const std::vector<uint8_t> &data) -> bool {
-    const fs::path tmp_path = path_.native() + ".tmp";
+    fs::path tmp_path = path_;
+    tmp_path += ".tmp";
 
 #ifdef _WIN32
     HANDLE tmp = CreateFileW(tmp_path.c_str(), GENERIC_WRITE, 0, nullptr,
@@ -722,7 +723,7 @@ public:
    */
   explicit DB(const fs::path &path) {
     if (!file_.open(path)) {
-      throw io_error("fluxen: failed to open '" + (path).native() + "'");
+      throw io_error("fluxen: failed to open '" + path.string() + "'");
     }
 
     if (file_.size() == 0) {

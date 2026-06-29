@@ -3,7 +3,7 @@ Checks: >
   clang-analyzer-*,
   modernize-*,
   performance-*,
-  readability-*
+  readability-*,
   -modernize-use-trailing-return-type,
   -modernize-avoid-c-arrays,
   -readability-magic-numbers,

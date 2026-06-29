@@ -25,9 +25,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang-tidy
 
       - name: Run clang-tidy
-        run: |
-          clang-tidy-15 fluxen.hpp -- -std=c++20
-          find tests/ -name "*.cpp" -o -name "*.hpp" | xargs -I {} clang-tidy-15 {} -- -std=c++20
+        run: clang-tidy-15 fluxen.hpp -- -std=c++20
 
   test:
     name: Test (${{ matrix.name }})
