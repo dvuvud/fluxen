@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['transaction_0',['transaction',['../classfluxen_1_1_d_b.html#a813e5af289cced2fb818bd4e59251faa',1,'fluxen::DB']]],
-  ['tx_1',['Tx',['../classfluxen_1_1_tx.html',1,'fluxen']]],
-  ['txresult_2',['TxResult',['../fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f',1,'fluxen']]]
+  ['remove_0',['remove',['../classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409',1,'fluxen::Tx::remove()'],['../classfluxen_1_1_d_b.html#a92036a8e5d31138ae5a7ace0d0853bca',1,'fluxen::DB::remove()']]]
 ];

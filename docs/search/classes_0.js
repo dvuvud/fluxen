@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['db_0',['DB',['../classfluxen_1_1_d_b.html',1,'fluxen']]]
+  ['corrupt_5ferror_0',['corrupt_error',['../structfluxen_1_1corrupt__error.html',1,'fluxen']]]
 ];

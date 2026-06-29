@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">fluxen<span id="projectnumber">&#160;1.1.1</span>
+   <div id="projectname">fluxen<span id="projectnumber">&#160;1.1.2</span>
    </div>
    <div id="projectbrief">Single-header embedded key-value store for C++20</div>
   </td>
@@ -135,7 +135,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="textblock"><p>A persistent key-value database backed by a single file. </p>
 <p>Keys are UTF-8 strings up to 255 bytes. Values can be std::string, string literals, or any trivially copyable type (int, float, struct, ...).</p>
 <p>The database is safe to use from multiple threads concurrently. Reads proceed in parallel, and writes acquire an exclusive lock and are given priority over waiting readers to prevent starvation. See the <a class="el" href="index.html">Thread safety</a> section in the main page for full details.</p>
-<dl class="section user"><dt>Poisoned state</dt><dd>If a write operation fails at the OS level and the subsequent attempt to truncate the partial write also fails, the <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> enters a permanent <em>poisoned</em> state. Every subsequent call to any public method will throw <span class="tt">std::runtime_error</span>. The only recovery is to destroy the <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object. Normal I/O errors that are successfully rolled back do <em>not</em> poison the database.</dd></dl>
+<dl class="section user"><dt>Poisoned state</dt><dd>If a write operation fails at the OS level and the subsequent attempt to truncate the partial write also fails, the <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> enters a permanent <em>poisoned</em> state. Every subsequent call to any public method will throw <span class="tt"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></span>. The only recovery is to destroy the <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object. Normal I/O errors that are successfully rolled back do <em>not</em> poison the database.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd><code class="param"><a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a></code> is non-copyable. Create one instance per file.</dd></dl>
 <dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_class" href="classfluxen_1_1_d_b.html">fluxen::DB</a> db(<span class="stringliteral">&quot;app.db&quot;</span>);</div>
 <div class="line"> </div>
@@ -144,7 +144,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="line"><span class="keywordflow">if</span> (<span class="keyword">auto</span> val = db.get&lt;int64_t&gt;(<span class="stringliteral">&quot;hits&quot;</span>)) {</div>
 <div class="line">    std::cout &lt;&lt; *val &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:665</div></div>
+<div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:688</div></div>
 </div><!-- fragment --> </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac2862b15b595d994b07ec99f8b4885f9" name="ac2862b15b595d994b07ec99f8b4885f9"></a>
@@ -181,9 +181,9 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the file cannot be opened or created. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the file exists but has an invalid magic header (i.e. was not created by fluxen). </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If a partial tail entry is detected but truncation fails. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If the file cannot be opened or created. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1corrupt__error.html">fluxen::corrupt_error</a></td><td>If the file exists but has an invalid magic header (i.e. was not created by fluxen). </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1corrupt__error.html">fluxen::corrupt_error</a></td><td>If a partial tail entry is detected but truncation fails. </td></tr>
   </table>
   </dd>
 </dl>
@@ -258,9 +258,9 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the key is empty or longer than 255 bytes. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so (and give a <a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a> instead). </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1key__error.html">fluxen::key_error</a></td><td>If the key is empty or longer than 255 bytes. </td></tr>
   </table>
   </dd>
 </dl>
@@ -315,9 +315,9 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the key is empty or longer than 255 bytes.</td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so (and give a <a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a> instead). </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1key__error.html">fluxen::key_error</a></td><td>If the key is empty or longer than 255 bytes.</td></tr>
   </table>
   </dd>
 </dl>
@@ -375,7 +375,8 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd><span class="tt">std::optional&lt;T&gt;</span> containing the value, or <span class="tt">std::nullopt</span>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned.</td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If remap fails after flushing deferred write.</td></tr>
   </table>
   </dd>
 </dl>
@@ -425,9 +426,9 @@ template&lt;typename T = std::string&gt; </div>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the key is empty or longer than 255 bytes. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If the append fails. The partial write is rolled back via truncation before throwing. If truncation also fails, the database is poisoned and the error message will say so (and give a <a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a> instead). </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1key__error.html">fluxen::key_error</a></td><td>If the key is empty or longer than 255 bytes. </td></tr>
   </table>
   </dd>
 </dl>
@@ -468,7 +469,8 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd><span class="tt">true</span> if the key exists, <span class="tt">false</span> otherwise.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If remap fails after flushing deferred write. </td></tr>
   </table>
   </dd>
 </dl>
@@ -510,7 +512,8 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>Do not call any write method from inside <code class="param">fn</code> — the shared lock is not reentrant with an exclusive lock and will deadlock. Copy keys out first if you need to write during iteration. The <code class="param"><a class="el" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569" title="A non-owning view of raw bytes in the memory-mapped file.">Bytes</a></code> span is only valid for the duration of the callback; copy the data if you need it later.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned.</td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If remap fails after flushing deferred write.</td></tr>
   </table>
   </dd>
 </dl>
@@ -518,7 +521,7 @@ template&lt;typename T = std::string&gt; </div>
 <div class="line">    std::string v(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(val.data()), val.size());</div>
 <div class="line">    std::cout &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; v &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line">});</div>
-<div class="ttc" id="afluxen_8hpp_html_afd6a328ee037d14a9ea8a08b6edc6569"><div class="ttname"><a href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:117</div></div>
+<div class="ttc" id="afluxen_8hpp_html_afd6a328ee037d14a9ea8a08b6edc6569"><div class="ttname"><a href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:120</div></div>
 </div><!-- fragment --> </dd></dl>
 
 </div>
@@ -563,7 +566,8 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Iteration is O(total keys), not O(matching keys), because the underlying index is a hash map with no sorted order.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned.</td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If remap fails after flushing deferred write.</td></tr>
   </table>
   </dd>
 </dl>
@@ -612,8 +616,8 @@ template&lt;typename T = std::string&gt; </div>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the batch append fails, or if the append succeeds but the subsequent fsync fails. In both cases the partial write is truncated before throwing, leaving the database unchanged. If truncation itself fails after an fsync error, the database is poisoned and every subsequent call will throw.</td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If the batch append fails, or if the append succeeds but the subsequent fsync fails. In both cases the partial write is truncated before throwing, leaving the database unchanged. If truncation itself fails after an fsync error, the database is poisoned and every subsequent call will throw <a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a>.</td></tr>
   </table>
   </dd>
 </dl>
@@ -624,9 +628,9 @@ template&lt;typename T = std::string&gt; </div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">remove</a>(<span class="stringliteral">&quot;old_session&quot;</span>);</div>
 <div class="line">    <span class="keywordflow">return</span> fluxen::commit;</div>
 <div class="line">});</div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:553</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:572</div></div>
-<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:623</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html"><div class="ttname"><a href="classfluxen_1_1_tx.html">fluxen::Tx</a></div><div class="ttdoc">A staged batch of write operations, used inside DB::transaction().</div><div class="ttdef"><b>Definition</b> fluxen.hpp:576</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:595</div></div>
+<div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:646</div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Rolling back</dt><dd><div class="fragment"><div class="line">db.transaction([&amp;](<a class="code hl_class" href="classfluxen_1_1_tx.html">fluxen::Tx</a>&amp; tx) {</div>
 <div class="line">    tx.<a class="code hl_function" href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">put</a>(<span class="stringliteral">&quot;x&quot;</span>, new_value);</div>
@@ -670,9 +674,9 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>true if compaction succeeded. false if the atomic rename failed. In that case the database is fully intact and usable, just not compacted. The caller may retry later.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If compaction failed and the original file could not be reopened. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed; any further use is undefined. </td></tr>
-    <tr><td class="paramname">std::runtime_error</td><td>If the file mapping could not be refreshed before or after the rewrite. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed due to any further use being undefined.</td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If compaction failed and the original file could not be reopened. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed; any further use is undefined. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1io__error.html" title="fluxen&#39;s error hierarchy">fluxen::io_error</a></td><td>If the file mapping could not be refreshed before or after the rewrite. The <a class="el" href="classfluxen_1_1_d_b.html" title="A persistent key-value database backed by a single file.">DB</a> object must be destroyed due to any further use being undefined.</td></tr>
   </table>
   </dd>
 </dl>
@@ -708,7 +712,7 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>Number of keys in the index. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
   </table>
   </dd>
 </dl>
@@ -744,7 +748,7 @@ template&lt;typename T = std::string&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>File size in bytes. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If the database is poisoned. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></td><td>If the database is poisoned. </td></tr>
   </table>
   </dd>
 </dl>
