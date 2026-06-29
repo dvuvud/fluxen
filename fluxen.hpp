@@ -81,6 +81,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <filesystem>
 #include <functional>
 #include <mutex>
 #include <optional>
@@ -103,6 +104,8 @@
 #include <unistd.h>
 #endif
 
+namespace fs = std::filesystem;
+
 namespace fluxen {
 
 // --- public types ---
@@ -124,6 +127,25 @@ using Bytes = std::span<const std::byte>;
  * @see DB::transaction()
  */
 enum TxResult : uint8_t { commit, rollback };
+
+/**
+ * @brief fluxen's error hierarchy
+ */
+struct io_error : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
+struct corrupt_error : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
+struct poisoned_error : public io_error {
+  using io_error::io_error;
+};
+
+struct key_error : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
 
 // --- internal ---
 
@@ -184,6 +206,24 @@ struct StringHash {
   }
 };
 
+#ifdef _WIN32
+auto utf8_to_wstring(std::string_view utf8) -> std::wstring {
+  if (utf8.empty()) {
+    return {};
+  }
+
+  int len = MultiByteToWideChar(CP_UTF8, 0, utf8.data(), static_cast<int>(utf8.size()), nullptr, 0);
+  if (len <= 0) {
+    return {};
+  }
+
+  std::wstring wide(len, L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, utf8.data(), static_cast<int>(utf8.size()), wide.data(), len);
+
+  return wide;
+}
+#endif
+
 using IndexMap =
 std::unordered_map<std::string, IndexEntry, StringHash, std::equal_to<>>;
 
@@ -200,7 +240,7 @@ private:
   size_t size_ = 0;
   size_t file_size_ = 0;
   std::atomic<bool> dirty_{false};
-  std::string path_;
+  fs::path path_;
 
 public:
   MappedFile() = default;
@@ -208,18 +248,20 @@ public:
 
   MappedFile(const MappedFile &) = delete;
   auto operator=(const MappedFile &) -> MappedFile & = delete;
+  MappedFile(const MappedFile &&) = delete;
+  auto operator=(MappedFile &&) -> MappedFile & = delete;
 
   auto open(std::string_view path) -> bool {
-    path_ = path;
 #ifdef _WIN32
-    file_ = CreateFileA(path_.c_str(), GENERIC_READ | GENERIC_WRITE,
-                        FILE_SHARE_READ, nullptr, OPEN_ALWAYS,
-                        FILE_ATTRIBUTE_NORMAL, nullptr);
+    path_ = utf8_to_wstring(path);
+    file_ = CreateFileW(path_.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr,
+                        OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file_ == INVALID_HANDLE_VALUE) {
       return false;
     }
     SetFilePointer(file_, 0, nullptr, FILE_END);
 #else
+    path_ = path;
     fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
     if (fd_ < 0) {
       return false;
@@ -253,7 +295,7 @@ public:
     }
 
 #ifdef _WIN32
-    map_ = CreateFileMappingA(file_, nullptr, PAGE_READWRITE, 0, 0, nullptr);
+    map_ = CreateFileMappingW(file_, nullptr, PAGE_READWRITE, 0, 0, nullptr);
 
     if (!map_) {
       dirty_.store(false, std::memory_order_release);
@@ -363,22 +405,23 @@ public:
    * @return true on success. false if the rename/replace failed. In that
    *         case the original file is intact and the mapping has been
    *         restored to it.
-   * @throws std::runtime_error If the rename/replace failed and the original
+   * @throws fluxen::io_error If the rename/replace failed and the original
    *         file could not be reopened afterwards. The MappedFile is left in
    *         an unusable state and the caller must not continue using it.
-   * @throws std::runtime_error If the rename/replace failed and the
+   * @throws fluxen::io_error If the rename/replace failed and the
    *         subsequent remap of the original file failed. The MappedFile is
    *         left in an unusable state and the caller must not continue using
    *         it.
-   * @throws std::runtime_error If the rename/replace succeeded but the
+   * @throws fluxen::io_error If the rename/replace succeeded but the
    *         subsequent remap failed. The MappedFile is left in an unusable
    *         state and the caller must not continue using it.
    */
   auto rewrite(const std::vector<uint8_t> &data) -> bool {
-    const std::string tmp_path = path_ + ".tmp";
+    fs::path tmp_path = path_;
+    tmp_path += ".tmp";
 
 #ifdef _WIN32
-    HANDLE tmp = CreateFileA(tmp_path.c_str(), GENERIC_WRITE, 0, nullptr,
+    HANDLE tmp = CreateFileW(tmp_path.c_str(), GENERIC_WRITE, 0, nullptr,
                              CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (tmp == INVALID_HANDLE_VALUE) {
       return false;
@@ -393,7 +436,7 @@ public:
     CloseHandle(tmp);
 
     if (!write_ok) {
-      DeleteFileA(tmp_path.c_str());
+      DeleteFileW(tmp_path.c_str());
       return false;
     }
 #else
@@ -427,23 +470,22 @@ public:
 #endif
 
 #ifdef _WIN32
-    if (!ReplaceFileA(path_.c_str(), tmp_path.c_str(), nullptr,
+    if (!ReplaceFileW(path_.c_str(), tmp_path.c_str(), nullptr,
                       REPLACEFILE_IGNORE_MERGE_ERRORS, nullptr, nullptr)) {
 
-      DeleteFileA(tmp_path.c_str());
+      DeleteFileW(tmp_path.c_str());
 
-      file_ = CreateFileA(path_.c_str(), GENERIC_READ | GENERIC_WRITE,
-                          FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-                          FILE_ATTRIBUTE_NORMAL, nullptr);
+      file_ =
+        CreateFileW(path_.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr,
+                    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
       if (file_ == INVALID_HANDLE_VALUE) {
-        throw std::runtime_error(
-          "fluxen: failed to reopen database file after replace");
+        throw io_error("fluxen: failed to reopen database file after replace");
       }
 
       SetFilePointer(file_, 0, nullptr, FILE_END);
       if (!remap()) {
-        throw std::runtime_error("fluxen: remap failed after replace failure");
+        throw io_error("fluxen: remap failed after replace failure");
       }
       return false;
     }
@@ -452,34 +494,32 @@ public:
       ::unlink(tmp_path.c_str());
       fd_ = ::open(path_.c_str(), O_RDWR | O_APPEND, 0644);
       if (fd_ < 0) {
-        throw std::runtime_error(
-          "fluxen: failed to reopen database file after rename");
+        throw io_error("fluxen: failed to reopen database file after rename");
       }
       if (!remap()) {
-        throw std::runtime_error("fluxen: remap failed after rename failure");
+        throw io_error("fluxen: remap failed after rename failure");
       }
       return false;
     }
 #endif
 
 #ifdef _WIN32
-    file_ = CreateFileA(path_.c_str(), GENERIC_READ | GENERIC_WRITE,
-                        FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-                        FILE_ATTRIBUTE_NORMAL, nullptr);
+    file_ = CreateFileW(path_.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr,
+                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file_ == INVALID_HANDLE_VALUE) {
-      throw std::runtime_error(
+      throw io_error(
         "fluxen: failed to reopen database file after successful replace");
     }
     SetFilePointer(file_, 0, nullptr, FILE_END);
 #else
     fd_ = ::open(path_.c_str(), O_RDWR | O_APPEND, 0644);
     if (fd_ < 0) {
-      throw std::runtime_error(
+      throw io_error(
         "fluxen: failed to reopen database file after successful rename");
     }
 #endif
     if (!remap()) {
-      throw std::runtime_error("fluxen: remap failed after successful rename");
+      throw io_error("fluxen: remap failed after successful rename");
     }
     return true;
   }
@@ -567,11 +607,11 @@ public:
    *
    * @param key   The key to write (max 255 bytes).
    * @param value The string value to store.
-   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
+   * @throws fluxen::key_error If the key is empty or longer than 255 bytes.
    */
   void put(std::string_view key, std::string_view value) {
     if (key.empty() || key.size() > detail::MAX_KEY) {
-      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+      throw key_error("fluxen: key must be between 1 and 255 bytes");
     }
     ops_.push_back({.key = std::string(key),
       .val = std::vector<uint8_t>(value.begin(), value.end()),
@@ -589,7 +629,7 @@ public:
    * @param key   The key to write (max 255 bytes).
    * @param value The value to store. Stored as raw bytes via memcpy.
    *
-   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
+   * @throws fluxen::key_error If the key is empty or longer than 255 bytes.
    *
    * @par Example
    * @code
@@ -603,7 +643,7 @@ public:
   !std::is_convertible_v<T, std::string_view>)
   void put(std::string_view key, const T &value) {
     if (key.empty() || key.size() > detail::MAX_KEY) {
-      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+      throw key_error("fluxen: key must be between 1 and 255 bytes");
     }
     const auto *p = reinterpret_cast<const uint8_t *>(&value);
     ops_.push_back({.key = std::string(key),
@@ -618,11 +658,11 @@ public:
    * transaction is committed.
    *
    * @param key The key to delete.
-   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
+   * @throws fluxen::key_error If the key is empty or longer than 255 bytes.
    */
   void remove(std::string_view key) {
     if (key.empty() || key.size() > detail::MAX_KEY) {
-      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+      throw key_error("fluxen: key must be between 1 and 255 bytes");
     }
     ops_.push_back({.key = std::string(key), .val = {}, .is_delete = true});
   }
@@ -645,9 +685,11 @@ public:
  * If a write operation fails at the OS level and the subsequent attempt to
  * truncate the partial write also fails, the DB enters a permanent
  * <em>poisoned</em> state. Every subsequent call to any public method will
- * throw `std::runtime_error`. The only recovery is to destroy the DB object.
- * Normal I/O errors that are successfully rolled back do @em not poison the
- * database.
+ * throw `fluxen::poisoned_error`.
+ *
+ * throw `fluxen::poisoned_error`. The only recovery is to destroy the DB
+ * object. Normal I/O errors that are successfully rolled back do @em not poison
+ * the database.
  *
  * @note @p DB is non-copyable. Create one instance per file.
  *
@@ -672,7 +714,7 @@ private:
 
   void check_poisoned() const {
     if (poisoned_) {
-      throw std::runtime_error(
+      throw poisoned_error(
         "fluxen: database is poisoned due to an unrecoverable I/O error");
     }
   }
@@ -690,18 +732,17 @@ public:
    * mid-write), the partial bytes are automatically truncated and the
    * database opens successfully with all fully committed entries intact.
    *
-   * @param path Filesystem path to the database file.
+   * @param path Path to the database file.
    *
-   * @throws std::runtime_error If the file cannot be opened or created.
-   * @throws std::runtime_error If the file exists but has an invalid magic
+   * @throws fluxen::io_error If the file cannot be opened or created.
+   * @throws fluxen::corrupt_error If the file exists but has an invalid magic
    *         header (i.e. was not created by fluxen).
-   * @throws std::runtime_error If a partial tail entry is detected but
+   * @throws fluxen::corrupt_error If a partial tail entry is detected but
    *         truncation fails.
    */
   explicit DB(std::string_view path) {
     if (!file_.open(path)) {
-      throw std::runtime_error("fluxen: failed to open '" + std::string(path) +
-                               "'");
+      throw io_error("fluxen: failed to open '" + std::string(path) + "'");
     }
 
     if (file_.size() == 0) {
@@ -739,11 +780,12 @@ public:
    * @param key   Key to write. Must be between 1 and 255 bytes.
    * @param value String value to store.
    *
-   * @throws std::runtime_error If the database is poisoned.
-   * @throws std::runtime_error If the append fails. The partial write is
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If the append fails. The partial write is
    *         rolled back via truncation before throwing. If truncation also
-   *         fails, the database is poisoned and the error message will say so.
-   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
+   *         fails, the database is poisoned and the error message will say
+   *         so (and give a fluxen::poisoned_error instead).
+   * @throws fluxen::key_error If the key is empty or longer than 255 bytes.
    */
   void put(std::string_view key, std::string_view value) {
     check_poisoned();
@@ -767,11 +809,12 @@ public:
    * @param key   Key to write. Must be between 1 and 255 bytes.
    * @param value Value to store.
    *
-   * @throws std::runtime_error If the database is poisoned.
-   * @throws std::runtime_error If the append fails. The partial write is
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If the append fails. The partial write is
    *         rolled back via truncation before throwing. If truncation also
-   *         fails, the database is poisoned and the error message will say so.
-   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
+   *         fails, the database is poisoned and the error message will say
+   *         so (and give a fluxen::poisoned_error instead).
+   * @throws fluxen::key_error If the key is empty or longer than 255 bytes.
    *
    * @par Example
    * @code
@@ -811,7 +854,8 @@ public:
    * @param key The key to look up.
    * @return `std::optional<T>` containing the value, or `std::nullopt`.
    *
-   * @throws std::runtime_error If the database is poisoned.
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If remap fails after flushing deferred write.
    *
    * @par Example
    * @code
@@ -867,11 +911,12 @@ public:
    *
    * @param key The key to delete.
    *
-   * @throws std::runtime_error If the database is poisoned.
-   * @throws std::runtime_error If the append fails. The partial write is
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If the append fails. The partial write is
    *         rolled back via truncation before throwing. If truncation also
-   *         fails, the database is poisoned and the error message will say so.
-   * @throws std::runtime_error If the key is empty or longer than 255 bytes.
+   *         fails, the database is poisoned and the error message will say
+   *         so (and give a fluxen::poisoned_error instead).
+   * @throws fluxen::key_error If the key is empty or longer than 255 bytes.
    */
   void remove(std::string_view key) {
     check_poisoned();
@@ -889,7 +934,8 @@ public:
    * @param key The key to look up.
    * @return `true` if the key exists, `false` otherwise.
    *
-   * @throws std::runtime_error If the database is poisoned.
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If remap fails after flushing deferred write.
    */
   [[nodiscard]] auto has(std::string_view key) const -> bool {
     check_poisoned();
@@ -916,7 +962,8 @@ public:
    * first if you need to write during iteration. The @p Bytes span is only
    * valid for the duration of the callback; copy the data if you need it later.
    *
-   * @throws std::runtime_error If the database is poisoned.
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If remap fails after flushing deferred write.
    *
    * @par Example
    * @code
@@ -931,7 +978,7 @@ public:
     std::shared_lock lock(mu_);
     ensure_mapped();
     for (const auto &[key, entry] : index_) {
-      auto *ptr =
+      const auto *ptr =
         reinterpret_cast<const std::byte *>(file_.ptr() + entry.val_offset);
       fn(key, Bytes{ptr, entry.val_len});
     }
@@ -954,6 +1001,7 @@ public:
    *       underlying index is a hash map with no sorted order.
    *
    * @throws std::runtime_error If the database is poisoned.
+   * @throws fluxen::io_error If remap fails after flushing deferred write.
    *
    * @par Example
    * @code
@@ -996,12 +1044,12 @@ public:
    *
    * @param fn A callable of the form `TxResult(Tx&)`.
    *
-   * @throws std::runtime_error If the database is poisoned.
-   * @throws std::runtime_error If the batch append fails, or if the append
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If the batch append fails, or if the append
    *         succeeds but the subsequent fsync fails. In both cases the partial
    *         write is truncated before throwing, leaving the database unchanged.
    *         If truncation itself fails after an fsync error, the database is
-   *         poisoned and every subsequent call will throw.
+   *         poisoned and every subsequent call will throw `fluxen::poisoned_error`.
    *
    * @note All staged operations are serialized into a single buffer and written
    * with one syscall and one fsync. This makes transaction() significantly
@@ -1061,17 +1109,17 @@ public:
     const size_t size_before = file_.size();
 
     if (!file_.append(batch.data(), batch.size())) {
-      throw std::runtime_error("fluxen: transaction append failed");
+      throw io_error("fluxen: transaction append failed");
     }
 
     if (!file_.sync()) {
       if (!file_.truncate(size_before)) {
         poisoned_ = true;
-        throw std::runtime_error(
+        throw poisoned_error(
           "fluxen: transaction fsync failed and truncation failed. Database "
           "file may contain a partial tail entry");
       }
-      throw std::runtime_error("fluxen: transaction fsync failed");
+      throw io_error("fluxen: transaction fsync failed");
     }
 
     size_t pos = 0;
@@ -1112,11 +1160,11 @@ public:
    *         In that case the database is fully intact and usable, just not
    *         compacted. The caller may retry later.
    *
-   * @throws std::runtime_error If the database is poisoned.
-   * @throws std::runtime_error If compaction failed and the original file
+   * @throws fluxen::poisoned_error If the database is poisoned.
+   * @throws fluxen::io_error If compaction failed and the original file
    *         could not be reopened. The DB object must be destroyed; any
    *         further use is undefined.
-   * @throws std::runtime_error If the file mapping could not be refreshed
+   * @throws fluxen::io_error If the file mapping could not be refreshed
    *         before or after the rewrite. The DB object must be destroyed
    *         due to any further use being undefined.
    *
@@ -1129,7 +1177,7 @@ public:
     std::unique_lock lock(mu_);
 
     if (file_.is_dirty() && !file_.remap()) {
-      throw std::runtime_error("fluxen: remap failed before compaction");
+      throw io_error("fluxen: remap failed before compaction");
     }
 
     std::vector<uint8_t> buf;
@@ -1175,7 +1223,7 @@ public:
    * Acquires a shared lock, allowing concurrent calls from other readers.
    *
    * @return Number of keys in the index.
-   * @throws std::runtime_error If the database is poisoned.
+   * @throws fluxen::poisoned_error If the database is poisoned.
    */
   [[nodiscard]] auto key_count() const -> size_t {
     check_poisoned();
@@ -1193,7 +1241,7 @@ public:
    * Acquires a shared lock, allowing concurrent calls from other readers.
    *
    * @return File size in bytes.
-   * @throws std::runtime_error If the database is poisoned.
+   * @throws fluxen::poisoned_error If the database is poisoned.
    */
   [[nodiscard]] auto file_size() const -> size_t {
     check_poisoned();
@@ -1205,7 +1253,7 @@ private:
   /// Writes the magic header to a newly created file.
   void init_file() {
     if (!file_.append(detail::MAGIC, sizeof(detail::MAGIC))) {
-      throw std::runtime_error("fluxen: failed to write magic header");
+      throw corrupt_error("fluxen: failed to write magic header");
     }
   }
 
@@ -1219,12 +1267,11 @@ private:
    */
   void load_index() {
     if (file_.size() < sizeof(detail::MAGIC)) {
-      throw std::runtime_error("fluxen: file too small to be valid");
+      throw corrupt_error("fluxen: file too small to be valid");
     }
 
     if (std::memcmp(file_.ptr(), detail::MAGIC, sizeof(detail::MAGIC)) != 0) {
-      throw std::runtime_error(
-        "fluxen: bad magic. File was not created by fluxen");
+      throw corrupt_error("fluxen: bad magic. File was not created by fluxen");
     }
 
     size_t pos = sizeof(detail::MAGIC);
@@ -1256,7 +1303,7 @@ private:
 
     if (last_good_pos < file_.size()) {
       if (!file_.truncate(last_good_pos)) {
-        throw std::runtime_error(
+        throw corrupt_error(
           "fluxen: failed to truncate partial tail entry on open");
       }
     }
@@ -1274,7 +1321,7 @@ private:
   void append_entry(std::string_view key, const uint8_t *val, uint32_t val_len,
                     bool tombstone) {
     if (key.empty() || key.size() > detail::MAX_KEY) {
-      throw std::runtime_error("fluxen: key must be between 1 and 255 bytes");
+      throw key_error("fluxen: key must be between 1 and 255 bytes");
     }
 
     detail::EntryHeader hdr{
@@ -1296,11 +1343,11 @@ private:
     if (!file_.append(buf.data(), buf.size())) {
       if (!file_.truncate(size_before)) {
         poisoned_ = true;
-        throw std::runtime_error(
+        throw poisoned_error(
           "fluxen: append failed and truncation failed. Database file may "
           "contain a partial tail entry");
       }
-      throw std::runtime_error("fluxen: append failed");
+      throw io_error("fluxen: append failed");
     }
 
     if (tombstone) {
@@ -1338,7 +1385,7 @@ private:
 
     std::unique_lock sync_lock(sync_mutex_);
     if (file_.is_dirty() && !file_.remap()) {
-      throw std::runtime_error("fluxen: remap failed");
+      throw io_error("fluxen: remap failed");
     }
   }
 };
