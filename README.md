@@ -82,7 +82,7 @@ Copy [`fluxen.hpp`](fluxen.hpp) into your project:
 curl -O https://raw.githubusercontent.com/dvuvud/fluxen/main/fluxen.hpp
 ```
 
-**Requirements:** C++20, GCC 13+, Clang 15+, or MSVC 19.34+. Linux, macOS, and Windows.
+**Requirements:** C++20, GCC 13+, Clang 18+, or MSVC 19.34+. Linux, macOS, and Windows.
 
 ---
 

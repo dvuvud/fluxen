@@ -416,14 +416,13 @@ TEST_F(FluxenTest, CompactWithOverwrittenKeys) {
 // file format
 
 TEST_F(FluxenTest, BadMagicThrowsOnOpen) {
-  auto bad_path =
-      std::filesystem::temp_directory_path() / "fluxen_bad_magic.db";
+  auto bad_path = make_temp_path("bad_magic");
   {
-    std::FILE *f = std::fopen(bad_path.string().c_str(), "wb");
+    std::FILE *f = std::fopen(bad_path.c_str(), "wb");
     std::fwrite("NOTVALID", 1, 8, f);
     std::fclose(f);
   }
-  EXPECT_THROW(fluxen::DB{bad_path.string()}, std::runtime_error);
+  EXPECT_THROW(fluxen::DB{bad_path}, std::runtime_error);
   std::filesystem::remove(bad_path);
 }
 
