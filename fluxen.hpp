@@ -201,9 +201,6 @@ struct StringHash {
   auto operator()(std::string_view sv) const noexcept -> size_t {
     return std::hash<std::string_view>{}(sv);
   }
-  auto operator()(const std::string &s) const noexcept -> size_t {
-    return std::hash<std::string_view>{}(s);
-  }
 };
 
 #ifdef _WIN32
