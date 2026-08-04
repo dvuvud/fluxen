@@ -104,8 +104,6 @@
 #include <unistd.h>
 #endif
 
-namespace fs = std::filesystem;
-
 namespace fluxen {
 
 // --- public types ---
@@ -237,7 +235,7 @@ private:
   size_t size_ = 0;
   size_t file_size_ = 0;
   std::atomic<bool> dirty_{false};
-  fs::path path_;
+  std::filesystem::path path_;
 
 public:
   MappedFile() = default;
@@ -414,7 +412,7 @@ public:
    *         state and the caller must not continue using it.
    */
   auto rewrite(const std::vector<uint8_t> &data) -> bool {
-    fs::path tmp_path = path_;
+    std::filesystem::path tmp_path = path_;
     tmp_path += ".tmp";
 
 #ifdef _WIN32
