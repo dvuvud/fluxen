@@ -94,137 +94,138 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 </div><!--header-->
 <div class="contents">
 <a href="fluxen_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">#include &lt;atomic&gt;</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#include &lt;cassert&gt;</span></div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="preprocessor">#include &lt;cstddef&gt;</span></div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="preprocessor">#include &lt;cstring&gt;</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="preprocessor">#include &lt;filesystem&gt;</span></div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="preprocessor">#include &lt;functional&gt;</span></div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="preprocessor">#include &lt;optional&gt;</span></div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">#include &lt;shared_mutex&gt;</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">#include &lt;span&gt;</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#include &lt;string_view&gt;</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="preprocessor">#define WIN32_LEAN_AND_MEAN</span></div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#include &lt;windows.h&gt;</span></div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="preprocessor">#include &lt;fcntl.h&gt;</span></div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="preprocessor">#include &lt;sys/mman.h&gt;</span></div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="preprocessor">#include &lt;sys/stat.h&gt;</span></div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="preprocessor">#include &lt;unistd.h&gt;</span></div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="keyword">namespace </span>fs = std::filesystem;</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="keyword">namespace </span>fluxen {</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment">// --- public types ---</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span></div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno"><a class="line" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">  120</a></span><span class="keyword">using </span><a class="code hl_typedef" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">Bytes</a> = std::span&lt;const std::byte&gt;;</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">  129</a></span><span class="keyword">enum</span> <a class="code hl_enumeration" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">TxResult</a> : uint8_t { commit, rollback };</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span></div>
-<div class="foldopen" id="foldopen00134" data-start="{" data-end="};">
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="structfluxen_1_1io__error.html">  134</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1io__error.html">io_error</a> : <span class="keyword">public</span> std::runtime_error {</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>  <span class="keyword">using </span>std::runtime_error::runtime_error;</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>};</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="preprocessor">#include &lt;atomic&gt;</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">#include &lt;cassert&gt;</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#include &lt;cstddef&gt;</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="preprocessor">#include &lt;cstring&gt;</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="preprocessor">#include &lt;filesystem&gt;</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="preprocessor">#include &lt;optional&gt;</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="preprocessor">#include &lt;shared_mutex&gt;</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">#include &lt;span&gt;</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">#include &lt;string_view&gt;</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="preprocessor">#define WIN32_LEAN_AND_MEAN</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="preprocessor">#include &lt;windows.h&gt;</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="preprocessor">#include &lt;fcntl.h&gt;</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="preprocessor">#include &lt;sys/mman.h&gt;</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="preprocessor">#include &lt;sys/stat.h&gt;</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="preprocessor">#include &lt;unistd.h&gt;</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="keyword">namespace </span>fluxen {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment">// --- public types ---</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno"><a class="line" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">  117</a></span><span class="keyword">using </span><a class="code hl_typedef" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">Bytes</a> = std::span&lt;const std::byte&gt;;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno"><a class="line" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">  126</a></span><span class="keyword">enum</span> <a class="code hl_enumeration" href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">TxResult</a> : uint8_t { commit, rollback };</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span></div>
+<div class="foldopen" id="foldopen00131" data-start="{" data-end="};">
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="structfluxen_1_1io__error.html">  131</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1io__error.html">io_error</a> : <span class="keyword">public</span> std::runtime_error {</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  <span class="keyword">using </span>std::runtime_error::runtime_error;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>};</div>
 </div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
-<div class="foldopen" id="foldopen00138" data-start="{" data-end="};">
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno"><a class="line" href="structfluxen_1_1corrupt__error.html">  138</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1corrupt__error.html">corrupt_error</a> : <span class="keyword">public</span> std::runtime_error {</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>  <span class="keyword">using </span>std::runtime_error::runtime_error;</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>};</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="foldopen" id="foldopen00135" data-start="{" data-end="};">
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno"><a class="line" href="structfluxen_1_1corrupt__error.html">  135</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1corrupt__error.html">corrupt_error</a> : <span class="keyword">public</span> std::runtime_error {</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>  <span class="keyword">using </span>std::runtime_error::runtime_error;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>};</div>
 </div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span> </div>
-<div class="foldopen" id="foldopen00142" data-start="{" data-end="};">
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno"><a class="line" href="structfluxen_1_1poisoned__error.html">  142</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1poisoned__error.html">poisoned_error</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structfluxen_1_1io__error.html">io_error</a> {</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>  <span class="keyword">using </span>io_error::io_error;</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>};</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
+<div class="foldopen" id="foldopen00139" data-start="{" data-end="};">
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="structfluxen_1_1poisoned__error.html">  139</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1poisoned__error.html">poisoned_error</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structfluxen_1_1io__error.html">io_error</a> {</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>  <span class="keyword">using </span>io_error::io_error;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>};</div>
 </div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span> </div>
-<div class="foldopen" id="foldopen00146" data-start="{" data-end="};">
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno"><a class="line" href="structfluxen_1_1key__error.html">  146</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1key__error.html">key_error</a> : <span class="keyword">public</span> std::runtime_error {</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  <span class="keyword">using </span>std::runtime_error::runtime_error;</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>};</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="foldopen" id="foldopen00143" data-start="{" data-end="};">
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno"><a class="line" href="structfluxen_1_1key__error.html">  143</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfluxen_1_1key__error.html">key_error</a> : <span class="keyword">public</span> std::runtime_error {</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>  <span class="keyword">using </span>std::runtime_error::runtime_error;</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>};</div>
 </div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span> </div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="comment">// --- internal ---</span></div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span></div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="keyword">namespace </span>detail {</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t MAGIC[8] = {<span class="charliteral">&#39;F&#39;</span>, <span class="charliteral">&#39;L&#39;</span>, <span class="charliteral">&#39;U&#39;</span>, <span class="charliteral">&#39;X&#39;</span>, <span class="charliteral">&#39;E&#39;</span>, <span class="charliteral">&#39;N&#39;</span>, <span class="charliteral">&#39;0&#39;</span>, <span class="charliteral">&#39;1&#39;</span>};</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t FLAG_LIVE = 0x00;</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t FLAG_TOMB = 0x01;</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t MAX_KEY = 255;</div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> HEADER_SIZE = 6; <span class="comment">// on-disk entry header size</span></div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span><span class="comment">/* On-disk entry header (6 bytes on disk) */</span></div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span><span class="keyword">struct </span>EntryHeader {</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>  uint8_t flags;</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  uint8_t key_len;</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>  uint32_t val_len;</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>};</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="comment">/* Serialize header into 6-byte buffer */</span></div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="keyword">inline</span> <span class="keywordtype">void</span> encode_header(uint8_t out[HEADER_SIZE],</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>                          <span class="keyword">const</span> EntryHeader &amp;h) <span class="keyword">noexcept</span> {</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>  out[0] = h.flags;</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>  out[1] = h.key_len;</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>  out[2] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(h.val_len &amp; 0xFFu);</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>  out[3] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>((h.val_len &gt;&gt; 8) &amp; 0xFFu);</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>  out[4] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>((h.val_len &gt;&gt; 16) &amp; 0xFFu);</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>  out[5] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>((h.val_len &gt;&gt; 24) &amp; 0xFFu);</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>}</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment">/* Deserialise header from a 6-byte buffer */</span></div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="keyword">inline</span> <span class="keyword">auto</span> decode_header(<span class="keyword">const</span> uint8_t in[HEADER_SIZE]) <span class="keyword">noexcept</span></div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>-&gt; EntryHeader {</div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>  <span class="keywordflow">return</span> {</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    .flags = in[0],</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    .key_len = in[1],</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    .val_len = <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[2]) |</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[3]) &lt;&lt; 8 |</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[4]) &lt;&lt; 16 |</div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[5]) &lt;&lt; 24,</div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>  };</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>}</div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="comment">/* In-memory index entry (points into the mmap&#39;d file) */</span></div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="keyword">struct </span>IndexEntry {</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>  <span class="keywordtype">size_t</span> val_offset; <span class="comment">// byte offset of value data in file</span></div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>  uint32_t val_len;</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>};</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="comment">// --- internal ---</span></div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="keyword">namespace </span>detail {</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t MAGIC[8] = {<span class="charliteral">&#39;F&#39;</span>, <span class="charliteral">&#39;L&#39;</span>, <span class="charliteral">&#39;U&#39;</span>, <span class="charliteral">&#39;X&#39;</span>, <span class="charliteral">&#39;E&#39;</span>, <span class="charliteral">&#39;N&#39;</span>, <span class="charliteral">&#39;0&#39;</span>, <span class="charliteral">&#39;1&#39;</span>};</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t FLAG_LIVE = 0x00;</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t FLAG_TOMB = 0x01;</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> uint8_t MAX_KEY = 255;</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="keyword">inline</span> <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> HEADER_SIZE = 6; <span class="comment">// on-disk entry header size</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span> </div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span><span class="comment">/* On-disk entry header (6 bytes on disk) */</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="keyword">struct </span>EntryHeader {</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>  uint8_t flags;</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>  uint8_t key_len;</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  uint32_t val_len;</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>};</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span><span class="comment">/* Serialize header into 6-byte buffer */</span></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="keyword">inline</span> <span class="keywordtype">void</span> encode_header(uint8_t out[HEADER_SIZE],</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>                          <span class="keyword">const</span> EntryHeader &amp;h) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>  out[0] = h.flags;</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>  out[1] = h.key_len;</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>  out[2] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(h.val_len &amp; 0xFFU);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>  out[3] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>((h.val_len &gt;&gt; 8) &amp; 0xFFU);</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>  out[4] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>((h.val_len &gt;&gt; 16) &amp; 0xFFU);</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>  out[5] = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>((h.val_len &gt;&gt; 24) &amp; 0xFFU);</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>}</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment">/* Deserialise header from a 6-byte buffer */</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="keyword">inline</span> <span class="keyword">auto</span> decode_header(<span class="keyword">const</span> uint8_t in[HEADER_SIZE]) <span class="keyword">noexcept</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>-&gt; EntryHeader {</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>  <span class="keywordflow">return</span> {</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    .flags = in[0],</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    .key_len = in[1],</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    .val_len = <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[2]) |</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[3]) &lt;&lt; 8 |</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[4]) &lt;&lt; 16 |</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(in[5]) &lt;&lt; 24,</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>  };</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>}</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span> </div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="comment">/* In-memory index entry (points into the mmap&#39;d file) */</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="keyword">struct </span>IndexEntry {</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>  <span class="keywordtype">size_t</span> val_offset; <span class="comment">// byte offset of value data in file</span></div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>  uint32_t val_len;</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>};</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="keyword">struct </span>StringHash {</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>  <span class="keyword">using </span>is_transparent = void;</div>
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="keyword">struct </span>StringHash {</div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>  <span class="keyword">using </span>is_transparent = void;</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>  <span class="keyword">auto</span> operator()(std::string_view sv) <span class="keyword">const</span> <span class="keyword">noexcept</span> -&gt; <span class="keywordtype">size_t</span> {</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keywordflow">return</span> std::hash&lt;std::string_view&gt;{}(sv);</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>  }</div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>  <span class="keyword">auto</span> operator()(<span class="keyword">const</span> std::string &amp;s) <span class="keyword">const</span> <span class="keyword">noexcept</span> -&gt; <span class="keywordtype">size_t</span> {</div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    <span class="keywordflow">return</span> std::hash&lt;std::string_view&gt;{}(s);</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>  }</div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>};</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>  <span class="keyword">auto</span> operator()(std::string_view sv) <span class="keyword">const</span> <span class="keyword">noexcept</span> -&gt; <span class="keywordtype">size_t</span> {</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    <span class="keywordflow">return</span> std::hash&lt;std::string_view&gt;{}(sv);</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>  }</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>};</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="keyword">auto</span> utf8_to_wstring(std::string_view utf8) -&gt; std::wstring {</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>  <span class="keywordflow">if</span> (utf8.empty()) {</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    <span class="keywordflow">return</span> {};</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>  }</div>
 <div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span> </div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="keyword">auto</span> utf8_to_wstring(<span class="keyword">const</span> std::string &amp;utf8) -&gt; std::wstring {</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>  <span class="keywordtype">int</span> len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, <span class="keyword">nullptr</span>, 0);</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>  <span class="keywordflow">if</span> (len &lt;= 1) {</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    <span class="keywordflow">return</span> {};</div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>  }</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  std::wstring wide(len - 1, L<span class="charliteral">&#39;\0&#39;</span>);</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>  MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wide.data(), len);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>  <span class="keywordtype">int</span> len = MultiByteToWideChar(CP_UTF8, 0, utf8.data(), <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(utf8.size()), <span class="keyword">nullptr</span>, 0);</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>  <span class="keywordflow">if</span> (len &lt;= 0) {</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    <span class="keywordflow">return</span> {};</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>  }</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>  std::wstring wide(len, L<span class="charliteral">&#39;\0&#39;</span>);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  MultiByteToWideChar(CP_UTF8, 0, utf8.data(), <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(utf8.size()), wide.data(), len);</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span> </div>
 <div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>  <span class="keywordflow">return</span> wide;</div>
 <div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>}</div>
 <div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span><span class="preprocessor">#endif</span></div>
@@ -245,7 +246,7 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>  <span class="keywordtype">size_t</span> size_ = 0;</div>
 <div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>  <span class="keywordtype">size_t</span> file_size_ = 0;</div>
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>  std::atomic&lt;bool&gt; dirty_{<span class="keyword">false</span>};</div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>  fs::path path_;</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>  std::filesystem::path path_;</div>
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span> </div>
 <div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>  MappedFile() = <span class="keywordflow">default</span>;</div>
@@ -256,7 +257,7 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>  MappedFile(<span class="keyword">const</span> MappedFile &amp;&amp;) = <span class="keyword">delete</span>;</div>
 <div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>  <span class="keyword">auto</span> operator=(MappedFile &amp;&amp;) -&gt; MappedFile &amp; = <span class="keyword">delete</span>;</div>
 <div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>  <span class="keyword">auto</span> open(<span class="keyword">const</span> std::string &amp;path) -&gt; <span class="keywordtype">bool</span> {</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>  <span class="keyword">auto</span> open(std::string_view path) -&gt; <span class="keywordtype">bool</span> {</div>
 <div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="preprocessor">#ifdef _WIN32</span></div>
 <div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    path_ = utf8_to_wstring(path);</div>
 <div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    file_ = CreateFileW(path_.c_str(), GENERIC_READ | GENERIC_WRITE, 0, <span class="keyword">nullptr</span>,</div>
@@ -382,7 +383,7 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>  }</div>
 <div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span></div>
 <div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>  <span class="keyword">auto</span> rewrite(<span class="keyword">const</span> std::vector&lt;uint8_t&gt; &amp;data) -&gt; <span class="keywordtype">bool</span> {</div>
-<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>    fs::path tmp_path = path_;</div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>    std::filesystem::path tmp_path = path_;</div>
 <div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>    tmp_path += <span class="stringliteral">&quot;.tmp&quot;</span>;</div>
 <div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span> </div>
 <div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span><span class="preprocessor">#ifdef _WIN32</span></div>
@@ -585,7 +586,7 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span><span class="comment">// --- DB ---</span></div>
 <div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span></div>
 <div class="foldopen" id="foldopen00701" data-start="{" data-end="};">
-<div class="line"><a id="l00701" name="l00701"></a><span class="lineno"><a class="line" href="classfluxen_1_1_d_b.html">  701</a></span><span class="keyword">class </span><a class="code hl_function" href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">DB</a> {</div>
+<div class="line"><a id="l00701" name="l00701"></a><span class="lineno"><a class="line" href="classfluxen_1_1_d_b.html">  701</a></span><span class="keyword">class </span><a class="code hl_function" href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">DB</a> {</div>
 <div class="line"><a id="l00702" name="l00702"></a><span class="lineno">  702</span><span class="keyword">private</span>:</div>
 <div class="line"><a id="l00703" name="l00703"></a><span class="lineno">  703</span>  detail::IndexMap index_;</div>
 <div class="line"><a id="l00704" name="l00704"></a><span class="lineno">  704</span>  <span class="keyword">mutable</span> detail::MappedFile file_;</div>
@@ -602,9 +603,9 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="line"><a id="l00715" name="l00715"></a><span class="lineno">  715</span> </div>
 <div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span><span class="keyword">public</span>:</div>
 <div class="foldopen" id="foldopen00737" data-start="{" data-end="}">
-<div class="line"><a id="l00737" name="l00737"></a><span class="lineno"><a class="line" href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">  737</a></span>  <span class="keyword">explicit</span> <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">DB</a>(<span class="keyword">const</span> std::string &amp;path) {</div>
+<div class="line"><a id="l00737" name="l00737"></a><span class="lineno"><a class="line" href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">  737</a></span>  <span class="keyword">explicit</span> <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">DB</a>(std::string_view path) {</div>
 <div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span>    <span class="keywordflow">if</span> (!file_.open(path)) {</div>
-<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span>      <span class="keywordflow">throw</span> <a class="code hl_struct" href="structfluxen_1_1io__error.html">io_error</a>(<span class="stringliteral">&quot;fluxen: failed to open &#39;&quot;</span> + path + <span class="stringliteral">&quot;&#39;&quot;</span>);</div>
+<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span>      <span class="keywordflow">throw</span> <a class="code hl_struct" href="structfluxen_1_1io__error.html">io_error</a>(<span class="stringliteral">&quot;fluxen: failed to open &#39;&quot;</span> + std::string(path) + <span class="stringliteral">&quot;&#39;&quot;</span>);</div>
 <div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span>    }</div>
 <div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span> </div>
 <div class="line"><a id="l00742" name="l00742"></a><span class="lineno">  742</span>    <span class="keywordflow">if</span> (file_.size() == 0) {</div>
@@ -616,8 +617,8 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 </div>
 <div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span></div>
 <div class="line"><a id="l00756" name="l00756"></a><span class="lineno"><a class="line" href="classfluxen_1_1_d_b.html#abea3002475bcc45ea415a1630df90a57">  756</a></span>  <a class="code hl_function" href="classfluxen_1_1_d_b.html#abea3002475bcc45ea415a1630df90a57">~DB</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00758" name="l00758"></a><span class="lineno">  758</span>  <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">DB</a>(<span class="keyword">const</span> <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">DB</a> &amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a id="l00759" name="l00759"></a><span class="lineno">  759</span>  <span class="keyword">auto</span> operator=(<span class="keyword">const</span> <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">DB</a> &amp;) -&gt; <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">DB</a> &amp; = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00758" name="l00758"></a><span class="lineno">  758</span>  <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">DB</a>(<span class="keyword">const</span> <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">DB</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00759" name="l00759"></a><span class="lineno">  759</span>  <span class="keyword">auto</span> operator=(<span class="keyword">const</span> <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">DB</a> &amp;) -&gt; <a class="code hl_function" href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">DB</a> &amp; = <span class="keyword">delete</span>;</div>
 <div class="line"><a id="l00761" name="l00761"></a><span class="lineno">  761</span> </div>
 <div class="line"><a id="l00762" name="l00762"></a><span class="lineno">  762</span>  <span class="comment">// --- WRITE ---</span></div>
 <div class="line"><a id="l00763" name="l00763"></a><span class="lineno">  763</span></div>
@@ -701,7 +702,7 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span>    std::shared_lock lock(mu_);</div>
 <div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span>    ensure_mapped();</div>
 <div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;[key, entry] : index_) {</div>
-<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>      <span class="keyword">auto</span> *ptr =</div>
+<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>      <span class="keyword">const</span> <span class="keyword">auto</span> *ptr =</div>
 <div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span>        <span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>std::byte *<span class="keyword">&gt;</span>(file_.ptr() + entry.val_offset);</div>
 <div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span>      fn(key, <a class="code hl_typedef" href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">Bytes</a>{ptr, entry.val_len});</div>
 <div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span>    }</div>
@@ -966,7 +967,7 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="ttc" id="aclassfluxen_1_1_d_b_html_abea3002475bcc45ea415a1630df90a57"><div class="ttname"><a href="classfluxen_1_1_d_b.html#abea3002475bcc45ea415a1630df90a57">fluxen::DB::~DB</a></div><div class="ttdeci">~DB()=default</div><div class="ttdoc">Closes the database and releases all file locks.</div></div>
 <div class="ttc" id="aclassfluxen_1_1_d_b_html_ac21afa63c18b05f6068b64640cde7a2a"><div class="ttname"><a href="classfluxen_1_1_d_b.html#ac21afa63c18b05f6068b64640cde7a2a">fluxen::DB::put</a></div><div class="ttdeci">void put(std::string_view key, const T &amp;value)</div><div class="ttdoc">Stores a trivially copyable value under the given key.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:823</div></div>
 <div class="ttc" id="aclassfluxen_1_1_d_b_html_ac2338b94d43bf9172a351ff46bd062ba"><div class="ttname"><a href="classfluxen_1_1_d_b.html#ac2338b94d43bf9172a351ff46bd062ba">fluxen::DB::compact</a></div><div class="ttdeci">auto compact() -&gt; bool</div><div class="ttdoc">Rewrites the database file retaining only live entries.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:1169</div></div>
-<div class="ttc" id="aclassfluxen_1_1_d_b_html_ac4c8a0c769db2ae87f971b458c0a87a5"><div class="ttname"><a href="classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5">fluxen::DB::DB</a></div><div class="ttdeci">DB(const std::string &amp;path)</div><div class="ttdoc">Opens or creates a database at the given path.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:737</div></div>
+<div class="ttc" id="aclassfluxen_1_1_d_b_html_ac2862b15b595d994b07ec99f8b4885f9"><div class="ttname"><a href="classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9">fluxen::DB::DB</a></div><div class="ttdeci">DB(std::string_view path)</div><div class="ttdoc">Opens or creates a database at the given path.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:737</div></div>
 <div class="ttc" id="aclassfluxen_1_1_d_b_html_ad40ad6ba8e4dfa1883bce67479f5f06f"><div class="ttname"><a href="classfluxen_1_1_d_b.html#ad40ad6ba8e4dfa1883bce67479f5f06f">fluxen::DB::get</a></div><div class="ttdeci">auto get(std::string_view key) const -&gt; std::optional&lt; T &gt;</div><div class="ttdoc">Retrieves the value stored under the given key.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:867</div></div>
 <div class="ttc" id="aclassfluxen_1_1_d_b_html_ae266a56e66ecd85e77c06697207cfb6d"><div class="ttname"><a href="classfluxen_1_1_d_b.html#ae266a56e66ecd85e77c06697207cfb6d">fluxen::DB::each</a></div><div class="ttdeci">void each(const std::function&lt; void(std::string_view, Bytes)&gt; &amp;fn) const</div><div class="ttdoc">Iterates over all live key-value pairs.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:970</div></div>
 <div class="ttc" id="aclassfluxen_1_1_d_b_html_ae62765f8a24f2baadbb5b0cfc12fd6c7"><div class="ttname"><a href="classfluxen_1_1_d_b.html#ae62765f8a24f2baadbb5b0cfc12fd6c7">fluxen::DB::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stores a string value under the given key.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:784</div></div>
@@ -974,12 +975,12 @@ $(function(){initNavTree('fluxen_8hpp_source.html','',''); });
 <div class="ttc" id="aclassfluxen_1_1_tx_html_a175e0524a81304ab085d86cf5b9ba3b4"><div class="ttname"><a href="classfluxen_1_1_tx.html#a175e0524a81304ab085d86cf5b9ba3b4">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, std::string_view value)</div><div class="ttdoc">Stage a string value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:606</div></div>
 <div class="ttc" id="aclassfluxen_1_1_tx_html_a450e67cc6d3b622dbba4ca37d5c25409"><div class="ttname"><a href="classfluxen_1_1_tx.html#a450e67cc6d3b622dbba4ca37d5c25409">fluxen::Tx::remove</a></div><div class="ttdeci">void remove(std::string_view key)</div><div class="ttdoc">Stage a key deletion.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:657</div></div>
 <div class="ttc" id="aclassfluxen_1_1_tx_html_aa629a0f77a6a0d0ae3eb4f97f5216232"><div class="ttname"><a href="classfluxen_1_1_tx.html#aa629a0f77a6a0d0ae3eb4f97f5216232">fluxen::Tx::put</a></div><div class="ttdeci">void put(std::string_view key, const T &amp;value)</div><div class="ttdoc">Stage a trivially copyable value to be written.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:638</div></div>
-<div class="ttc" id="afluxen_8hpp_html_a5b83d2a98ddc80be8f159ea12a1d8c4f"><div class="ttname"><a href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">fluxen::TxResult</a></div><div class="ttdeci">TxResult</div><div class="ttdoc">Controls whether a transaction&#39;s operations are applied or discarded.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:129</div></div>
-<div class="ttc" id="afluxen_8hpp_html_afd6a328ee037d14a9ea8a08b6edc6569"><div class="ttname"><a href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:120</div></div>
-<div class="ttc" id="astructfluxen_1_1corrupt__error_html"><div class="ttname"><a href="structfluxen_1_1corrupt__error.html">fluxen::corrupt_error</a></div><div class="ttdef"><b>Definition</b> fluxen.hpp:138</div></div>
-<div class="ttc" id="astructfluxen_1_1io__error_html"><div class="ttname"><a href="structfluxen_1_1io__error.html">fluxen::io_error</a></div><div class="ttdoc">fluxen&#39;s error hierarchy</div><div class="ttdef"><b>Definition</b> fluxen.hpp:134</div></div>
-<div class="ttc" id="astructfluxen_1_1key__error_html"><div class="ttname"><a href="structfluxen_1_1key__error.html">fluxen::key_error</a></div><div class="ttdef"><b>Definition</b> fluxen.hpp:146</div></div>
-<div class="ttc" id="astructfluxen_1_1poisoned__error_html"><div class="ttname"><a href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></div><div class="ttdef"><b>Definition</b> fluxen.hpp:142</div></div>
+<div class="ttc" id="afluxen_8hpp_html_a5b83d2a98ddc80be8f159ea12a1d8c4f"><div class="ttname"><a href="fluxen_8hpp.html#a5b83d2a98ddc80be8f159ea12a1d8c4f">fluxen::TxResult</a></div><div class="ttdeci">TxResult</div><div class="ttdoc">Controls whether a transaction&#39;s operations are applied or discarded.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:126</div></div>
+<div class="ttc" id="afluxen_8hpp_html_afd6a328ee037d14a9ea8a08b6edc6569"><div class="ttname"><a href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:117</div></div>
+<div class="ttc" id="astructfluxen_1_1corrupt__error_html"><div class="ttname"><a href="structfluxen_1_1corrupt__error.html">fluxen::corrupt_error</a></div><div class="ttdef"><b>Definition</b> fluxen.hpp:135</div></div>
+<div class="ttc" id="astructfluxen_1_1io__error_html"><div class="ttname"><a href="structfluxen_1_1io__error.html">fluxen::io_error</a></div><div class="ttdoc">fluxen&#39;s error hierarchy</div><div class="ttdef"><b>Definition</b> fluxen.hpp:131</div></div>
+<div class="ttc" id="astructfluxen_1_1key__error_html"><div class="ttname"><a href="structfluxen_1_1key__error.html">fluxen::key_error</a></div><div class="ttdef"><b>Definition</b> fluxen.hpp:143</div></div>
+<div class="ttc" id="astructfluxen_1_1poisoned__error_html"><div class="ttname"><a href="structfluxen_1_1poisoned__error.html">fluxen::poisoned_error</a></div><div class="ttdef"><b>Definition</b> fluxen.hpp:139</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->

@@ -101,8 +101,8 @@ $(function(){initNavTree('classfluxen_1_1_d_b.html','','classfluxen_1_1_d_b-memb
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ac4c8a0c769db2ae87f971b458c0a87a5" id="r_ac4c8a0c769db2ae87f971b458c0a87a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac4c8a0c769db2ae87f971b458c0a87a5">DB</a> (const std::string &amp;path)</td></tr>
-<tr class="memdesc:ac4c8a0c769db2ae87f971b458c0a87a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens or creates a database at the given path.  <br /></td></tr>
+<tr class="memitem:ac2862b15b595d994b07ec99f8b4885f9" id="r_ac2862b15b595d994b07ec99f8b4885f9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2862b15b595d994b07ec99f8b4885f9">DB</a> (std::string_view path)</td></tr>
+<tr class="memdesc:ac2862b15b595d994b07ec99f8b4885f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens or creates a database at the given path.  <br /></td></tr>
 <tr class="memitem:abea3002475bcc45ea415a1630df90a57" id="r_abea3002475bcc45ea415a1630df90a57"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abea3002475bcc45ea415a1630df90a57">~DB</a> ()=default</td></tr>
 <tr class="memdesc:abea3002475bcc45ea415a1630df90a57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the database and releases all file locks.  <br /></td></tr>
 <tr class="memitem:ae62765f8a24f2baadbb5b0cfc12fd6c7" id="r_ae62765f8a24f2baadbb5b0cfc12fd6c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae62765f8a24f2baadbb5b0cfc12fd6c7">put</a> (std::string_view key, std::string_view value)</td></tr>
@@ -148,8 +148,8 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
 <div class="ttc" id="aclassfluxen_1_1_d_b_html"><div class="ttname"><a href="classfluxen_1_1_d_b.html">fluxen::DB</a></div><div class="ttdoc">A persistent key-value database backed by a single file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:701</div></div>
 </div><!-- fragment --> </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ac4c8a0c769db2ae87f971b458c0a87a5" name="ac4c8a0c769db2ae87f971b458c0a87a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac4c8a0c769db2ae87f971b458c0a87a5">&#9670;&#160;</a></span>DB()</h2>
+<a id="ac2862b15b595d994b07ec99f8b4885f9" name="ac2862b15b595d994b07ec99f8b4885f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2862b15b595d994b07ec99f8b4885f9">&#9670;&#160;</a></span>DB()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,7 +160,7 @@ requires (std::is_trivially_copyable_v&lt;T&gt; &amp;&amp; !std::is_convertible_
         <tr>
           <td class="memname">fluxen::DB::DB </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span></td><td>)</td>
+          <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>path</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -522,7 +522,7 @@ template&lt;typename T = std::string&gt; </div>
 <div class="line">    std::string v(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(val.data()), val.size());</div>
 <div class="line">    std::cout &lt;&lt; key &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; v &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line">});</div>
-<div class="ttc" id="afluxen_8hpp_html_afd6a328ee037d14a9ea8a08b6edc6569"><div class="ttname"><a href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:120</div></div>
+<div class="ttc" id="afluxen_8hpp_html_afd6a328ee037d14a9ea8a08b6edc6569"><div class="ttname"><a href="fluxen_8hpp.html#afd6a328ee037d14a9ea8a08b6edc6569">fluxen::Bytes</a></div><div class="ttdeci">std::span&lt; const std::byte &gt; Bytes</div><div class="ttdoc">A non-owning view of raw bytes in the memory-mapped file.</div><div class="ttdef"><b>Definition</b> fluxen.hpp:117</div></div>
 </div><!-- fragment --> </dd></dl>
 
 </div>

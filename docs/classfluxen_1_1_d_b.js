@@ -1,6 +1,6 @@
 var classfluxen_1_1_d_b =
 [
-    [ "DB", "classfluxen_1_1_d_b.html#ac4c8a0c769db2ae87f971b458c0a87a5", null ],
+    [ "DB", "classfluxen_1_1_d_b.html#ac2862b15b595d994b07ec99f8b4885f9", null ],
     [ "~DB", "classfluxen_1_1_d_b.html#abea3002475bcc45ea415a1630df90a57", null ],
     [ "put", "classfluxen_1_1_d_b.html#ae62765f8a24f2baadbb5b0cfc12fd6c7", null ],
     [ "put", "classfluxen_1_1_d_b.html#ac21afa63c18b05f6068b64640cde7a2a", null ],

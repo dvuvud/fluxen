@@ -69,7 +69,6 @@
  * C++20. Tested with GCC 12+, Clang 15+, MSVC 19.34+.
  * Runs on Linux, macOS, and Windows.
  *
- * @version 1.1.2
  * @par License
  * MIT License
  */
@@ -168,10 +167,10 @@ inline void encode_header(uint8_t out[HEADER_SIZE],
                           const EntryHeader &h) noexcept {
   out[0] = h.flags;
   out[1] = h.key_len;
-  out[2] = static_cast<uint8_t>(h.val_len & 0xFFu);
-  out[3] = static_cast<uint8_t>((h.val_len >> 8) & 0xFFu);
-  out[4] = static_cast<uint8_t>((h.val_len >> 16) & 0xFFu);
-  out[5] = static_cast<uint8_t>((h.val_len >> 24) & 0xFFu);
+  out[2] = static_cast<uint8_t>(h.val_len & 0xFFU);
+  out[3] = static_cast<uint8_t>((h.val_len >> 8) & 0xFFU);
+  out[4] = static_cast<uint8_t>((h.val_len >> 16) & 0xFFU);
+  out[5] = static_cast<uint8_t>((h.val_len >> 24) & 0xFFU);
 }
 
 /* Deserialise header from a 6-byte buffer */
