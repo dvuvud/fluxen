@@ -4,9 +4,26 @@
 #include <algorithm>
 #include <filesystem>
 #include <string>
+#include <thread>
+#include <chrono>
 #include <vector>
 
 #include <gtest/gtest.h>
+
+namespace {
+
+static void remove_with_retry(const std::filesystem::path &p,
+                               int attempts = 5) {
+  for (int i = 0; i < attempts; ++i) {
+    std::error_code ec;
+    if (std::filesystem::remove(p, ec) || !std::filesystem::exists(p)) {
+      return;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  }
+}
+
+}
 
 class FluxenTest : public ::testing::Test {
 protected:
@@ -423,7 +440,7 @@ TEST_F(FluxenTest, BadMagicThrowsOnOpen) {
     std::fclose(f);
   }
   EXPECT_THROW(fluxen::DB{bad_path}, std::runtime_error);
-  std::filesystem::remove(bad_path);
+  remove_with_retry(bad_path);
 }
 
 TEST_F(FluxenTest, EmptyFileInitialisesCleanly) {
