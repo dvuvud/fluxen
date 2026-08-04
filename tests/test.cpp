@@ -12,7 +12,7 @@ class FluxenTest : public ::testing::Test {
 protected:
   void SetUp() override {
     path_ = make_temp_path("test");
-    db_ = std::make_unique<fluxen::DB>(path_.string());
+    db_   = std::make_unique<fluxen::DB>(path_.string());
   }
 
   void TearDown() override {
@@ -261,7 +261,7 @@ TEST_F(FluxenTest, TransactionThrowIsEquivalentToRollback) {
       tx.put("x", std::string("danger"));
       throw std::runtime_error("abort");
     });
-  } catch (const std::runtime_error &) {
+  } catch (...) {
   }
   EXPECT_EQ(db_->get("x"), "safe");
 }
@@ -349,7 +349,7 @@ TEST_F(FluxenTest, CompactReducesFileSize) {
   }
 
   size_t before = db_->file_size();
-  db_->compact();
+  (void)db_->compact();
   EXPECT_LT(db_->file_size(), before);
 }
 
@@ -361,7 +361,7 @@ TEST_F(FluxenTest, CompactPreservesAllLiveKeys) {
     db_->remove("k" + std::to_string(i));
   }
 
-  db_->compact();
+  (void)db_->compact();
 
   EXPECT_EQ(db_->key_count(), 50u);
   for (int i = 50; i < 100; ++i) {
@@ -374,7 +374,7 @@ TEST_F(FluxenTest, CompactRemovesDeletedKeys) {
     db_->remove("k" + std::to_string(i));
   }
 
-  db_->compact();
+  (void)db_->compact();
 
   for (int i = 0; i < 50; ++i) {
     EXPECT_FALSE(db_->has("k" + std::to_string(i)));
@@ -386,7 +386,7 @@ TEST_F(FluxenTest, CompactedDataPersistsAcrossReopen) {
   db_->put("b", "drop");
   db_->put("c", "keep");
   db_->remove("b");
-  db_->compact();
+  (void)db_->compact();
 
   reopen();
 
@@ -405,7 +405,7 @@ TEST_F(FluxenTest, CompactWithOverwrittenKeys) {
   }
 
   size_t before = db_->file_size();
-  db_->compact();
+  (void)db_->compact();
 
   EXPECT_LT(db_->file_size(), before);
   for (int i = 0; i < 50; ++i) {

@@ -19,7 +19,7 @@ class FluxenConcurrentTest : public ::testing::Test {
 protected:
   void SetUp() override {
     path_ = make_temp_path("concurrent");
-    db_ = std::make_unique<fluxen::DB>(path_.string());
+    db_   = std::make_unique<fluxen::DB>(path_.string());
   }
 
   void TearDown() override {
@@ -135,7 +135,7 @@ TEST_F(FluxenConcurrentTest, ConcurrentWritersDoNotCorruptData) {
   db_->put("n", int32_t{0});
 
   constexpr int kThreads = 8;
-  constexpr int kWrites = 50;
+  constexpr int kWrites  = 50;
   std::latch start{kThreads};
 
   std::vector<std::thread> threads;
@@ -280,7 +280,7 @@ TEST_F(FluxenConcurrentTest, CompactUnderConcurrentReadsCompletesCleanly) {
   }
 
   std::this_thread::sleep_for(2ms);
-  db_->compact();
+  (void)db_->compact();
   stop.store(true);
 
   for (auto &t : readers)
@@ -295,7 +295,7 @@ TEST_F(FluxenConcurrentTest, ReadAfterCompactSeesCorrectData) {
   db_->put("live", std::string("yes"));
   db_->put("dead", std::string("no"));
   db_->remove("dead");
-  db_->compact();
+  (void)db_->compact();
 
   constexpr int kThreads = 8;
   std::latch start{kThreads};

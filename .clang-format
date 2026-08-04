@@ -4,7 +4,7 @@ AlignAfterOpenBracket: true
 AccessModifierOffset: -2
 AlignArrayOfStructures: None
 AlignConsecutiveAssignments:
-  Enabled:         false
+  Enabled:         true
   AcrossEmptyLines: false
   AcrossComments:  false
   AlignCompound:   false

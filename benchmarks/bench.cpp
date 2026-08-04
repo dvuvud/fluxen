@@ -1,66 +1,62 @@
-#include "tests/test_helpers.hpp"
 #include "fluxen.hpp"
+#include "tests/test_helpers.hpp"
 
 #include <benchmark/benchmark.h>
 #include <sqlite3.h>
 
-#include <cstdint>
-#include <string>
-#include <vector>
 #include <algorithm>
+#include <cstdint>
 #include <numeric>
 #include <random>
+#include <string>
+#include <vector>
 
 namespace {
 
-auto make_keys(int n) -> std::vector<std::string> {
-    std::vector<std::string> keys;
-    keys.reserve(n);
-    for (int i = 0; i < n; ++i) {
-        keys.push_back("key:" + std::to_string(i));
-    }
-    return keys;
+std::vector<std::string> make_keys(int n) {
+  std::vector<std::string> keys;
+  keys.reserve(n);
+  for (int i = 0; i < n; ++i) {
+    keys.push_back("key:" + std::to_string(i));
+  }
+  return keys;
 }
 
-auto make_values(int n) -> std::vector<std::string> {
-    std::vector<std::string> vals;
-    vals.reserve(n);
-    for (int i = 0; i < n; ++i) {
-        vals.push_back("value:" + std::to_string(i));
-    }
-    return vals;
+std::vector<std::string> make_values(int n) {
+  std::vector<std::string> vals;
+  vals.reserve(n);
+  for (int i = 0; i < n; ++i) {
+    vals.push_back("value:" + std::to_string(i));
+  }
+  return vals;
 }
 
 /**
  * SQLite in WAL mode with synchronous=OFF. No fsyncs on individual writes
  * which matches fluxen's bare put().
  */
-auto open_sqlite_no_sync(const std::string& path) -> sqlite3* {
-    sqlite3* db = nullptr;
-    sqlite3_open(path.c_str(), &db);
-    sqlite3_exec(
-        db,
-        "PRAGMA journal_mode=WAL;"
-        "PRAGMA synchronous=OFF;",
-        nullptr, nullptr, nullptr
-    );
-    return db;
+sqlite3 *open_sqlite_no_sync(const std::string &path) {
+  sqlite3 *db = nullptr;
+  sqlite3_open(path.c_str(), &db);
+  sqlite3_exec(db,
+               "PRAGMA journal_mode=WAL;"
+               "PRAGMA synchronous=OFF;",
+               nullptr, nullptr, nullptr);
+  return db;
 }
 
 /**
  * SQLite in WAL mode with synchronous=NORMAL. Checkpoints sync but individual
  * commits don't. Matches fluxen's transaction(), which fsyncs once at the end.
  */
-auto open_sqlite_normal_sync(const std::string& path) -> sqlite3* {
-    sqlite3* db = nullptr;
-    sqlite3_open(path.c_str(), &db);
-    sqlite3_exec(
-        db,
-        "PRAGMA journal_mode=WAL;"
-        "PRAGMA synchronous=NORMAL;",
-        nullptr, nullptr, nullptr
-    );
-    return db;
+sqlite3 *open_sqlite_normal_sync(const std::string &path) {
+  sqlite3 *db = nullptr;
+  sqlite3_open(path.c_str(), &db);
+  sqlite3_exec(db,
+               "PRAGMA journal_mode=WAL;"
+               "PRAGMA synchronous=NORMAL;",
+               nullptr, nullptr, nullptr);
+  return db;
 }
 
 } // namespace
@@ -73,63 +69,57 @@ auto open_sqlite_normal_sync(const std::string& path) -> sqlite3* {
  * Baseline cost of a single put in each system.
  */
 
-static void BM_fluxen_SequentialWrite(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_SequentialWrite(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("write");
-        {
-            fluxen::DB db(path);
-            for (int i = 0; i < n; ++i) {
-                db.put(keys[i], vals[i]);
-            }
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+  for (auto _ : state) {
+    auto path = make_temp_path("write");
+    {
+      fluxen::DB db(path);
+      for (int i = 0; i < n; ++i) {
+        db.put(keys[i], vals[i]);
+      }
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-static void BM_SQLite_SequentialWrite(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_SQLite_SequentialWrite(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("sqlite_write.db");
-        {
-            sqlite3* db = open_sqlite_no_sync(path);
-            sqlite3_exec(
-                db,
-                "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);",
-                nullptr, nullptr, nullptr
-            );
+  for (auto _ : state) {
+    auto path = make_temp_path("sqlite_write.db");
+    {
+      sqlite3 *db = open_sqlite_no_sync(path);
+      sqlite3_exec(db, "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);", nullptr,
+                   nullptr, nullptr);
 
-            sqlite3_stmt* stmt = nullptr;
-            sqlite3_prepare_v2(
-                db,
-                "INSERT INTO kv (k, v) VALUES (?, ?);",
-                -1, &stmt, nullptr
-            );
+      sqlite3_stmt *stmt = nullptr;
+      sqlite3_prepare_v2(db, "INSERT INTO kv (k, v) VALUES (?, ?);", -1, &stmt,
+                         nullptr);
 
-            for (int i = 0; i < n; ++i) {
-                sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_step(stmt);
-                sqlite3_reset(stmt);
-            }
+      for (int i = 0; i < n; ++i) {
+        sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+      }
 
-            sqlite3_finalize(stmt);
-            sqlite3_close(db);
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+      sqlite3_finalize(stmt);
+      sqlite3_close(db);
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 /**
@@ -141,150 +131,139 @@ static void BM_SQLite_SequentialWrite(benchmark::State& state) {
  * synchronous=NORMAL which also syncs at checkpoint but not per-commit.
  */
 
-static void BM_fluxen_BulkWrite(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_BulkWrite(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("bulk");
-        {
-            fluxen::DB db(path);
-            db.transaction([&](fluxen::Tx& tx) -> fluxen::TxResult {
-                for (int i = 0; i < n; ++i) {
-                    tx.put(keys[i], vals[i]);
-                }
-                return fluxen::commit;
-            });
+  for (auto _ : state) {
+    auto path = make_temp_path("bulk");
+    {
+      fluxen::DB db(path);
+      db.transaction([&](fluxen::Tx &tx) {
+        for (int i = 0; i < n; ++i) {
+          tx.put(keys[i], vals[i]);
         }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+        return fluxen::commit;
+      });
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-static void BM_SQLite_BulkWrite(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_SQLite_BulkWrite(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("sqlite_bulk.db");
-        {
-            sqlite3* db = open_sqlite_normal_sync(path);
-            sqlite3_exec(
-                db,
-                "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);",
-                nullptr, nullptr, nullptr
-            );
+  for (auto _ : state) {
+    auto path = make_temp_path("sqlite_bulk.db");
+    {
+      sqlite3 *db = open_sqlite_normal_sync(path);
+      sqlite3_exec(db, "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);", nullptr,
+                   nullptr, nullptr);
 
-            sqlite3_stmt* stmt = nullptr;
-            sqlite3_prepare_v2(
-                db,
-                "INSERT INTO kv (k, v) VALUES (?, ?);",
-                -1, &stmt, nullptr
-            );
+      sqlite3_stmt *stmt = nullptr;
+      sqlite3_prepare_v2(db, "INSERT INTO kv (k, v) VALUES (?, ?);", -1, &stmt,
+                         nullptr);
 
-            sqlite3_exec(db, "BEGIN;", nullptr, nullptr, nullptr);
-            for (int i = 0; i < n; ++i) {
-                sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_step(stmt);
-                sqlite3_reset(stmt);
-            }
-            sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
+      sqlite3_exec(db, "BEGIN;", nullptr, nullptr, nullptr);
+      for (int i = 0; i < n; ++i) {
+        sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+      }
+      sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
 
-            sqlite3_finalize(stmt);
-            sqlite3_close(db);
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+      sqlite3_finalize(stmt);
+      sqlite3_close(db);
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 /**
  * Sequential Read
  *
  * DB is pre-loaded and the connection is open before the clock starts.
- * Pure read throughput with no open cost and no index rebuild paid during timing.
+ * Pure read throughput with no open cost and no index rebuild paid during
+ * timing.
  */
 
-static void BM_fluxen_SequentialRead(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_SequentialRead(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    auto path = make_temp_path("read");
-    {
-        fluxen::DB setup(path);
-        for (int i = 0; i < n; ++i) {
-            setup.put(keys[i], vals[i]);
-        }
+  auto path = make_temp_path("read");
+  {
+    fluxen::DB setup(path);
+    for (int i = 0; i < n; ++i) {
+      setup.put(keys[i], vals[i]);
     }
+  }
 
-    fluxen::DB db(path);
-    for (auto _ : state) {
-        for (int i = 0; i < n; ++i) {
-            benchmark::DoNotOptimize(db.get(keys[i]));
-        }
+  fluxen::DB db(path);
+  for (auto _ : state) {
+    for (int i = 0; i < n; ++i) {
+      benchmark::DoNotOptimize(db.get(keys[i]));
     }
+  }
 
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-static void BM_SQLite_SequentialRead(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
-    auto path = make_temp_path("sqlite_read.db");
+static void BM_SQLite_SequentialRead(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
+  auto path   = make_temp_path("sqlite_read.db");
 
-    {
-        sqlite3* db = open_sqlite_no_sync(path);
-        sqlite3_exec(
-            db,
-            "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);",
-            nullptr, nullptr, nullptr
-        );
-        sqlite3_exec(db, "BEGIN;", nullptr, nullptr, nullptr);
-        sqlite3_stmt* ins = nullptr;
-        sqlite3_prepare_v2(
-            db,
-            "INSERT INTO kv (k, v) VALUES (?, ?);",
-            -1, &ins, nullptr
-        );
-        for (int i = 0; i < n; ++i) {
-            sqlite3_bind_text(ins, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(ins, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-            sqlite3_step(ins);
-            sqlite3_reset(ins);
-        }
-        sqlite3_finalize(ins);
-        sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
-        sqlite3_close(db);
+  {
+    sqlite3 *db = open_sqlite_no_sync(path);
+    sqlite3_exec(db, "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);", nullptr,
+                 nullptr, nullptr);
+    sqlite3_exec(db, "BEGIN;", nullptr, nullptr, nullptr);
+    sqlite3_stmt *ins = nullptr;
+    sqlite3_prepare_v2(db, "INSERT INTO kv (k, v) VALUES (?, ?);", -1, &ins,
+                       nullptr);
+    for (int i = 0; i < n; ++i) {
+      sqlite3_bind_text(ins, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+      sqlite3_bind_text(ins, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+      sqlite3_step(ins);
+      sqlite3_reset(ins);
     }
-
-    sqlite3* db = open_sqlite_normal_sync(path);
-    sqlite3_stmt* sel = nullptr;
-    sqlite3_prepare_v2(db, "SELECT v FROM kv WHERE k = ?;", -1, &sel, nullptr);
-
-    for (auto _ : state) {
-        for (int i = 0; i < n; ++i) {
-            sqlite3_bind_text(sel, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-            if (sqlite3_step(sel) == SQLITE_ROW) {
-                benchmark::DoNotOptimize(sqlite3_column_text(sel, 0));
-            }
-            sqlite3_reset(sel);
-        }
-    }
-
-    sqlite3_finalize(sel);
+    sqlite3_finalize(ins);
+    sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
     sqlite3_close(db);
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  }
+
+  sqlite3 *db       = open_sqlite_normal_sync(path);
+  sqlite3_stmt *sel = nullptr;
+  sqlite3_prepare_v2(db, "SELECT v FROM kv WHERE k = ?;", -1, &sel, nullptr);
+
+  for (auto _ : state) {
+    for (int i = 0; i < n; ++i) {
+      sqlite3_bind_text(sel, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+      if (sqlite3_step(sel) == SQLITE_ROW) {
+        benchmark::DoNotOptimize(sqlite3_column_text(sel, 0));
+      }
+      sqlite3_reset(sel);
+    }
+  }
+
+  sqlite3_finalize(sel);
+  sqlite3_close(db);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 /**
@@ -294,85 +273,82 @@ static void BM_SQLite_SequentialRead(benchmark::State& state) {
  * cache locality. The shuffle is fixed-seed so results are reproducible.
  */
 
-static void BM_fluxen_RandomRead(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_RandomRead(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    std::vector<int> order(n);
-    std::iota(order.begin(), order.end(), 0);
-    std::mt19937 rng(42);
-    std::shuffle(order.begin(), order.end(), rng);
+  std::vector<int> order(n);
+  std::iota(order.begin(), order.end(), 0);
+  std::mt19937 rng(42);
+  std::shuffle(order.begin(), order.end(), rng);
 
-    auto path = make_temp_path("rread");
-    {
-        fluxen::DB setup(path);
-        for (int i = 0; i < n; ++i) {
-            setup.put(keys[i], vals[i]);
-        }
+  auto path = make_temp_path("rread");
+  {
+    fluxen::DB setup(path);
+    for (int i = 0; i < n; ++i) {
+      setup.put(keys[i], vals[i]);
     }
+  }
 
-    fluxen::DB db(path);
-    for (auto _ : state) {
-        for (int idx : order) {
-            benchmark::DoNotOptimize(db.get(keys[idx]));
-        }
+  fluxen::DB db(path);
+  for (auto _ : state) {
+    for (int idx : order) {
+      benchmark::DoNotOptimize(db.get(keys[idx]));
     }
+  }
 
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-static void BM_SQLite_RandomRead(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_SQLite_RandomRead(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    std::vector<int> order(n);
-    std::iota(order.begin(), order.end(), 0);
-    std::mt19937 rng(42);
-    std::shuffle(order.begin(), order.end(), rng);
+  std::vector<int> order(n);
+  std::iota(order.begin(), order.end(), 0);
+  std::mt19937 rng(42);
+  std::shuffle(order.begin(), order.end(), rng);
 
-    auto path = make_temp_path("sqlite_rread.db");
-    {
-        sqlite3* tmp = open_sqlite_no_sync(path);
-        sqlite3_exec(
-            tmp,
-            "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);",
-            nullptr, nullptr, nullptr
-        );
-        sqlite3_exec(tmp, "BEGIN;", nullptr, nullptr, nullptr);
-        sqlite3_stmt* ins = nullptr;
-        sqlite3_prepare_v2(tmp, "INSERT INTO kv VALUES (?, ?);", -1, &ins, nullptr);
-        for (int i = 0; i < n; ++i) {
-            sqlite3_bind_text(ins, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(ins, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-            sqlite3_step(ins);
-            sqlite3_reset(ins);
-        }
-        sqlite3_finalize(ins);
-        sqlite3_exec(tmp, "COMMIT;", nullptr, nullptr, nullptr);
-        sqlite3_close(tmp);
+  auto path = make_temp_path("sqlite_rread.db");
+  {
+    sqlite3 *tmp = open_sqlite_no_sync(path);
+    sqlite3_exec(tmp, "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);", nullptr,
+                 nullptr, nullptr);
+    sqlite3_exec(tmp, "BEGIN;", nullptr, nullptr, nullptr);
+    sqlite3_stmt *ins = nullptr;
+    sqlite3_prepare_v2(tmp, "INSERT INTO kv VALUES (?, ?);", -1, &ins, nullptr);
+    for (int i = 0; i < n; ++i) {
+      sqlite3_bind_text(ins, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+      sqlite3_bind_text(ins, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+      sqlite3_step(ins);
+      sqlite3_reset(ins);
     }
+    sqlite3_finalize(ins);
+    sqlite3_exec(tmp, "COMMIT;", nullptr, nullptr, nullptr);
+    sqlite3_close(tmp);
+  }
 
-    sqlite3* db = open_sqlite_normal_sync(path);
-    sqlite3_stmt* sel = nullptr;
-    sqlite3_prepare_v2(db, "SELECT v FROM kv WHERE k = ?;", -1, &sel, nullptr);
+  sqlite3 *db       = open_sqlite_normal_sync(path);
+  sqlite3_stmt *sel = nullptr;
+  sqlite3_prepare_v2(db, "SELECT v FROM kv WHERE k = ?;", -1, &sel, nullptr);
 
-    for (auto _ : state) {
-        for (int idx : order) {
-            sqlite3_bind_text(sel, 1, keys[idx].c_str(), -1, SQLITE_STATIC);
-            if (sqlite3_step(sel) == SQLITE_ROW) {
-                benchmark::DoNotOptimize(sqlite3_column_text(sel, 0));
-            }
-            sqlite3_reset(sel);
-        }
+  for (auto _ : state) {
+    for (int idx : order) {
+      sqlite3_bind_text(sel, 1, keys[idx].c_str(), -1, SQLITE_STATIC);
+      if (sqlite3_step(sel) == SQLITE_ROW) {
+        benchmark::DoNotOptimize(sqlite3_column_text(sel, 0));
+      }
+      sqlite3_reset(sel);
     }
+  }
 
-    sqlite3_finalize(sel);
-    sqlite3_close(db);
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  sqlite3_finalize(sel);
+  sqlite3_close(db);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 /**
@@ -382,72 +358,66 @@ static void BM_SQLite_RandomRead(benchmark::State& state) {
  * handles overwrites and SQLite uses INSERT OR REPLACE.
  */
 
-static void BM_fluxen_Overwrite(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_Overwrite(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("overwrite");
-        {
-            fluxen::DB db(path);
-            for (int i = 0; i < n; ++i) {
-                db.put(keys[i], vals[i]);
-            }
-            for (int i = 0; i < n; ++i) {
-                db.put(keys[i], vals[i]);
-            }
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+  for (auto _ : state) {
+    auto path = make_temp_path("overwrite");
+    {
+      fluxen::DB db(path);
+      for (int i = 0; i < n; ++i) {
+        db.put(keys[i], vals[i]);
+      }
+      for (int i = 0; i < n; ++i) {
+        db.put(keys[i], vals[i]);
+      }
     }
-    state.SetItemsProcessed(state.iterations() * n * 2);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n * 2);
 }
 
-static void BM_SQLite_Overwrite(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_SQLite_Overwrite(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("sqlite_ovw.db");
-        {
-            sqlite3* db = open_sqlite_no_sync(path);
-            sqlite3_exec(
-                db,
-                "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);",
-                nullptr, nullptr, nullptr
-            );
+  for (auto _ : state) {
+    auto path = make_temp_path("sqlite_ovw.db");
+    {
+      sqlite3 *db = open_sqlite_no_sync(path);
+      sqlite3_exec(db, "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);", nullptr,
+                   nullptr, nullptr);
 
-            sqlite3_stmt* stmt = nullptr;
-            sqlite3_prepare_v2(
-                db,
-                "INSERT OR REPLACE INTO kv VALUES (?, ?);",
-                -1, &stmt, nullptr
-            );
+      sqlite3_stmt *stmt = nullptr;
+      sqlite3_prepare_v2(db, "INSERT OR REPLACE INTO kv VALUES (?, ?);", -1,
+                         &stmt, nullptr);
 
-            for (int i = 0; i < n; ++i) {
-                sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_step(stmt);
-                sqlite3_reset(stmt);
-            }
-            for (int i = 0; i < n; ++i) {
-                sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_step(stmt);
-                sqlite3_reset(stmt);
-            }
+      for (int i = 0; i < n; ++i) {
+        sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+      }
+      for (int i = 0; i < n; ++i) {
+        sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+      }
 
-            sqlite3_finalize(stmt);
-            sqlite3_close(db);
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+      sqlite3_finalize(stmt);
+      sqlite3_close(db);
     }
-    state.SetItemsProcessed(state.iterations() * n * 2);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n * 2);
 }
 
 /**
@@ -458,167 +428,177 @@ static void BM_SQLite_Overwrite(benchmark::State& state) {
  * sides comparable startup work.
  */
 
-static void BM_fluxen_Open(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_Open(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    auto path = make_temp_path("open");
-    {
-        fluxen::DB setup(path);
-        for (int i = 0; i < n; ++i) {
-            setup.put(keys[i], vals[i]);
-        }
+  auto path = make_temp_path("open");
+  {
+    fluxen::DB setup(path);
+    for (int i = 0; i < n; ++i) {
+      setup.put(keys[i], vals[i]);
     }
+  }
 
-    for (auto _ : state) {
-        fluxen::DB db(path);
-        benchmark::DoNotOptimize(db.key_count());
-    }
+  for (auto _ : state) {
+    fluxen::DB db(path);
+    benchmark::DoNotOptimize(db.key_count());
+  }
 
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-static void BM_SQLite_Open(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
-    auto path = make_temp_path("sqlite_open.db");
+static void BM_SQLite_Open(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
+  auto path   = make_temp_path("sqlite_open.db");
 
-    {
-        sqlite3* tmp = open_sqlite_no_sync(path);
-        sqlite3_exec(
-            tmp,
-            "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);",
-            nullptr, nullptr, nullptr
-        );
-        sqlite3_exec(tmp, "BEGIN;", nullptr, nullptr, nullptr);
-        sqlite3_stmt* stmt = nullptr;
-        sqlite3_prepare_v2(tmp, "INSERT INTO kv VALUES (?, ?);", -1, &stmt, nullptr);
-        for (int i = 0; i < n; ++i) {
-            sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-            sqlite3_step(stmt);
-            sqlite3_reset(stmt);
-        }
-        sqlite3_finalize(stmt);
-        sqlite3_exec(tmp, "COMMIT;", nullptr, nullptr, nullptr);
-        sqlite3_close(tmp);
+  {
+    sqlite3 *tmp = open_sqlite_no_sync(path);
+    sqlite3_exec(tmp, "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);", nullptr,
+                 nullptr, nullptr);
+    sqlite3_exec(tmp, "BEGIN;", nullptr, nullptr, nullptr);
+    sqlite3_stmt *stmt = nullptr;
+    sqlite3_prepare_v2(tmp, "INSERT INTO kv VALUES (?, ?);", -1, &stmt,
+                       nullptr);
+    for (int i = 0; i < n; ++i) {
+      sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+      sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+      sqlite3_step(stmt);
+      sqlite3_reset(stmt);
     }
+    sqlite3_finalize(stmt);
+    sqlite3_exec(tmp, "COMMIT;", nullptr, nullptr, nullptr);
+    sqlite3_close(tmp);
+  }
 
-    for (auto _ : state) {
-        sqlite3* db = nullptr;
-        sqlite3_open(path.c_str(), &db);
-        sqlite3_stmt* stmt = nullptr;
-        sqlite3_prepare_v2(db, "SELECT k, v FROM kv;", -1, &stmt, nullptr);
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-            benchmark::DoNotOptimize(sqlite3_column_text(stmt, 0));
-            benchmark::DoNotOptimize(sqlite3_column_text(stmt, 1));
-        }
-        sqlite3_finalize(stmt);
-        sqlite3_close(db);
+  for (auto _ : state) {
+    sqlite3 *db = nullptr;
+    sqlite3_open(path.c_str(), &db);
+    sqlite3_stmt *stmt = nullptr;
+    sqlite3_prepare_v2(db, "SELECT k, v FROM kv;", -1, &stmt, nullptr);
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      benchmark::DoNotOptimize(sqlite3_column_text(stmt, 0));
+      benchmark::DoNotOptimize(sqlite3_column_text(stmt, 1));
     }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+  }
 
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 // Compaction
 
-static void BM_fluxen_Compact(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_Compact(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("compact");
+  for (auto _ : state) {
+    auto path = make_temp_path("compact");
 
-        state.PauseTiming();
-        {
-            fluxen::DB db(path);
-            for (int i = 0; i < n; ++i) {
-                db.put(keys[i], vals[i]);
-            }
-            for (int i = 0; i < n / 2; ++i) {
-                db.remove(keys[i]);
-            }
-        }
-        {
-            fluxen::DB db(path);
-            state.ResumeTiming();
-            db.compact();
-        }
-
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+    state.PauseTiming();
+    {
+      fluxen::DB db(path);
+      for (int i = 0; i < n; ++i) {
+        db.put(keys[i], vals[i]);
+      }
+      for (int i = 0; i < n / 2; ++i) {
+        db.remove(keys[i]);
+      }
     }
+    {
+      fluxen::DB db(path);
+      state.ResumeTiming();
+      (void)db.compact();
+    }
+
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
 }
 
 /**
  * Struct Write: storing a fixed-size struct as raw bytes, one write at a time.
  */
 
-static void BM_fluxen_StructWrite(benchmark::State& state) {
-    struct Player { int32_t score; float x, y; bool active; char pad[3]; };
-    const int n = state.range(0);
-    auto keys = make_keys(n);
+static void BM_fluxen_StructWrite(benchmark::State &state) {
+  struct Player {
+    int32_t score;
+    float x, y;
+    bool active;
+    char pad[3];
+  };
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("struct");
-        {
-            fluxen::DB db(path);
-            for (int i = 0; i < n; ++i) {
-                db.put(keys[i], Player{.score=i, .x=float(i), .y=float(i), .active=true, .pad={}});
-            }
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+  for (auto _ : state) {
+    auto path = make_temp_path("struct");
+    {
+      fluxen::DB db(path);
+      for (int i = 0; i < n; ++i) {
+        db.put(keys[i], Player{.score  = i,
+                               .x      = float(i),
+                               .y      = float(i),
+                               .active = true,
+                               .pad    = {}});
+      }
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-struct Player { int32_t score; float x, y; bool active; char pad[3]; };
+struct Player {
+  int32_t score;
+  float x, y;
+  bool active;
+  char pad[3];
+};
 
-static void BM_SQLite_StructWrite(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
+static void BM_SQLite_StructWrite(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("sqlite_struct.db");
-        {
-            sqlite3* db = open_sqlite_no_sync(path);
-            sqlite3_exec(
-                db,
-                "CREATE TABLE kv (k TEXT PRIMARY KEY, v BLOB);",
-                nullptr, nullptr, nullptr
-            );
+  for (auto _ : state) {
+    auto path = make_temp_path("sqlite_struct.db");
+    {
+      sqlite3 *db = open_sqlite_no_sync(path);
+      sqlite3_exec(db, "CREATE TABLE kv (k TEXT PRIMARY KEY, v BLOB);", nullptr,
+                   nullptr, nullptr);
 
-            sqlite3_stmt* stmt = nullptr;
-            sqlite3_prepare_v2(
-                db,
-                "INSERT INTO kv VALUES (?, ?);",
-                -1, &stmt, nullptr
-            );
+      sqlite3_stmt *stmt = nullptr;
+      sqlite3_prepare_v2(db, "INSERT INTO kv VALUES (?, ?);", -1, &stmt,
+                         nullptr);
 
-            for (int i = 0; i < n; ++i) {
-                Player p{.score=i, .x=float(i), .y=float(i), .active=true, .pad={}};
-                sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_bind_blob(stmt, 2, &p, sizeof(Player), SQLITE_STATIC);
-                sqlite3_step(stmt);
-                sqlite3_reset(stmt);
-            }
+      for (int i = 0; i < n; ++i) {
+        Player p{.score  = i,
+                 .x      = float(i),
+                 .y      = float(i),
+                 .active = true,
+                 .pad    = {}};
+        sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_blob(stmt, 2, &p, sizeof(Player), SQLITE_STATIC);
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+      }
 
-            sqlite3_finalize(stmt);
-            sqlite3_close(db);
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+      sqlite3_finalize(stmt);
+      sqlite3_close(db);
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 /**
@@ -626,78 +606,85 @@ static void BM_SQLite_StructWrite(benchmark::State& state) {
  * clock starts on both sides.
  */
 
-static void BM_fluxen_StructRead(benchmark::State& state) {
-    struct Player { int32_t score; float x, y; bool active; char pad[3]; };
-    const int n = state.range(0);
-    auto keys = make_keys(n);
+static void BM_fluxen_StructRead(benchmark::State &state) {
+  struct Player {
+    int32_t score;
+    float x, y;
+    bool active;
+    char pad[3];
+  };
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
 
-    auto path = make_temp_path("sread");
-    {
-        fluxen::DB setup(path);
-        for (int i = 0; i < n; ++i) {
-            setup.put(keys[i], Player{.score=i, .x=float(i), .y=float(i), .active=true, .pad={}});
-        }
+  auto path = make_temp_path("sread");
+  {
+    fluxen::DB setup(path);
+    for (int i = 0; i < n; ++i) {
+      setup.put(keys[i], Player{.score  = i,
+                                .x      = float(i),
+                                .y      = float(i),
+                                .active = true,
+                                .pad    = {}});
     }
+  }
 
-    fluxen::DB db(path);
-    for (auto _ : state) {
-        for (int i = 0; i < n; ++i) {
-            benchmark::DoNotOptimize(db.get<Player>(keys[i]));
-        }
+  fluxen::DB db(path);
+  for (auto _ : state) {
+    for (int i = 0; i < n; ++i) {
+      benchmark::DoNotOptimize(db.get<Player>(keys[i]));
     }
+  }
 
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-static void BM_SQLite_StructRead(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto path = make_temp_path("sqlite_sread.db");
+static void BM_SQLite_StructRead(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto path   = make_temp_path("sqlite_sread.db");
 
-    {
-        sqlite3* tmp = open_sqlite_no_sync(path);
-        sqlite3_exec(
-            tmp,
-            "CREATE TABLE kv (k TEXT PRIMARY KEY, v BLOB);",
-            nullptr, nullptr, nullptr
-        );
-        sqlite3_exec(tmp, "BEGIN;", nullptr, nullptr, nullptr);
-        sqlite3_stmt* ins = nullptr;
-        sqlite3_prepare_v2(tmp, "INSERT INTO kv VALUES (?, ?);", -1, &ins, nullptr);
-        for (int i = 0; i < n; ++i) {
-            Player p{.score=i, .x=float(i), .y=float(i), .active=true, .pad={}};
-            sqlite3_bind_text(ins, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_blob(ins, 2, &p, sizeof(Player), SQLITE_STATIC);
-            sqlite3_step(ins);
-            sqlite3_reset(ins);
-        }
-        sqlite3_finalize(ins);
-        sqlite3_exec(tmp, "COMMIT;", nullptr, nullptr, nullptr);
-        sqlite3_close(tmp);
+  {
+    sqlite3 *tmp = open_sqlite_no_sync(path);
+    sqlite3_exec(tmp, "CREATE TABLE kv (k TEXT PRIMARY KEY, v BLOB);", nullptr,
+                 nullptr, nullptr);
+    sqlite3_exec(tmp, "BEGIN;", nullptr, nullptr, nullptr);
+    sqlite3_stmt *ins = nullptr;
+    sqlite3_prepare_v2(tmp, "INSERT INTO kv VALUES (?, ?);", -1, &ins, nullptr);
+    for (int i = 0; i < n; ++i) {
+      Player p{
+          .score = i, .x = float(i), .y = float(i), .active = true, .pad = {}};
+      sqlite3_bind_text(ins, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+      sqlite3_bind_blob(ins, 2, &p, sizeof(Player), SQLITE_STATIC);
+      sqlite3_step(ins);
+      sqlite3_reset(ins);
     }
+    sqlite3_finalize(ins);
+    sqlite3_exec(tmp, "COMMIT;", nullptr, nullptr, nullptr);
+    sqlite3_close(tmp);
+  }
 
-    sqlite3* db = open_sqlite_normal_sync(path);
-    sqlite3_stmt* sel = nullptr;
-    sqlite3_prepare_v2(db, "SELECT v FROM kv WHERE k = ?;", -1, &sel, nullptr);
+  sqlite3 *db       = open_sqlite_normal_sync(path);
+  sqlite3_stmt *sel = nullptr;
+  sqlite3_prepare_v2(db, "SELECT v FROM kv WHERE k = ?;", -1, &sel, nullptr);
 
-    for (auto _ : state) {
-        for (int i = 0; i < n; ++i) {
-            sqlite3_bind_text(sel, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-            if (sqlite3_step(sel) == SQLITE_ROW) {
-                const void* blob = sqlite3_column_blob(sel, 0);
-                Player p{};
-                std::memcpy(&p, blob, sizeof(Player));
-                benchmark::DoNotOptimize(p);
-            }
-            sqlite3_reset(sel);
-        }
+  for (auto _ : state) {
+    for (int i = 0; i < n; ++i) {
+      sqlite3_bind_text(sel, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+      if (sqlite3_step(sel) == SQLITE_ROW) {
+        const void *blob = sqlite3_column_blob(sel, 0);
+        Player p{};
+        std::memcpy(&p, blob, sizeof(Player));
+        benchmark::DoNotOptimize(p);
+      }
+      sqlite3_reset(sel);
     }
+  }
 
-    sqlite3_finalize(sel);
-    sqlite3_close(db);
-    std::filesystem::remove(path);
-    state.SetItemsProcessed(state.iterations() * n);
+  sqlite3_finalize(sel);
+  sqlite3_close(db);
+  std::filesystem::remove(path);
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 /**
@@ -708,68 +695,62 @@ static void BM_SQLite_StructRead(benchmark::State& state) {
  * closely matched durability level.
  */
 
-static void BM_fluxen_Transaction(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_fluxen_Transaction(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("tx");
-        {
-            fluxen::DB db(path);
-            db.transaction([&](fluxen::Tx& tx) -> fluxen::TxResult {
-                for (int i = 0; i < n; ++i) {
-                    tx.put(keys[i], vals[i]);
-                }
-                return fluxen::commit;
-            });
+  for (auto _ : state) {
+    auto path = make_temp_path("tx");
+    {
+      fluxen::DB db(path);
+      db.transaction([&](fluxen::Tx &tx) {
+        for (int i = 0; i < n; ++i) {
+          tx.put(keys[i], vals[i]);
         }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+        return fluxen::commit;
+      });
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
-static void BM_SQLite_Transaction(benchmark::State& state) {
-    const int n = state.range(0);
-    auto keys = make_keys(n);
-    auto vals = make_values(n);
+static void BM_SQLite_Transaction(benchmark::State &state) {
+  const int n = state.range(0);
+  auto keys   = make_keys(n);
+  auto vals   = make_values(n);
 
-    for (auto _ : state) {
-        auto path = make_temp_path("sqlite_tx.db");
-        {
-            sqlite3* db = open_sqlite_normal_sync(path);
-            sqlite3_exec(
-                db,
-                "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);",
-                nullptr, nullptr, nullptr
-            );
+  for (auto _ : state) {
+    auto path = make_temp_path("sqlite_tx.db");
+    {
+      sqlite3 *db = open_sqlite_normal_sync(path);
+      sqlite3_exec(db, "CREATE TABLE kv (k TEXT PRIMARY KEY, v TEXT);", nullptr,
+                   nullptr, nullptr);
 
-            sqlite3_stmt* stmt = nullptr;
-            sqlite3_prepare_v2(
-                db,
-                "INSERT INTO kv VALUES (?, ?);",
-                -1, &stmt, nullptr
-            );
+      sqlite3_stmt *stmt = nullptr;
+      sqlite3_prepare_v2(db, "INSERT INTO kv VALUES (?, ?);", -1, &stmt,
+                         nullptr);
 
-            sqlite3_exec(db, "BEGIN;", nullptr, nullptr, nullptr);
-            for (int i = 0; i < n; ++i) {
-                sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
-                sqlite3_step(stmt);
-                sqlite3_reset(stmt);
-            }
-            sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
+      sqlite3_exec(db, "BEGIN;", nullptr, nullptr, nullptr);
+      for (int i = 0; i < n; ++i) {
+        sqlite3_bind_text(stmt, 1, keys[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, vals[i].c_str(), -1, SQLITE_STATIC);
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+      }
+      sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
 
-            sqlite3_finalize(stmt);
-            sqlite3_close(db);
-        }
-        state.PauseTiming();
-        std::filesystem::remove(path);
-        state.ResumeTiming();
+      sqlite3_finalize(stmt);
+      sqlite3_close(db);
     }
-    state.SetItemsProcessed(state.iterations() * n);
+    state.PauseTiming();
+    std::filesystem::remove(path);
+    state.ResumeTiming();
+  }
+  state.SetItemsProcessed(state.iterations() * n);
 }
 
 // registration
